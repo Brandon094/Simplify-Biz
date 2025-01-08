@@ -27,7 +27,7 @@ La aplicación incluye el **Java Development Kit (JDK) 17** necesario para su ej
      ```
    - Deberías ver una salida que muestre la versión de Java instalada, algo como:
      ```bash
-     java version "1.1.0"
+     java version "17.0.13"
      ```
 ## Base de datos
 
