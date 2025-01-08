@@ -14,12 +14,12 @@ La aplicación incluye el **Java Development Kit (JDK) 17** necesario para su ej
 
 2. **Ejecutar la aplicación:**
    - Abre la carpeta donde descargaste el proyecto.
-   - Haz doble clic en el archivo `Simplify_Biz-17.0.jar` para iniciar la aplicación.
+   - Haz doble clic en el archivo `Simplify_Biz-1.1.0.jar` para iniciar la aplicación.
 
 3. **Desde la terminal (opcional):**
    - Si prefieres usar la terminal, navega hasta la ubicación del archivo `.jar` y ejecuta:
      ```bash
-     java -jar Simplify_Biz-17.0.jar
+     java -jar Simplify_Biz-1.1.0.jar
      ```
 
 ## Base de datos
