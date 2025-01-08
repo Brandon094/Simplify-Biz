@@ -1,47 +1,41 @@
-# ZL Solución Integral
+# Simplify Biz
 
-**ZL Solución Integral** es un software de gestión empresarial que facilita la administración de usuarios, productos, ventas e informes. Está desarrollado en **Java** con una interfaz gráfica **Swing** y una base de datos **SQLite**, brindando un sistema eficiente y organizado a través de módulos especializados.
+Simplify Biz es un software de gestión empresarial que facilita la administración de usuarios, productos, ventas e informes. Desarrollado en **Java 17** con interfaz gráfica **Swing** y una base de datos **SQLite**, ofrece un sistema de roles para un manejo eficiente de datos.
 
 ## Requisitos para ejecutar la aplicación
 
-Para ejecutar la aplicación, necesitas tener instalado el **Java Development Kit (JDK) 22** o una versión superior. La aplicación está desarrollada en una versión avanzada de Java que requiere características específicas.
+La aplicación incluye el **Java Development Kit (JDK) 17** necesario para su ejecución, que se encuentra en la carpeta `jdk17` del paquete descargado.
 
-### Pasos para instalar Java Development Kit (JDK 22 o superior)
+## Pasos para ejecutar la aplicación
 
-1. **Descargar JDK:**
-   - Visita la página oficial de Oracle para descargar el JDK: [Descargar JDK](https://www.oracle.com/java/technologies/javase-jdk22-downloads.html).
-   - ![image](https://github.com/user-attachments/assets/2df0ba31-c9f2-437a-a3b6-f4bfb0217859)
-   - Selecciona la versión de JDK compatible con tu sistema operativo (Windows, macOS o Linux).
-   - Asegúrate de elegir la versión de 64 bits si tu sistema es de 64 bits.
+1. **Configurar el JDK (si es necesario):**
+   - Navega a la carpeta `jdk17` incluida en el paquete descargado.
+   - Si tu sistema requiere configuración adicional, sigue las instrucciones para instalar o configurar el JDK.
 
-2. **Instalar JDK:**
-   - Ejecuta el instalador descargado.
-   - Sigue las instrucciones proporcionadas por el instalador.
-   - Acepta los términos y condiciones de la licencia cuando se te solicite.
-   - El instalador agregará las configuraciones necesarias al sistema.
+2. **Ejecutar la aplicación:**
+   - Abre la carpeta donde descargaste el proyecto.
+   - Haz doble clic en el archivo `Simplify_Biz-17.0.jar` para iniciar la aplicación.
 
-3. **Verificar la instalación del JDK:**
-   - Abre una terminal o símbolo del sistema (cmd en Windows).
-   - Escribe el siguiente comando para verificar que JDK está instalado correctamente:
+3. **Desde la terminal (opcional):**
+   - Si prefieres usar la terminal, navega hasta la ubicación del archivo `.jar` y ejecuta:
      ```bash
-     java -version
-     ```
-   - Deberías ver una salida similar a la siguiente:
-     ```bash
-     java version "22.0.1"
-     ```
-   - ![image](https://github.com/user-attachments/assets/063d1e40-2e00-4907-af16-2dd28292da4f)
-
-4. **Ejecutar la aplicación:**
-   - Una vez que el JDK esté instalado, puedes ejecutar la aplicación haciendo doble clic en el archivo `.jar`:
-     `ZL_Solución_Integral-1.1.0.jar`.
-   - Si tu sistema no abre el archivo `.jar` directamente, puedes usar el siguiente comando en la terminal o símbolo del sistema:
-     ```bash
-     java -jar ZL_Solucion_Integral-1.1.0.jar
+     java -jar Simplify_Biz-17.0.jar
      ```
 
----
+## Base de datos
 
-Con estos pasos, la aplicación debería ejecutarse correctamente en tu equipo.
+El archivo de base de datos, `DB.db`, está incluido en la raíz del proyecto. Este contiene los datos iniciales necesarios para usar la aplicación. Para iniciar sesión, utiliza el usuario genérico preconfigurado:
 
-¡Gracias por usar ZL Solución Integral!
+- **Usuario:** `admin`
+- **Contraseña:** `admin`
+
+## Soporte
+
+Si encuentras problemas al ejecutar la aplicación, asegúrate de que:
+
+- El JDK proporcionado está configurado correctamente.
+- No hay bloqueos del sistema operativo o antivirus que impidan ejecutar el archivo `.jar`.
+
+Para más ayuda, contacta con el equipo de soporte técnico.
+- correo electronico: dazace94gmail.com
+- telefono: 3222824941
