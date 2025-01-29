@@ -127,7 +127,6 @@ public class FormRegistroProductos extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        tbProductos.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         tbProductos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -142,12 +141,15 @@ public class FormRegistroProductos extends javax.swing.JFrame {
         tbProductos.setSelectionForeground(new java.awt.Color(0, 0, 0));
         jScrollPane1.setViewportView(tbProductos);
 
-        jLabel1.setFont(new java.awt.Font("Lucida Console", 0, 36)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Lucida Console", 2, 48)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Registro de Productos");
         jLabel1.setToolTipText("");
 
-        btnMenuPricipal.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
+        btnMenuPricipal.setBackground(new java.awt.Color(153, 255, 255));
+        btnMenuPricipal.setFont(new java.awt.Font("Candara", 3, 12)); // NOI18N
+        btnMenuPricipal.setForeground(new java.awt.Color(0, 0, 0));
         btnMenuPricipal.setText("Menu principal");
         btnMenuPricipal.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnMenuPricipal.addActionListener(new java.awt.event.ActionListener() {
@@ -156,7 +158,9 @@ public class FormRegistroProductos extends javax.swing.JFrame {
             }
         });
 
-        btnSalir.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
+        btnSalir.setBackground(new java.awt.Color(153, 255, 255));
+        btnSalir.setFont(new java.awt.Font("Candara", 3, 12)); // NOI18N
+        btnSalir.setForeground(new java.awt.Color(0, 0, 0));
         btnSalir.setText("Salir");
         btnSalir.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnSalir.addActionListener(new java.awt.event.ActionListener() {
@@ -165,15 +169,22 @@ public class FormRegistroProductos extends javax.swing.JFrame {
             }
         });
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Ingrese los datos para realizar el registro", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 2, 14))); // NOI18N
+        jPanel1.setBackground(new java.awt.Color(51, 51, 51));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Ingrese los datos para realizar el registro", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Candara", 2, 14), new java.awt.Color(255, 255, 255))); // NOI18N
+        jPanel1.setForeground(new java.awt.Color(255, 255, 255));
 
+        txtPrecio.setBackground(new java.awt.Color(204, 204, 204));
         txtPrecio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtPrecioActionPerformed(evt);
             }
         });
 
-        btnEliminar.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
+        txtCantidad.setBackground(new java.awt.Color(204, 204, 204));
+
+        btnEliminar.setBackground(new java.awt.Color(153, 204, 255));
+        btnEliminar.setFont(new java.awt.Font("Candara", 3, 14)); // NOI18N
+        btnEliminar.setForeground(new java.awt.Color(0, 0, 0));
         btnEliminar.setText("Eliminar");
         btnEliminar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnEliminar.addActionListener(new java.awt.event.ActionListener() {
@@ -182,13 +193,16 @@ public class FormRegistroProductos extends javax.swing.JFrame {
             }
         });
 
+        txtCodigo.setBackground(new java.awt.Color(204, 204, 204));
         txtCodigo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtCodigoActionPerformed(evt);
             }
         });
 
-        btnModificar.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
+        btnModificar.setBackground(new java.awt.Color(153, 204, 255));
+        btnModificar.setFont(new java.awt.Font("Candara", 3, 14)); // NOI18N
+        btnModificar.setForeground(new java.awt.Color(0, 0, 0));
         btnModificar.setText("Modificar");
         btnModificar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnModificar.addActionListener(new java.awt.event.ActionListener() {
@@ -197,7 +211,9 @@ public class FormRegistroProductos extends javax.swing.JFrame {
             }
         });
 
-        btnGuardar.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
+        btnGuardar.setBackground(new java.awt.Color(153, 204, 255));
+        btnGuardar.setFont(new java.awt.Font("Candara", 3, 14)); // NOI18N
+        btnGuardar.setForeground(new java.awt.Color(0, 0, 0));
         btnGuardar.setText("Guardar ");
         btnGuardar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnGuardar.addActionListener(new java.awt.event.ActionListener() {
@@ -206,18 +222,27 @@ public class FormRegistroProductos extends javax.swing.JFrame {
             }
         });
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtProducto.setBackground(new java.awt.Color(204, 204, 204));
+
+        jLabel3.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("Producto:");
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel4.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("Precio:");
 
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel5.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("Cantidad:");
 
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("Codigo:");
 
+        btnImportarExcel.setBackground(new java.awt.Color(153, 204, 255));
+        btnImportarExcel.setFont(new java.awt.Font("Candara", 3, 14)); // NOI18N
+        btnImportarExcel.setForeground(new java.awt.Color(0, 0, 0));
         btnImportarExcel.setText("Importar Excel");
         btnImportarExcel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnImportarExcel.addActionListener(new java.awt.event.ActionListener() {
@@ -226,6 +251,9 @@ public class FormRegistroProductos extends javax.swing.JFrame {
             }
         });
 
+        btnExportar.setBackground(new java.awt.Color(153, 204, 255));
+        btnExportar.setFont(new java.awt.Font("Candara", 3, 14)); // NOI18N
+        btnExportar.setForeground(new java.awt.Color(0, 0, 0));
         btnExportar.setText("Exportar Excel");
         btnExportar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnExportar.addActionListener(new java.awt.event.ActionListener() {
@@ -234,11 +262,24 @@ public class FormRegistroProductos extends javax.swing.JFrame {
             }
         });
 
+        jLabel2.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Importa tus datos desde un archivo excel");
 
+        jLabel7.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setText("Exporta tus productos a un archivo excel");
 
+        jLabel8.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(255, 255, 255));
         jLabel8.setText("Categoria:");
+
+        txtCategoria.setBackground(new java.awt.Color(204, 204, 204));
+        txtCategoria.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtCategoriaActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -316,9 +357,10 @@ public class FormRegistroProductos extends javax.swing.JFrame {
                 .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnExportar)
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
 
+        ListCategoria.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
         ListCategoria.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         ListCategoria.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -326,21 +368,23 @@ public class FormRegistroProductos extends javax.swing.JFrame {
             }
         });
 
+        jLabel10.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(0, 0, 0));
         jLabel10.setText("Categoria:");
 
+        jLabel9.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(0, 0, 0));
         jLabel9.setText("Filtrar por:");
 
-        textTotalRegistros.setText("TOTAL DE REGISTROS: ");
+        textTotalRegistros.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        textTotalRegistros.setForeground(new java.awt.Color(0, 0, 0));
+        textTotalRegistros.setText("Total registros:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(295, 295, 295)
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(291, 291, 291))
             .addComponent(jSeparator3)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
@@ -355,7 +399,7 @@ public class FormRegistroProductos extends javax.swing.JFrame {
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 887, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
                                 .addComponent(jLabel9)
@@ -364,13 +408,13 @@ public class FormRegistroProductos extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(ListCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(12, 12, 12))))
+            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(13, 13, 13)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -597,6 +641,10 @@ public class FormRegistroProductos extends javax.swing.JFrame {
         String totalRegistros = String.valueOf(productoCtrl.contarRegistros(categoriaSeleccionada));
         textTotalRegistros.setText("Total registros: " + totalRegistros);
     }//GEN-LAST:event_ListCategoriaActionPerformed
+
+    private void txtCategoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCategoriaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtCategoriaActionPerformed
     // Metodo para Limpiar el formulario  
     private void limpiarFormulario() {
         txtProducto.setText("");

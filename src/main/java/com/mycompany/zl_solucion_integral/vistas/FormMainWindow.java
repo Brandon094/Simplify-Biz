@@ -59,12 +59,15 @@ public class FormMainWindow extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setFont(new java.awt.Font("Lucida Console", 0, 36)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Lucida Console", 2, 48)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Administrar base de datos");
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
-        btnSalir.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
+        btnSalir.setBackground(new java.awt.Color(153, 255, 255));
+        btnSalir.setFont(new java.awt.Font("Candara", 3, 12)); // NOI18N
+        btnSalir.setForeground(new java.awt.Color(0, 0, 0));
         btnSalir.setText("Salir de la app");
         btnSalir.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnSalir.addActionListener(new java.awt.event.ActionListener() {
@@ -73,10 +76,13 @@ public class FormMainWindow extends javax.swing.JFrame {
             }
         });
 
+        jPanel1.setBackground(new java.awt.Color(51, 51, 51));
         jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jPanel1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
-        btnRegistroProductos.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
+        btnRegistroProductos.setBackground(new java.awt.Color(153, 204, 255));
+        btnRegistroProductos.setFont(new java.awt.Font("Candara", 3, 14)); // NOI18N
+        btnRegistroProductos.setForeground(new java.awt.Color(0, 0, 0));
         btnRegistroProductos.setText("Registro de productos");
         btnRegistroProductos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnRegistroProductos.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -86,7 +92,9 @@ public class FormMainWindow extends javax.swing.JFrame {
             }
         });
 
-        btnRegistroUsuarios.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
+        btnRegistroUsuarios.setBackground(new java.awt.Color(153, 204, 255));
+        btnRegistroUsuarios.setFont(new java.awt.Font("Candara", 3, 14)); // NOI18N
+        btnRegistroUsuarios.setForeground(new java.awt.Color(0, 0, 0));
         btnRegistroUsuarios.setText("Registro de usuarios");
         btnRegistroUsuarios.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnRegistroUsuarios.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -96,7 +104,9 @@ public class FormMainWindow extends javax.swing.JFrame {
             }
         });
 
-        btnRegistroVentas.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
+        btnRegistroVentas.setBackground(new java.awt.Color(153, 204, 255));
+        btnRegistroVentas.setFont(new java.awt.Font("Candara", 3, 14)); // NOI18N
+        btnRegistroVentas.setForeground(new java.awt.Color(0, 0, 0));
         btnRegistroVentas.setText("Registro de ventas");
         btnRegistroVentas.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnRegistroVentas.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -106,7 +116,9 @@ public class FormMainWindow extends javax.swing.JFrame {
             }
         });
 
-        btnInformes.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
+        btnInformes.setBackground(new java.awt.Color(153, 204, 255));
+        btnInformes.setFont(new java.awt.Font("Candara", 3, 14)); // NOI18N
+        btnInformes.setForeground(new java.awt.Color(0, 0, 0));
         btnInformes.setText("Informes Ventas");
         btnInformes.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnInformes.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -123,10 +135,10 @@ public class FormMainWindow extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(114, 114, 114)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(btnRegistroProductos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnRegistroUsuarios, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnRegistroVentas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnInformes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnRegistroProductos, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRegistroUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRegistroVentas, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnInformes, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(116, 116, 116))
         );
         jPanel1Layout.setVerticalGroup(
@@ -140,10 +152,12 @@ public class FormMainWindow extends javax.swing.JFrame {
                 .addComponent(btnRegistroVentas, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btnInformes, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(120, Short.MAX_VALUE))
+                .addContainerGap(86, Short.MAX_VALUE))
         );
 
-        btnCerrarSecion.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
+        btnCerrarSecion.setBackground(new java.awt.Color(153, 255, 255));
+        btnCerrarSecion.setFont(new java.awt.Font("Candara", 3, 12)); // NOI18N
+        btnCerrarSecion.setForeground(new java.awt.Color(0, 0, 0));
         btnCerrarSecion.setText("Cerrar sesìon");
         btnCerrarSecion.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnCerrarSecion.addActionListener(new java.awt.event.ActionListener() {
@@ -160,36 +174,38 @@ public class FormMainWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnCerrarSecion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(799, 799, 799)
-                        .addComponent(btnSalir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGap(302, 302, 302)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(307, 307, 307)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 295, Short.MAX_VALUE)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 295, Short.MAX_VALUE)))
                 .addContainerGap())
             .addComponent(jSeparator2)
             .addGroup(layout.createSequentialGroup()
                 .addGap(6, 6, 6)
                 .addComponent(jSeparator1))
+            .addGroup(javax.swing.GroupLayout.Alignment.CENTER, layout.createSequentialGroup()
+                .addGap(25, 25, 25)
+                .addComponent(btnCerrarSecion, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnSalir, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(25, 25, 25))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(12, 12, 12)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(25, 25, 25)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(20, 20, 20)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(14, 14, 14)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCerrarSecion)
                     .addComponent(btnSalir))
-                .addContainerGap(69, Short.MAX_VALUE))
+                .addContainerGap(51, Short.MAX_VALUE))
         );
 
         pack();

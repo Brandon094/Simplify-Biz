@@ -109,30 +109,44 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Ingresa los datos para registrar el usuario", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 2, 12))); // NOI18N
+        jPanel1.setBackground(new java.awt.Color(51, 51, 51));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Ingresa los datos para registrar el usuario", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Candara", 2, 14), new java.awt.Color(255, 255, 255))); // NOI18N
+        jPanel1.setForeground(new java.awt.Color(255, 255, 255));
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel4.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("Ingrese la telefono:");
 
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel5.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("Ingrese el email:");
 
+        txtTelefono.setBackground(new java.awt.Color(204, 204, 204));
+        txtTelefono.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+
+        txtEmail.setBackground(new java.awt.Color(204, 204, 204));
+        txtEmail.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
         txtEmail.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtEmailActionPerformed(evt);
             }
         });
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("Ingrese el nombre: ");
 
+        txtNombre.setBackground(new java.awt.Color(204, 204, 204));
+        txtNombre.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
         txtNombre.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtNombreActionPerformed(evt);
             }
         });
 
-        btnGuardarUsuario.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
+        btnGuardarUsuario.setBackground(new java.awt.Color(153, 204, 255));
+        btnGuardarUsuario.setFont(new java.awt.Font("Candara", 3, 14)); // NOI18N
+        btnGuardarUsuario.setForeground(new java.awt.Color(0, 0, 0));
         btnGuardarUsuario.setText("Guardar");
         btnGuardarUsuario.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnGuardarUsuario.addActionListener(new java.awt.event.ActionListener() {
@@ -141,7 +155,9 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
             }
         });
 
-        btnEliminar.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
+        btnEliminar.setBackground(new java.awt.Color(153, 204, 255));
+        btnEliminar.setFont(new java.awt.Font("Candara", 3, 14)); // NOI18N
+        btnEliminar.setForeground(new java.awt.Color(0, 0, 0));
         btnEliminar.setText("Eliminar");
         btnEliminar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnEliminar.addActionListener(new java.awt.event.ActionListener() {
@@ -150,7 +166,9 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
             }
         });
 
-        btnModificar.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
+        btnModificar.setBackground(new java.awt.Color(153, 204, 255));
+        btnModificar.setFont(new java.awt.Font("Candara", 3, 14)); // NOI18N
+        btnModificar.setForeground(new java.awt.Color(0, 0, 0));
         btnModificar.setText("Modificar");
         btnModificar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnModificar.addActionListener(new java.awt.event.ActionListener() {
@@ -159,24 +177,39 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
             }
         });
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Ingrese la contraseña:");
 
+        txtContraseña.setBackground(new java.awt.Color(204, 204, 204));
+        txtContraseña.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
         txtContraseña.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtContraseñaActionPerformed(evt);
             }
         });
 
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("Ingrese el rol:");
 
+        txtRol.setBackground(new java.awt.Color(204, 204, 204));
+        txtRol.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+
+        jLabel7.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setText("Ingrese 1 para rol de Administrador, 0 para rol de vendedor");
 
+        jLabel8.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(255, 255, 255));
         jLabel8.setText("1 o 0");
 
+        jLabel9.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(255, 255, 255));
         jLabel9.setText("Para los clientes se les asigna una contraseña generica");
 
+        jLabel10.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(255, 255, 255));
         jLabel10.setText("Para el rol se asigna el 2 que referencia al cliente");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -269,7 +302,6 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
                 .addGap(26, 26, 26))
         );
 
-        tbUsuarios.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         tbUsuarios.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {},
@@ -283,12 +315,14 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(tbUsuarios);
 
-        jLabel1.setFont(new java.awt.Font("Lucida Console", 0, 36)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Lucida Console", 2, 48)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Registro de Usuarios");
-        jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
-        btnCerrar.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
+        btnCerrar.setBackground(new java.awt.Color(153, 255, 255));
+        btnCerrar.setFont(new java.awt.Font("Candara", 3, 12)); // NOI18N
+        btnCerrar.setForeground(new java.awt.Color(0, 0, 0));
         btnCerrar.setText("Cerrar sesìon");
         btnCerrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnCerrar.addActionListener(new java.awt.event.ActionListener() {
@@ -297,7 +331,9 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
             }
         });
 
-        btnMenuPrincipal.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
+        btnMenuPrincipal.setBackground(new java.awt.Color(153, 255, 255));
+        btnMenuPrincipal.setFont(new java.awt.Font("Candara", 3, 12)); // NOI18N
+        btnMenuPrincipal.setForeground(new java.awt.Color(0, 0, 0));
         btnMenuPrincipal.setText("Menu Principal");
         btnMenuPrincipal.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnMenuPrincipal.addActionListener(new java.awt.event.ActionListener() {
@@ -306,6 +342,7 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
             }
         });
 
+        jLabel11.setForeground(new java.awt.Color(0, 0, 0));
         jLabel11.setText("Filtrar por:");
 
         ListRol.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -316,6 +353,7 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
             }
         });
 
+        jLabel12.setForeground(new java.awt.Color(0, 0, 0));
         jLabel12.setText("Rol");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -349,7 +387,7 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -369,7 +407,7 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(37, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();

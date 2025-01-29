@@ -302,12 +302,14 @@ public class FormRegistroVentas extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setFont(new java.awt.Font("Lucida Console", 0, 36)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Lucida Console", 2, 48)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Registro de Ventas");
-        jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
-        btnCerrar.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
+        btnCerrar.setBackground(new java.awt.Color(153, 255, 255));
+        btnCerrar.setFont(new java.awt.Font("Candara", 3, 12)); // NOI18N
+        btnCerrar.setForeground(new java.awt.Color(0, 0, 0));
         btnCerrar.setText("Cerrar secion");
         btnCerrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnCerrar.addActionListener(new java.awt.event.ActionListener() {
@@ -316,7 +318,9 @@ public class FormRegistroVentas extends javax.swing.JFrame {
             }
         });
 
-        btnMenuPrincipal.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
+        btnMenuPrincipal.setBackground(new java.awt.Color(153, 255, 255));
+        btnMenuPrincipal.setFont(new java.awt.Font("Candara", 3, 12)); // NOI18N
+        btnMenuPrincipal.setForeground(new java.awt.Color(0, 0, 0));
         btnMenuPrincipal.setText("Menu Principal");
         btnMenuPrincipal.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnMenuPrincipal.addActionListener(new java.awt.event.ActionListener() {
@@ -325,30 +329,44 @@ public class FormRegistroVentas extends javax.swing.JFrame {
             }
         });
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("INFORMACION DEL PRODUCTO"));
+        jPanel1.setBackground(new java.awt.Color(51, 51, 51));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "INFORMACION DEL PRODUCTO", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Candara", 2, 14), new java.awt.Color(255, 255, 255))); // NOI18N
+        jPanel1.setForeground(new java.awt.Color(255, 255, 255));
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel4.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("Ingrese la cantidad:");
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtCantidad.setBackground(new java.awt.Color(204, 204, 204));
+        txtCantidad.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+
+        jLabel3.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("Ingrese el codigo: ");
 
+        txtCodigo.setBackground(new java.awt.Color(204, 204, 204));
+        txtCodigo.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
         txtCodigo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtCodigoActionPerformed(evt);
             }
         });
 
-        txtNameCliente.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtNameCliente.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        txtNameCliente.setForeground(new java.awt.Color(255, 255, 255));
         txtNameCliente.setText("Nombre cliente:");
 
+        txtCliente.setBackground(new java.awt.Color(204, 204, 204));
+        txtCliente.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
         txtCliente.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtClienteActionPerformed(evt);
             }
         });
 
-        btnAgregarAlCarrito.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
+        btnAgregarAlCarrito.setBackground(new java.awt.Color(153, 204, 255));
+        btnAgregarAlCarrito.setFont(new java.awt.Font("Candara", 3, 14)); // NOI18N
+        btnAgregarAlCarrito.setForeground(new java.awt.Color(0, 0, 0));
         btnAgregarAlCarrito.setText("Agregar al carrito");
         btnAgregarAlCarrito.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnAgregarAlCarrito.addActionListener(new java.awt.event.ActionListener() {
@@ -357,38 +375,82 @@ public class FormRegistroVentas extends javax.swing.JFrame {
             }
         });
 
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("Ingrese el producto:");
 
-        txtNoCcCliente.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtProducto.setBackground(new java.awt.Color(204, 204, 204));
+        txtProducto.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+
+        txtNoCc.setBackground(new java.awt.Color(204, 204, 204));
+        txtNoCc.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+
+        txtNoCcCliente.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        txtNoCcCliente.setForeground(new java.awt.Color(255, 255, 255));
         txtNoCcCliente.setText("Numero de cedula:");
 
+        jLabel8.setFont(new java.awt.Font("Candara", 2, 14)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(255, 255, 255));
         jLabel8.setText("INFORMACION DEL CLIENTE");
 
-        jLabel10.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel10.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(255, 255, 255));
         jLabel10.setText("Ingrese el descuento: ");
 
-        txtNoTel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtDescuento.setBackground(new java.awt.Color(204, 204, 204));
+        txtDescuento.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+
+        txtNoTel.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        txtNoTel.setForeground(new java.awt.Color(255, 255, 255));
         txtNoTel.setText("Numero de telefono:");
 
-        txtCorreoCl.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtCorreoCl.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        txtCorreoCl.setForeground(new java.awt.Color(255, 255, 255));
         txtCorreoCl.setText("Correo electronico:");
 
+        txtTelefonoCliente.setBackground(new java.awt.Color(204, 204, 204));
+        txtTelefonoCliente.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
         txtTelefonoCliente.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtTelefonoClienteActionPerformed(evt);
             }
         });
 
+        txtCorreoCliente.setBackground(new java.awt.Color(204, 204, 204));
+        txtCorreoCliente.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+
+        jLabel7.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setText("NIT:");
 
+        jLabel9.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(255, 255, 255));
         jLabel9.setText("DIR:");
 
+        txtNit.setBackground(new java.awt.Color(204, 204, 204));
+        txtNit.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+
+        txtDir.setBackground(new java.awt.Color(204, 204, 204));
+        txtDir.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+
+        jLabel11.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel11.setForeground(new java.awt.Color(255, 255, 255));
         jLabel11.setText("Metodo de pago:");
 
+        checkEfectivo.setBackground(new java.awt.Color(51, 51, 51));
+        checkEfectivo.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        checkEfectivo.setForeground(new java.awt.Color(255, 255, 255));
         checkEfectivo.setText("Efectivo");
         checkEfectivo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        checkEfectivo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkEfectivoActionPerformed(evt);
+            }
+        });
 
+        checkCredito.setBackground(new java.awt.Color(51, 51, 51));
+        checkCredito.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        checkCredito.setForeground(new java.awt.Color(255, 255, 255));
         checkCredito.setText("Credito");
         checkCredito.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
@@ -416,7 +478,7 @@ public class FormRegistroVentas extends javax.swing.JFrame {
                                     .addComponent(jLabel10))
                                 .addGap(10, 10, 10)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtCantidad, javax.swing.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)
+                                    .addComponent(txtCantidad)
                                     .addComponent(txtDescuento)))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -509,23 +571,40 @@ public class FormRegistroVentas extends javax.swing.JFrame {
                 .addComponent(btnAgregarAlCarrito))
         );
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("CARRITO DE COMPRAS"));
+        jPanel5.setBackground(new java.awt.Color(51, 51, 51));
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "CARRITO DE COMPRAS", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Candara", 2, 14), new java.awt.Color(255, 255, 255))); // NOI18N
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Informacion de cliente"));
+        jPanel2.setBackground(new java.awt.Color(51, 51, 51));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Informacion de cliente", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Candara", 2, 14), new java.awt.Color(255, 255, 255))); // NOI18N
+        jPanel2.setForeground(new java.awt.Color(255, 255, 255));
         jPanel2.setToolTipText("");
 
+        textNombre.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        textNombre.setForeground(new java.awt.Color(255, 255, 255));
         textNombre.setText("Nombre:");
 
+        textCedula.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        textCedula.setForeground(new java.awt.Color(255, 255, 255));
         textCedula.setText("N° Cedula:");
 
+        textTelefono.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        textTelefono.setForeground(new java.awt.Color(255, 255, 255));
         textTelefono.setText("N° Telefono:");
 
+        textCorreo.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        textCorreo.setForeground(new java.awt.Color(255, 255, 255));
         textCorreo.setText("Email: ");
 
+        textNIT.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        textNIT.setForeground(new java.awt.Color(255, 255, 255));
         textNIT.setText("NIT:");
 
+        textDIR.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        textDIR.setForeground(new java.awt.Color(255, 255, 255));
         textDIR.setText("DIR:");
 
+        textMetodoPago.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        textMetodoPago.setForeground(new java.awt.Color(255, 255, 255));
         textMetodoPago.setText("Metodo de pago: ");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -563,8 +642,12 @@ public class FormRegistroVentas extends javax.swing.JFrame {
                 .addComponent(textMetodoPago))
         );
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Informacion de vendedor"));
+        jPanel3.setBackground(new java.awt.Color(51, 51, 51));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Informacion de vendedor", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Candara", 2, 14), new java.awt.Color(255, 255, 255))); // NOI18N
+        jPanel3.setForeground(new java.awt.Color(255, 255, 255));
 
+        textVendedor.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        textVendedor.setForeground(new java.awt.Color(255, 255, 255));
         textVendedor.setText("Vendedor:");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -583,8 +666,11 @@ public class FormRegistroVentas extends javax.swing.JFrame {
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Informacion de producto"));
+        jPanel4.setBackground(new java.awt.Color(51, 51, 51));
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Informacion de producto", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Candara", 2, 14), new java.awt.Color(255, 255, 255))); // NOI18N
 
+        listProCotizados.setBackground(new java.awt.Color(153, 153, 153));
+        listProCotizados.setForeground(new java.awt.Color(0, 0, 0));
         listProCotizados.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
@@ -592,6 +678,9 @@ public class FormRegistroVentas extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(listProCotizados);
 
+        btnEliminar.setBackground(new java.awt.Color(153, 204, 255));
+        btnEliminar.setFont(new java.awt.Font("Candara", 3, 12)); // NOI18N
+        btnEliminar.setForeground(new java.awt.Color(0, 0, 0));
         btnEliminar.setText("Eliminar");
         btnEliminar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnEliminar.addActionListener(new java.awt.event.ActionListener() {
@@ -600,9 +689,13 @@ public class FormRegistroVentas extends javax.swing.JFrame {
             }
         });
 
+        textValorTotal.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        textValorTotal.setForeground(new java.awt.Color(255, 255, 255));
         textValorTotal.setText("Total:");
 
-        btnCotizar.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
+        btnCotizar.setBackground(new java.awt.Color(153, 204, 255));
+        btnCotizar.setFont(new java.awt.Font("Candara", 3, 12)); // NOI18N
+        btnCotizar.setForeground(new java.awt.Color(0, 0, 0));
         btnCotizar.setText("Cotizacion");
         btnCotizar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnCotizar.addActionListener(new java.awt.event.ActionListener() {
@@ -611,8 +704,12 @@ public class FormRegistroVentas extends javax.swing.JFrame {
             }
         });
 
+        jLabel2.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Enviar cotizacion:");
 
+        jLabel5.setFont(new java.awt.Font("Candara", 0, 12)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("Eliminar del carrito:");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
@@ -650,7 +747,9 @@ public class FormRegistroVentas extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        btnGuardarVenta.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
+        btnGuardarVenta.setBackground(new java.awt.Color(153, 204, 255));
+        btnGuardarVenta.setFont(new java.awt.Font("Candara", 3, 14)); // NOI18N
+        btnGuardarVenta.setForeground(new java.awt.Color(0, 0, 0));
         btnGuardarVenta.setText("Confirmar Venta");
         btnGuardarVenta.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnGuardarVenta.addActionListener(new java.awt.event.ActionListener() {
@@ -659,7 +758,9 @@ public class FormRegistroVentas extends javax.swing.JFrame {
             }
         });
 
-        btnLimpiarCarrito.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
+        btnLimpiarCarrito.setBackground(new java.awt.Color(153, 204, 255));
+        btnLimpiarCarrito.setFont(new java.awt.Font("Candara", 3, 14)); // NOI18N
+        btnLimpiarCarrito.setForeground(new java.awt.Color(0, 0, 0));
         btnLimpiarCarrito.setText("Limpiar carrito de compras");
         btnLimpiarCarrito.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnLimpiarCarrito.addActionListener(new java.awt.event.ActionListener() {
@@ -687,13 +788,14 @@ public class FormRegistroVentas extends javax.swing.JFrame {
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnGuardarVenta)
@@ -731,7 +833,7 @@ public class FormRegistroVentas extends javax.swing.JFrame {
                             .addComponent(btnCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 765, Short.MAX_VALUE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 784, Short.MAX_VALUE)
                             .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(19, 19, 19))))
         );
@@ -739,7 +841,7 @@ public class FormRegistroVentas extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(12, 12, 12)
-                .addComponent(jLabel1)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -747,7 +849,7 @@ public class FormRegistroVentas extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 148, Short.MAX_VALUE))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1045,6 +1147,10 @@ public class FormRegistroVentas extends javax.swing.JFrame {
     private void txtCodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCodigoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtCodigoActionPerformed
+
+    private void checkEfectivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkEfectivoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_checkEfectivoActionPerformed
     // Metodo para actualizar el precio total de la venta
     private void actualizarPrecioTotal() {
         double total = ventasCotizadas.stream().mapToDouble(Venta::getTotal).sum();
