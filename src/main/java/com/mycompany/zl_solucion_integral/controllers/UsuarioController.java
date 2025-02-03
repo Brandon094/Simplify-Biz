@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -41,37 +42,50 @@ public class UsuarioController {
      * usuario.
      */
     public void agregarUsuario(final Usuario usuario) {
-        // Validar existencia del usuario y correo (omitir por brevedad)
+        // Validar si ya existe un usuario con ese nombre
+        if (validarExistenciaUsuario(usuario.getNombre())) {
+            JOptionPane.showMessageDialog(null, "El usuario ya existe con este nombre.");
+            return; // Sale del método para evitar duplicados
+        }
 
-        final String sql = "INSERT INTO usuarios (nombre, telefono, email, contraseña, rol) "
-                + "VALUES (?, ?, ?, ?, ?)";
+        // Validar si ya existe un usuario con ese correo
+        if (validarExistenciaPorCorreo(usuario.getEmail())) {
+            JOptionPane.showMessageDialog(null, "El usuario ya existe con este correo.");
+            return; // Sale del método para evitar duplicados
+        }
+
+        final String sql = "INSERT INTO usuarios (nombre, telefono, email, contraseña, rol) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = conexion.establecerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            // Establecer los parámetros en la consulta SQL
+            // Encriptar la contraseña antes de guardarla
+            String contraseñaEncriptada = Seguridad.encriptarContraseña(usuario.getContraseña());
+
+            // Establecer parámetros
             pstmt.setString(1, usuario.getNombre());
             pstmt.setString(2, usuario.getTelefono());
             pstmt.setString(3, usuario.getEmail());
-
-            // Encriptar la contraseña antes de guardarla
-            String contraseñaEncriptada = Seguridad.encriptarContraseña(usuario.getContraseña());
             pstmt.setString(4, contraseñaEncriptada);
-            pstmt.setString(5, usuario.getRol());
+            pstmt.setString(5, usuario.getRol()); // Asumiendo que el rol es un número
 
-            // Ejecutar la consulta SQL
+            // Ejecutar la consulta
             int rowsAffected = pstmt.executeUpdate();
 
+            // Mensaje al usuario
             if (rowsAffected > 0) {
                 JOptionPane.showMessageDialog(null, "Usuario registrado exitosamente");
             } else {
                 JOptionPane.showMessageDialog(null, "No se pudo registrar el usuario");
             }
 
+        } catch (SQLIntegrityConstraintViolationException e) {
+            JOptionPane.showMessageDialog(null, "El usuario ya existe con este correo o teléfono.");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error en la base de datos: " + e.getMessage());
+            logger.log(Level.SEVERE, "Error en la base de datos", e);
         } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error inesperado: " + e.getMessage());
             logger.log(Level.SEVERE, "Error al registrar el usuario", e);
-            JOptionPane.showMessageDialog(null, "Error al registrar el usuario: " + e.getMessage());
-        } finally {
-            conexion.cerrarConexion();
         }
     }
 
@@ -296,6 +310,7 @@ public class UsuarioController {
         }
     }
 
+    // Validar usuario regular 
     public boolean validarCredencialesUsuarioRegular(final String usuario, final String contraseña) {
         final String sql = "SELECT contraseña FROM usuarios WHERE nombre = ? AND rol != 1";
 
@@ -318,6 +333,7 @@ public class UsuarioController {
         }
         return false;
     }
+// Validar credenciales administrador
 
     public boolean validarCredencialesAdmin(final String usuario, final String contraseña) {
         String usuarioEnMinusculas = usuario.toLowerCase();
@@ -341,6 +357,22 @@ public class UsuarioController {
             conexion.cerrarConexion();
         }
         return false;
+    }
+
+    // Validar si existe un administrador 
+    public boolean existeAdministrador() {
+        boolean existe = false;
+        try (Connection con = new ConexionDB().establecerConexion()) {
+            String sql = "SELECT COUNT(*) FROM usuarios WHERE rol = 1"; // Verifica si hay un admin
+            try (PreparedStatement pst = con.prepareStatement(sql); ResultSet rs = pst.executeQuery()) {
+                if (rs.next() && rs.getInt(1) > 0) {
+                    existe = true; // Si hay un administrador, devuelve true
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return existe;
     }
 
     /**
