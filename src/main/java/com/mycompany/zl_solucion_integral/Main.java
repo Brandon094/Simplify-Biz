@@ -2,8 +2,9 @@ package com.mycompany.zl_solucion_integral;
 
 import com.mycompany.zl_solucion_integral.config.ConexionDB;
 import com.mycompany.zl_solucion_integral.config.DatabaseInitializer;
-import com.mycompany.zl_solucion_integral.vistas.FormLogIn;
-import com.mycompany.zl_solucion_integral.vistas.FormRegistroUsuarios;
+import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
+import com.mycompany.zl_solucion_integral.views.FormLogIn;
+import com.mycompany.zl_solucion_integral.views.FormRegistroAdmin;
 import javax.swing.JOptionPane;
 
 /**
@@ -18,34 +19,12 @@ import javax.swing.JOptionPane;
  */
 public class Main {
 
-    /**
-     * Método principal que se ejecuta al iniciar la aplicación.
-     *
-     * Este método inicializa la base de datos y, si la inicialización es
-     * exitosa, inicia la aplicación mostrando el formulario de inicio de
-     * sesión. Si la inicialización de la base de datos falla, muestra un
-     * mensaje de error.
-     *
-     * @param args Argumentos de línea de comandos (no utilizados en esta
-     * aplicación).
-     */
     public static void main(String[] args) {
         if (inicializarBaseDatos()) {
             iniciarAplicacion();
         }
     }
 
-    /**
-     * Método para inicializar la base de datos.
-     *
-     * Este método crea una instancia de `ConexionDB` y `DatabaseInitializer`
-     * para inicializar las tablas necesarias en la base de datos. Si ocurre un
-     * error durante la inicialización, se muestra un mensaje de error al
-     * usuario.
-     *
-     * @return `true` si la base de datos se inicializa correctamente, `false`
-     * en caso contrario.
-     */
     private static boolean inicializarBaseDatos() {
         ConexionDB conexion = new ConexionDB();
         try {
@@ -54,23 +33,32 @@ public class Main {
             return true;
         } catch (Exception e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, 
-                    "Error al inicializar la base de datos: " + e.getMessage());
+            JOptionPane.showMessageDialog(null,
+                    "Error al inicializar la base de datos: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
     }
 
-    /**
-     * Método para iniciar la aplicación.
-     *
-     * Este método crea e muestra el formulario de inicio de sesión
-     * (`FormLogIn`). Este formulario es el punto de entrada para el usuario de
-     * la aplicación.
-     */
     private static void iniciarAplicacion() {
-        FormLogIn loginForm = new FormLogIn();
-        loginForm.setVisible(true);
-        FormRegistroUsuarios ru = new FormRegistroUsuarios();
-        //ru.setVisible(true);
+        UsuarioController usuarioCtrl = new UsuarioController();
+        // Se asume que existeAdministrador() devuelve true si ya existe un administrador.
+        boolean existeAdmin = usuarioCtrl.existeAdministrador();
+
+        if (!existeAdmin) { // Si no existe administrador, mostrar el formulario de registro.
+            JOptionPane.showMessageDialog(null,
+                    "Bienvenido a Simplify Biz.\n\n" +
+                    "Para comenzar a usar la aplicación, primero debes configurar una cuenta de administrador.\n\n" +
+                    "Por favor, completa el siguiente formulario con tus datos.",
+                    "Configuración Inicial", JOptionPane.INFORMATION_MESSAGE);
+
+            // Mostrar la ventana de registro de administrador.
+            FormRegistroAdmin registro = new FormRegistroAdmin();
+            registro.setVisible(true);
+        } else {
+            // Si ya existe un administrador, mostrar la ventana de inicio de sesión.
+            FormLogIn loginForm = new FormLogIn();
+            loginForm.setVisible(true);
+        }
     }
 }

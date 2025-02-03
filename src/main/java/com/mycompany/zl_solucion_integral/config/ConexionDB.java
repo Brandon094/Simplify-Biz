@@ -1,9 +1,10 @@
 package com.mycompany.zl_solucion_integral.config;
 
-import com.mycompany.zl_solucion_integral.vistas.FormLogIn;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+
+import com.mycompany.zl_solucion_integral.views.FormLogIn;
 
 /**
  * Clase para manejar la conexión con la base de datos SQLite.
