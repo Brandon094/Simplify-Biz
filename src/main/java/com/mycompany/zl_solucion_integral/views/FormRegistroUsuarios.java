@@ -1,4 +1,4 @@
-package com.mycompany.zl_solucion_integral.vistas;
+package com.mycompany.zl_solucion_integral.views;
 
 // @author Dazac
 import com.mycompany.zl_solucion_integral.config.Listener;

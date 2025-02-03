@@ -1,4 +1,4 @@
-package com.mycompany.zl_solucion_integral.vistas;
+package com.mycompany.zl_solucion_integral.views;
 
 import com.mycompany.zl_solucion_integral.config.UtilVentanas;
 import javax.swing.JOptionPane;

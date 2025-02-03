@@ -1,10 +1,9 @@
-package com.mycompany.zl_solucion_integral.vistas;
+package com.mycompany.zl_solucion_integral.views;
 
 import com.mycompany.zl_solucion_integral.config.UtilVentanas;
 import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
 import com.mycompany.zl_solucion_integral.models.Sesion;
 import javax.swing.JOptionPane;
-import java.awt.Color;
 
 
 /**
@@ -206,7 +205,7 @@ public class FormLogIn extends javax.swing.JFrame {
         btnSalir.setBackground(new java.awt.Color(153, 255, 255));
         btnSalir.setFont(new java.awt.Font("Candara", 3, 12)); // NOI18N
         btnSalir.setForeground(new java.awt.Color(0, 0, 0));
-        btnSalir.setText("Salir de la app");
+        btnSalir.setText("Salir ");
         btnSalir.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnSalir.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnSalir.addActionListener(new java.awt.event.ActionListener() {
