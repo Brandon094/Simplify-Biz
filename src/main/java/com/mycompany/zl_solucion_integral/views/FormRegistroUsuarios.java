@@ -43,8 +43,8 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
         // Define un nuevo modelo con los valores deseados
         DefaultComboBoxModel<String> modeloRol = new DefaultComboBoxModel<>();
         modeloRol.addElement("Todas"); // Opción para mostrar todos
-        modeloRol.addElement("1: Administrador");
         modeloRol.addElement("0: Vendedor");
+        modeloRol.addElement("1: Administrador");
         modeloRol.addElement("2: Cliente");
 
         // Asigna el modelo al JComboBox

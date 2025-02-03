@@ -187,6 +187,12 @@ public class FormRegistroAdmin extends javax.swing.JFrame {
         administrador.setContraseña(contraseña);
         administrador.setRol("1"); // Rol de administrador
 
+         // Validar formato del correo electrónico
+        if (!administrador.getEmail().matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            JOptionPane.showMessageDialog(this, "El correo electrónico no tiene un formato válido.");
+            return;
+        }
+        
         // Intentar guardar el usuario
         usuarioCtrl.agregarUsuario(administrador);        
         boolean usuarioCreado = usuarioCtrl.existeAdministrador();
