@@ -26,20 +26,20 @@ public class FormRegistroProductos extends javax.swing.JFrame {
     ProductoController productoCtrl = new ProductoController();
     Listener listenerTb = new Listener();
 
-    /*
-    * Constructor que inicaliza la ventana y muestra los productos en la tabla
+    /**
+     * Constructor que inicializa la ventana y muestra los productos en la tabla.
      */
     public FormRegistroProductos() {
-        initComponents();
-        setTitle("Registro de productos");
-        UtilVentanas.aplicarPantallaCompleta(this);
+        initComponents(); // Inicializa los componentes gráficos
+        setTitle("Registro de productos"); // Establece el título de la ventana
+        UtilVentanas.aplicarPantallaCompleta(this); // Aplica pantalla completa
 
         // Mostrar los datos de la tabla productos
         productoCtrl.mostrarProductos(tbProductos);
         String totalRegistros = String.valueOf(productoCtrl.contarRegistros("Todas"));
         textTotalRegistros.setText("Total registros:  " + totalRegistros);
 
-        // Rellenar el JComboBox de categorias
+        // Rellenar el JComboBox de categorías
         initComboBoxCategorias();
 
         // Crear los campos de texto a llenar con los datos de la fila seleccionada
@@ -63,7 +63,11 @@ public class FormRegistroProductos extends javax.swing.JFrame {
         ListCategoria.addItem("SEÑALIZACION");
     }
 
-    // Método para obtener los datos del formulario 
+    /**
+     * Método para obtener los datos del formulario.
+     *
+     * @return Un objeto Producto con los datos del formulario, o null si hay un error.
+     */
     private Producto obtenerDatosFormulario() {
         // Obtener los datos del formulario
         String productoNombre = txtProducto.getText();
@@ -89,7 +93,6 @@ public class FormRegistroProductos extends javax.swing.JFrame {
         // Crear y retornar un objeto Producto con los datos
         return new Producto(productoNombre, precio, cantidad, codigo, categoria);
     }
-
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -444,18 +447,15 @@ public class FormRegistroProductos extends javax.swing.JFrame {
      * Acción para cerrar la aplicación.
      */
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
-        // Cerrar la aplicacion
-        System.exit(0);
+        System.exit(0); // Cerrar la aplicacion
     }//GEN-LAST:event_btnSalirActionPerformed
     /**
      * Acción para volver al menú principal.
      */
     private void btnMenuPricipalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMenuPricipalActionPerformed
-        // cerrar la ventana actual 
-        this.setVisible(false);
-        // Abrir una ventana de magerDB
-        FormMainWindow dbManager = new FormMainWindow();
-        dbManager.setVisible(true);
+        this.setVisible(false); // Oculta la ventana actual
+        FormMainWindow dbManager = new FormMainWindow(); // Crea una nueva instancia del menú principal
+        dbManager.setVisible(true); // Muestra la ventana del menú principal
     }//GEN-LAST:event_btnMenuPricipalActionPerformed
 
     private void txtPrecioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPrecioActionPerformed
@@ -496,6 +496,9 @@ public class FormRegistroProductos extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
+    /*
+    * Metodo para eliminar un producto selecionado
+    */
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         // Obtener el ID del producto seleccionado en la tabla
         int idProducto = productoCtrl.obtenerIdProductoSeleccionado(tbProductos);
@@ -509,7 +512,9 @@ public class FormRegistroProductos extends javax.swing.JFrame {
         formConfEliminacion.setVisible(true);
     }//GEN-LAST:event_btnEliminarActionPerformed
 
-    // Metodo para modificar un producto selecionado
+    /**
+     * Método para modificar un producto seleccionado.
+     */
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
         // Obtener los datos del formulario
         Producto producto = obtenerDatosFormulario();
@@ -550,8 +555,11 @@ public class FormRegistroProductos extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnModificarActionPerformed
 
+     /**
+     * Método para importar datos desde un archivo Excel.
+     */
     private void btnImportarExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportarExcelActionPerformed
-        // Seleccionar la ruta del archivo Excel usando el método SeleccionRuta
+     // Seleccionar la ruta del archivo Excel usando el método SeleccionRuta
         String rutaExcel = SelecionRuta.obtenerRutaAbrir("Seleccionar archivo Excel");
 
         // Verificar si el usuario seleccionó un archivo
@@ -598,6 +606,9 @@ public class FormRegistroProductos extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnImportarExcelActionPerformed
 
+    /**
+     * Método para exportar datos a un archivo Excel.
+     */
     private void btnExportarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportarActionPerformed
         // Usar la clase SeleccionRuta para obtener la ruta de exportación
         String rutaExcel = SelecionRuta.obtenerRuta("Exportar archivo Excel", "Inventario_productos_exportado.xlsx", ".xlsx");
@@ -630,6 +641,9 @@ public class FormRegistroProductos extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnExportarActionPerformed
 
+   /**
+     * Método para filtrar productos por categoría.
+     */
     private void ListCategoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ListCategoriaActionPerformed
         // Obtener la categoría seleccionada del combo box
         String categoriaSeleccionada = (String) ListCategoria.getSelectedItem();
@@ -645,7 +659,9 @@ public class FormRegistroProductos extends javax.swing.JFrame {
     private void txtCategoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCategoriaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtCategoriaActionPerformed
-    // Metodo para Limpiar el formulario  
+     /**
+     * Método para limpiar los campos del formulario.
+     */
     private void limpiarFormulario() {
         txtProducto.setText("");
         txtCantidad.setText("");

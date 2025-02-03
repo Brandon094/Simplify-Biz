@@ -1,6 +1,5 @@
 package com.mycompany.zl_solucion_integral.views;
 
-// @author Dazac
 import com.mycompany.zl_solucion_integral.config.Listener;
 import com.mycompany.zl_solucion_integral.config.UtilVentanas;
 import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
@@ -9,6 +8,12 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
+/*
+* Ventana para registrar y gestionar usuarios. Controla el registro,
+* modifica y eliminacion de usuarios.
+*
+* @author Dazac
+*/
 public class FormRegistroUsuarios extends javax.swing.JFrame {
 
     // Instancia del controlador del usuario
@@ -38,7 +43,9 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
         listenerTb.agregarListenerTabla(tbUsuarios, camposTexto, columnas);
     }
 
-    // Método para inicializar las categorías en el JComboBox
+    /**
+     * Método para inicializar las opciones de rol en el JComboBox.
+     */
     private void initComboBoxRol() {
         // Define un nuevo modelo con los valores deseados
         DefaultComboBoxModel<String> modeloRol = new DefaultComboBoxModel<>();
@@ -51,7 +58,11 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
         ListRol.setModel(modeloRol);
     }
 
-    // Método para obtener los datos del formulario
+    /**
+     * Método para obtener los datos del formulario.
+     *
+     * @return Un objeto Usuario con los datos del formulario.
+     */
     private Usuario obtenerDatosFormulario() {
         // Obtener los datos de los campos
         String nombre = txtNombre.getText().toLowerCase();
@@ -64,7 +75,9 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
         return new Usuario(0, nombre, telefono, email, contraseña, rol);
     }
 
-    // Metodo para Limpiar el formulario
+    /**
+     * Método para limpiar los campos del formulario.
+     */
     public void limpiarCampos() {
         txtNombre.setText("");
         txtTelefono.setText("");
@@ -421,6 +434,9 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNombreActionPerformed
 
+        /**
+     * Acción para guardar un nuevo usuario.
+     */
     private void btnGuardarUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarUsuarioActionPerformed
         // Obtener los datos del formulario
         Usuario usuario = obtenerDatosFormulario();
@@ -462,6 +478,9 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnGuardarUsuarioActionPerformed
 
+     /**
+     * Acción para eliminar un usuario seleccionado.
+     */
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         // Obtener el ID del usuario seleccionado en la tabla
         int idUsuario = usuarioCtrl.obtenerIdUsuarioSeleccionado(tbUsuarios);
@@ -473,6 +492,9 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
         usuarioCtrl.mostrarUsuarios(tbUsuarios);
     }//GEN-LAST:event_btnEliminarActionPerformed
 
+    /**
+     * Acción para modificar un usuario seleccionado.
+     */
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
         // Obtener datos del formulario
         Usuario usuario = obtenerDatosFormulario();
@@ -511,6 +533,9 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtContraseñaActionPerformed
 
+    /**
+     * Acción para cerrar la sesión y volver a la ventana de inicio de sesión.
+     */
     private void btnCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarActionPerformed
         // ocultar la interfaz actual
         this.setVisible(false);
@@ -520,14 +545,20 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
         log_In.setVisible(true);
     }//GEN-LAST:event_btnCerrarActionPerformed
 
+    /**
+     * Acción para volver al menú principal.
+     */
     private void btnMenuPrincipalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMenuPrincipalActionPerformed
-        // Ocultar la interfaz de registro ventas
+        // Ocultar la interfaz de registro usuarios
         this.setVisible(false);
-        // abrir la nueva interfaz
+        // abrir la nueva interfaz del menu principal
         FormMainWindow dbMag = new FormMainWindow();
         dbMag.setVisible(true);
     }//GEN-LAST:event_btnMenuPrincipalActionPerformed
 
+    /**
+     * Acción para filtrar usuarios por rol.
+     */
     private void ListRolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ListRolActionPerformed
         String rolSeleccionado = (String) ListRol.getSelectedItem();
         usuarioCtrl.mostrarUsuariosPorRol(tbUsuarios, rolSeleccionado);

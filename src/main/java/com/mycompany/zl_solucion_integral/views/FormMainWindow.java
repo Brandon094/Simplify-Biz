@@ -1,11 +1,16 @@
 package com.mycompany.zl_solucion_integral.views;
 
+import com.mycompany.zl_solucion_integral.config.SelecionRuta;
 import com.mycompany.zl_solucion_integral.config.UtilVentanas;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Properties;
+import java.io.OutputStream;
 import javax.swing.JOptionPane;
 
 /*
  * Esta clase representa la ventana principal para administrar la base de datos 
- * en la aplicación 'zl_solucion_integral'. Ofrece opciones para registrar usuarios, 
+ * en la aplicación 'Simplify-Biz'. Ofrece opciones para registrar usuarios, 
  * productos, ventas e informes. La interfaz gráfica es generada usando Swing.
  * 
  * Al interactuar con esta ventana, los administradores pueden elegir diferentes 
@@ -25,21 +30,23 @@ import javax.swing.JOptionPane;
  * Autor: Dazac
  */
 public class FormMainWindow extends javax.swing.JFrame {
+    
+    private FormRegistroUsuarios formUsuarios; // Ventana de registro de usuarios
+    private FormRegistroProductos formProductos; // Ventana de registro de productos
+    private FormRegistroVentas formVentas; // Ventana de registro de ventas
+    private FormMenuInformes formInformes; // Ventana de informes
+    private FormInfoVentas formInfoVentas; // Ventana de información de ventas
 
-    private FormRegistroUsuarios formUsuarios;
-    private FormRegistroProductos formProductos;
-    private FormRegistroVentas formVentas;
-    private FormMenuInformes formInformes;
-    private FormInfoVentas formInfoVentas;
+    SelecionRuta ruta = new SelecionRuta(); // Utilidad para seleccionar rutas de archivos
 
     /**
      * Constructor de la clase que inicializa la ventana 'manager_DB'. Invoca al
      * método initComponents() para configurar los componentes gráficos.
      */
     public FormMainWindow() {
-        initComponents();
-        setTitle("Menu administrador");
-        UtilVentanas.aplicarPantallaCompleta(this);        
+        initComponents(); // Inicializa los componentes gráficos
+        setTitle("Menu administrador"); // Establece el título de la ventana
+        UtilVentanas.aplicarPantallaCompleta(this); // Aplica pantalla completa
     }
 
     @SuppressWarnings("unchecked")
@@ -54,6 +61,7 @@ public class FormMainWindow extends javax.swing.JFrame {
         btnRegistroUsuarios = new javax.swing.JButton();
         btnRegistroVentas = new javax.swing.JButton();
         btnInformes = new javax.swing.JButton();
+        btnConfig = new javax.swing.JButton();
         jSeparator2 = new javax.swing.JSeparator();
         btnCerrarSecion = new javax.swing.JButton();
 
@@ -128,6 +136,16 @@ public class FormMainWindow extends javax.swing.JFrame {
             }
         });
 
+        btnConfig.setBackground(new java.awt.Color(153, 204, 255));
+        btnConfig.setFont(new java.awt.Font("Candara", 3, 14)); // NOI18N
+        btnConfig.setForeground(new java.awt.Color(0, 0, 0));
+        btnConfig.setText("Configuracion");
+        btnConfig.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConfigActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -138,7 +156,8 @@ public class FormMainWindow extends javax.swing.JFrame {
                     .addComponent(btnRegistroProductos, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnRegistroUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnRegistroVentas, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnInformes, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnInformes, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnConfig))
                 .addGap(116, 116, 116))
         );
         jPanel1Layout.setVerticalGroup(
@@ -152,7 +171,9 @@ public class FormMainWindow extends javax.swing.JFrame {
                 .addComponent(btnRegistroVentas, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btnInformes, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(86, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnConfig)
+                .addContainerGap(49, Short.MAX_VALUE))
         );
 
         btnCerrarSecion.setBackground(new java.awt.Color(153, 255, 255));
@@ -211,66 +232,111 @@ public class FormMainWindow extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    // Metodo para cerrar la aplicacion
+    /**
+     * Método para cerrar la aplicación.
+     *
+     * @param evt Evento de acción generado al hacer clic en el botón "Salir".
+     */
+
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
-        System.exit(0);
+        System.exit(0); // Cierra la applicacion
     }//GEN-LAST:event_btnSalirActionPerformed
 
-    // Método para abrir la ventana de registro de usuarios
+    /**
+     * Método para abrir la ventana de registro de usuarios.
+     *
+     * @param evt Evento de acción generado al hacer clic en el botón "Registro de usuarios".
+     */
     private void btnRegistroUsuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistroUsuariosActionPerformed
-        this.setVisible(false); // Ocultar la interfaz acutal    
+        this.setVisible(false); // Oculta la ventana actual
         if (formUsuarios == null) {
-            formUsuarios = new FormRegistroUsuarios();
+            formUsuarios = new FormRegistroUsuarios(); // Crea una nueva instancia si no existe
         }
-        formUsuarios.setVisible(true);
+        formUsuarios.setVisible(true); // Muestra la ventana de registro de usuarios
     }//GEN-LAST:event_btnRegistroUsuariosActionPerformed
 
-    // Metodo para abrir la ventana de registro de productos
+    /**
+     * Método para abrir la ventana de registro de productos.
+     *
+     * @param evt Evento de acción generado al hacer clic en el botón "Registro de productos".
+     */
     private void btnRegistroProductosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistroProductosActionPerformed
         this.setVisible(false); // Oculta la ventana actual
         if (formProductos == null) {
-            formProductos = new FormRegistroProductos();
+            formProductos = new FormRegistroProductos(); // Crea una nueva instancia si no existe
         }
-        formProductos.setVisible(true);
+        formProductos.setVisible(true); // Muestra la ventana de registro de productos
     }//GEN-LAST:event_btnRegistroProductosActionPerformed
 
-    // Método para abrir la ventana de registro de ventas
+    /**
+     * Método para abrir la ventana de registro de ventas.
+     *
+     * @param evt Evento de acción generado al hacer clic en el botón "Registro de ventas".
+     */
     private void btnRegistroVentasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistroVentasActionPerformed
         this.setVisible(false); // Oculta la ventana actual
         if (formVentas == null) {
-            formVentas = new FormRegistroVentas(true);
+            formVentas = new FormRegistroVentas(true); // Crea una nueva instancia si no existe
         }
-        formVentas.setVisible(true);
+        formVentas.setVisible(true); // Muestra la ventana de registro de ventas
     }//GEN-LAST:event_btnRegistroVentasActionPerformed
 
-    // Método para abrir la ventana de informes
+     /**
+     * Método para abrir la ventana de informes.
+     *
+     * @param evt Evento de acción generado al hacer clic en el botón "Informes Ventas".
+     */
     private void btnInformesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInformesActionPerformed
         this.setVisible(false); // Oculta la ventana actual
         if (formInfoVentas == null) {
-            formInfoVentas = new FormInfoVentas();
+            formInfoVentas = new FormInfoVentas(); // Crea una nueva instancia si no existe
         }
-        formInfoVentas.setVisible(true); // Muestra la nueva ventana        
+        formInfoVentas.setVisible(true); // Muestra la ventana de informes
     }//GEN-LAST:event_btnInformesActionPerformed
 
+     /**
+     * Método para cerrar la sesión actual y volver a la ventana de inicio de sesión.
+     *
+     * @param evt Evento de acción generado al hacer clic en el botón "Cerrar sesión".
+     */
     private void btnCerrarSecionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarSecionActionPerformed
         int confirmed = JOptionPane.showConfirmDialog(this, "¿Estás seguro de que deseas cerrar sesión?", "Confirmación", JOptionPane.YES_NO_OPTION);
 
         if (confirmed == JOptionPane.YES_OPTION) {
-            this.setVisible(false); // Oculta la interfaz actual
-            FormLogIn log_In = new FormLogIn();
+            this.setVisible(false); // Oculta la ventana actual
+            FormLogIn log_In = new FormLogIn(); // Crea una nueva instancia de la ventana de inicio de sesión
             log_In.setVisible(true); // Muestra la ventana de inicio de sesión
         }
     }//GEN-LAST:event_btnCerrarSecionActionPerformed
 
     /**
-     * @param args the command line arguments
+     * Método para configurar la ruta de la base de datos.
+     *
+     * @param evt Evento de acción generado al hacer clic en el botón "Configuración".
+     */
+    private void btnConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfigActionPerformed
+        // Llamamos al método para seleccionar la ruta
+        String rutaSeleccionada = ruta.selecionarRutaDB();
+
+        // Si se obtuvo una ruta, se guarda en un archivo de configuración
+        if (rutaSeleccionada != null) {
+            Properties props = new Properties();
+            props.setProperty("db.path", rutaSeleccionada); // Guarda la ruta en las propiedades
+            try (OutputStream output = new FileOutputStream("config.properties")) {
+                props.store(output, "Configuración de la base de datos"); // Guarda las propiedades en un archivo
+                JOptionPane.showMessageDialog(null, "Ruta de la base de datos configurada:\n" + rutaSeleccionada);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null, "Error al guardar la configuración: " + e.getMessage());
+            }
+        }
+    }//GEN-LAST:event_btnConfigActionPerformed
+
+    /**
+     * Método principal para ejecutar la ventana principal.
+     *
+     * @param args Argumentos de la línea de comandos (no utilizados).
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -302,6 +368,7 @@ public class FormMainWindow extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCerrarSecion;
+    private javax.swing.JButton btnConfig;
     private javax.swing.JButton btnInformes;
     private javax.swing.JButton btnRegistroProductos;
     private javax.swing.JButton btnRegistroUsuarios;
