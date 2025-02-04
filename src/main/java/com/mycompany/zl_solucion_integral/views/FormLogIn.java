@@ -1,7 +1,6 @@
 package com.mycompany.zl_solucion_integral.views;
 
 import com.mycompany.zl_solucion_integral.config.UtilVentanas;
-import com.mycompany.zl_solucion_integral.config.Validaciones;
 import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
 import com.mycompany.zl_solucion_integral.models.Sesion;
 import javax.swing.JOptionPane;
@@ -14,7 +13,6 @@ import javax.swing.JOptionPane;
  */
 public class FormLogIn extends javax.swing.JFrame {
 
-    Validaciones valid = new Validaciones();
     private Sesion sesion; //Obgeto para manejar la sesion del usuario
 
     /**
