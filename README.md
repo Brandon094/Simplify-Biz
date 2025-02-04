@@ -38,13 +38,11 @@ La aplicación está desarrollada en **Java 17** y no requiere instalación. Sim
 
 ## **🗄️ Base de datos**
 
-📂 La base de datos de **Simplify Biz** está almacenada en el archivo `DB.db`, que debe estar en la **misma carpeta** donde esté el archivo `.jar`. Este archivo contiene los datos iniciales necesarios para el funcionamiento de la aplicación.  
+📂 La base de datos de Simplify Biz está almacenada en el archivo db.db, que debe estar en la misma carpeta donde esté el archivo .jar. Este archivo contiene los datos iniciales necesarios para el funcionamiento de la aplicación.
 
-🔑 En la base de datos se ha creado un usuario genérico:  
+🔎 Ahora, al iniciar la aplicación, se verifica si existe un usuario administrador. Si no se encuentra ninguno, se solicitará el registro de un administrador antes de continuar con el uso del sistema.
 
-- **👤 Usuario:** `admin`  
-- **🔒 Contraseña:** `admin`  
-
+⚙️ Luego de iniciar sesión, hay un botón de Configuración que permite seleccionar la ruta donde deseas que se almacene la base de datos, brindando mayor flexibilidad en la gestión de los datos.
 ---
 
 ## **🚀 Ejecutar la aplicación**
