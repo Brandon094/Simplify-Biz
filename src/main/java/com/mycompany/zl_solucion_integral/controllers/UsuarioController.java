@@ -44,13 +44,13 @@ public class UsuarioController {
     public void agregarUsuario(final Usuario usuario) {
         // Validar si ya existe un usuario con ese nombre
         if (validarExistenciaUsuario(usuario.getNombre())) {
-            JOptionPane.showMessageDialog(null, "El usuario ya existe con este nombre.");
+            JOptionPane.showMessageDialog(null, "El usuario ya existe con este nombre.", "Error", JOptionPane.ERROR_MESSAGE);
             return; // Sale del método para evitar duplicados
         }
 
         // Validar si ya existe un usuario con ese correo
         if (validarExistenciaPorCorreo(usuario.getEmail())) {
-            JOptionPane.showMessageDialog(null, "El usuario ya existe con este correo.");
+            JOptionPane.showMessageDialog(null, "El usuario ya existe con este correo.",  "Error", JOptionPane.ERROR_MESSAGE);
             return; // Sale del método para evitar duplicados
         }
 
@@ -150,8 +150,8 @@ public class UsuarioController {
      */
     public void eliminarUsuario(int idUsuario, JTable tbUsuarios) {
         if (idUsuario == -1) {
-            JOptionPane.showMessageDialog(null, "Debe seleccionar un usuario de la tabla",
-                    "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Seleccione un usuario",
+                    "Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
 

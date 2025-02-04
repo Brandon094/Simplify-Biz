@@ -2,6 +2,7 @@ package com.mycompany.zl_solucion_integral.views;
 
 import com.mycompany.zl_solucion_integral.config.Listener;
 import com.mycompany.zl_solucion_integral.config.UtilVentanas;
+import com.mycompany.zl_solucion_integral.config.Validaciones;
 import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
 import com.mycompany.zl_solucion_integral.models.Usuario;
 import javax.swing.DefaultComboBoxModel;
@@ -13,13 +14,14 @@ import javax.swing.JTextField;
 * modifica y eliminacion de usuarios.
 *
 * @author Dazac
-*/
+ */
 public class FormRegistroUsuarios extends javax.swing.JFrame {
 
     // Instancia del controlador del usuario
     UsuarioController usuarioCtrl = new UsuarioController();
 
     Listener listenerTb = new Listener();
+    Validaciones valid = new Validaciones();
 
     // Constructor           
     public FormRegistroUsuarios() {
@@ -65,13 +67,37 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
      */
     private Usuario obtenerDatosFormulario() {
         // Obtener los datos de los campos
-        String nombre = txtNombre.getText().toLowerCase();
-        String telefono = txtTelefono.getText();
-        String email = txtEmail.getText().toLowerCase();
-        String rol = txtRol.getText();
-        String contraseña = txtContraseña.getText();
+        String nombre = txtNombre.getText().trim().toLowerCase();
+        String telefono = txtTelefono.getText().trim();
+        String email = txtEmail.getText().trim().toLowerCase();
+        String rol = txtRol.getText().trim();
+        String contraseña = txtContraseña.getText().trim();
 
-        // Crear y retornar un objeto Usuario con los datos
+        // Validar que los campos no estén vacíos
+        if (!Validaciones.validarNoVacio(nombre, telefono, email, rol, contraseña)) {
+                JOptionPane.showMessageDialog(this, "LLena los campos obligatorios.\n\n- Nombre\n- Telefono\n- Email\n- Rol\n- Contraseña", "Error", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+
+        // Validar formato del correo electrónico
+        if (!Validaciones.validarEmail(email)) {
+            JOptionPane.showMessageDialog(this, "El correo electrónico no tiene un formato válido.", "Error", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+
+        // Validar formato del teléfono (10 dígitos)
+        if (!Validaciones.validarTelefono(telefono)) {
+            JOptionPane.showMessageDialog(this, "El número de teléfono debe contener exactamente 10 dígitos.", "Error", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+
+        // Validar el rol (debe ser 1 o 0)
+        if (!Validaciones.validarRol(rol)) {
+            JOptionPane.showMessageDialog(this, "El rol debe ser 1 para administrador o 0 para vendedor.", "Error", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+
+        // Si todas las validaciones pasan, crear y retornar el usuario
         return new Usuario(0, nombre, telefono, email, contraseña, rol);
     }
 
@@ -434,51 +460,34 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNombreActionPerformed
 
-        /**
+    /**
      * Acción para guardar un nuevo usuario.
      */
     private void btnGuardarUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarUsuarioActionPerformed
-        // Obtener los datos del formulario
+        // Obtener los datos del formulario con validaciones
         Usuario usuario = obtenerDatosFormulario();
 
-        // Validar que los campos no estén vacíos
-        if (usuario.getNombre().isEmpty() || usuario.getTelefono().isEmpty() || usuario.getEmail().isEmpty()
-                || usuario.getRol().isEmpty() || usuario.getContraseña().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Debe ingresar todos los datos.");
+        // Si obtenerDatosFormulario devuelve null, no continuar
+        if (usuario == null) {
             return;
         }
 
-        // Validar formato del correo electrónico
-        if (!usuario.getEmail().matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-            JOptionPane.showMessageDialog(this, "El correo electrónico no tiene un formato válido.");
-            return;
-        }
-
-        // Validar el rol (debe ser 1 o 0)
         try {
-            int rolNumero = Integer.parseInt(usuario.getRol());
-            // Verificar que el rol sea 1 (admin) o 0 (vendedor)
-            if (rolNumero != 1 && rolNumero != 0) {
-                JOptionPane.showMessageDialog(this, "El rol debe ser 1 para administrador o 0 para vendedor.");
-                return;
-            }
-
             // Guardar el nuevo usuario en la base de datos
             usuarioCtrl.agregarUsuario(usuario);
 
             // Actualizar los datos de la tabla
             usuarioCtrl.mostrarUsuarios(tbUsuarios);
+
             // Limpiar campos del formulario
             limpiarCampos();
 
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "El rol debe ser un número válido.");
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error al guardar el usuario: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al guardar el usuario: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnGuardarUsuarioActionPerformed
 
-     /**
+    /**
      * Acción para eliminar un usuario seleccionado.
      */
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
@@ -496,13 +505,11 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
      * Acción para modificar un usuario seleccionado.
      */
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
-        // Obtener datos del formulario
+        // Obtener datos del formulario con validaciones
         Usuario usuario = obtenerDatosFormulario();
 
-        // Validar que los campos no estén vacíos
-        if (usuario.getNombre().isEmpty() || usuario.getTelefono().isEmpty() || usuario.getEmail().isEmpty()
-                || usuario.getRol().isEmpty() || usuario.getContraseña().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Debe ingresar todos los datos.");
+        // Si obtenerDatosFormulario devuelve null, no continuar
+        if (usuario == null) {
             return;
         }
 
@@ -521,11 +528,11 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
                 // Limpiar los campos después de modificar
                 limpiarCampos();
             } else {
-                JOptionPane.showMessageDialog(this, "Debe seleccionar un usuario para modificar.");
+                JOptionPane.showMessageDialog(this, "Debe seleccionar un usuario para modificar.", "Error", JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error al modificar el usuario: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al modificar el usuario: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnModificarActionPerformed
 
@@ -561,7 +568,11 @@ public class FormRegistroUsuarios extends javax.swing.JFrame {
      */
     private void ListRolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ListRolActionPerformed
         String rolSeleccionado = (String) ListRol.getSelectedItem();
-        usuarioCtrl.mostrarUsuariosPorRol(tbUsuarios, rolSeleccionado);
+        if (rolSeleccionado != null && !rolSeleccionado.isEmpty()) {
+            usuarioCtrl.mostrarUsuariosPorRol(tbUsuarios, rolSeleccionado);
+        } else {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar un rol válido.");
+        }
     }//GEN-LAST:event_ListRolActionPerformed
     /**
      * @param args the command line arguments

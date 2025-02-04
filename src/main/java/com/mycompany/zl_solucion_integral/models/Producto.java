@@ -128,12 +128,15 @@ public class Producto {
 
     @Override
     public String toString() {
-        return "id: " + id
-                + "producto: " + producto
-                + "precio: " + precio
-                + "cantidad: " + cantidad
-                + "codigo: " + codigo
-                + "total: " + total
-                + "categoria: " + categoria;
+        return String.format(
+                "| %-5s | %-20s | %-10s | %-8s | %-10s | %-10s | %-15s |",
+                "ID: " + id,
+                "PRODUCTO: " + producto,
+                "PRECIO: " + precio,
+                "CANTIDAD: " + cantidad,
+                "CODIGO: " + codigo,
+                "TOTAL: " + total,
+                "CATEGORIA: " + categoria
+        );
     }
 }

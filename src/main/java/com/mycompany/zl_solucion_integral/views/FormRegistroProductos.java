@@ -5,6 +5,7 @@ import com.mycompany.zl_solucion_integral.config.Listener;
 import com.mycompany.zl_solucion_integral.config.PantallaCarga;
 import com.mycompany.zl_solucion_integral.config.SelecionRuta;
 import com.mycompany.zl_solucion_integral.config.UtilVentanas;
+import com.mycompany.zl_solucion_integral.config.Validaciones;
 import com.mycompany.zl_solucion_integral.controllers.ProductoController;
 import com.mycompany.zl_solucion_integral.models.Producto;
 import javax.swing.JFrame;
@@ -25,9 +26,11 @@ public class FormRegistroProductos extends javax.swing.JFrame {
 
     ProductoController productoCtrl = new ProductoController();
     Listener listenerTb = new Listener();
+    Validaciones valid = new Validaciones();
 
     /**
-     * Constructor que inicializa la ventana y muestra los productos en la tabla.
+     * Constructor que inicializa la ventana y muestra los productos en la
+     * tabla.
      */
     public FormRegistroProductos() {
         initComponents(); // Inicializa los componentes gráficos
@@ -66,15 +69,28 @@ public class FormRegistroProductos extends javax.swing.JFrame {
     /**
      * Método para obtener los datos del formulario.
      *
-     * @return Un objeto Producto con los datos del formulario, o null si hay un error.
+     * @return Un objeto Producto con los datos del formulario, o null si hay un
+     * error.
      */
     private Producto obtenerDatosFormulario() {
-        // Obtener los datos del formulario
-        String productoNombre = txtProducto.getText();
+        // Obtener los datos del formulario y convertirlos a mayúsculas
+        String productoNombre = valid.convertirAMayusculas(txtProducto.getText());
         String cantidadStr = txtCantidad.getText();
         String precioStr = txtPrecio.getText();
-        String codigo = txtCodigo.getText();
-        String categoria = txtCategoria.getText();
+        String codigo = valid.convertirAMayusculas(txtCodigo.getText());
+        String categoria = valid.convertirAMayusculas(txtCategoria.getText());
+
+        // Validar que los campos no estén vacíos
+        if (!valid.validarNoVacio(productoNombre, cantidadStr, precioStr, codigo, categoria)) {
+                JOptionPane.showMessageDialog(this, "LLena los campos obligatorios.\n\n- Producto\n- Cantidad\n- Precio\n- Codigo\n- Categoria", "Error", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+
+        // Validar que la categoría sea válida
+        if (!valid.validarCategoria(categoria)) {
+            JOptionPane.showMessageDialog(this, "La categoría seleccionada no es válida.", "Error", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
 
         // Inicializar variables para cantidad y precio
         int cantidad = 0;
@@ -84,15 +100,27 @@ public class FormRegistroProductos extends javax.swing.JFrame {
             // Parsear cantidad y precio
             cantidad = Integer.parseInt(cantidadStr);
             precio = Double.parseDouble(precioStr);
+
+            // Validar que la cantidad y el precio sean positivos
+            if (!valid.validarNumeroPositivo(cantidad)) {
+                JOptionPane.showMessageDialog(this, "La cantidad y el precio deben ser números positivos.", "Error", JOptionPane.ERROR_MESSAGE);
+                return null;
+            }
+            if (!valid.validarNumeroPositivo(precio)) {
+                JOptionPane.showMessageDialog(this, "El precio deben ser números positivos.",  "Error", JOptionPane.ERROR_MESSAGE);
+                return null;
+            }
+
         } catch (NumberFormatException e) {
             // Mostrar un mensaje si ocurre un error en el parseo
-            JOptionPane.showMessageDialog(this, "La cantidad debe ser un número entero y el precio un número decimal válido.");
+            JOptionPane.showMessageDialog(this, "La cantidad debe ser un número entero y el precio un número decimal válido.",  "Error", JOptionPane.ERROR_MESSAGE);
             return null; // Retornar null si hay un error en el parseo
         }
 
         // Crear y retornar un objeto Producto con los datos
         return new Producto(productoNombre, precio, cantidad, codigo, categoria);
     }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -470,15 +498,9 @@ public class FormRegistroProductos extends javax.swing.JFrame {
         // Obtener los datos del formulario
         Producto producto = obtenerDatosFormulario();
 
-        // Verificar si el producto es nulo (error en la conversión)
+        // Verificar si el producto es nulo (error en la validación)
         if (producto == null) {
             return; // Ya se ha mostrado un mensaje de error en obtenerDatosFormulario()
-        }
-
-        // Validar que los campos no estén vacíos
-        if (producto.getProducto().isEmpty() || producto.getCantidad() <= 0 || producto.getPrecio() <= 0 || producto.getCodigo().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Debe ingresar todos los datos correctamente.");
-            return;
         }
 
         try {
@@ -498,7 +520,7 @@ public class FormRegistroProductos extends javax.swing.JFrame {
 
     /*
     * Metodo para eliminar un producto selecionado
-    */
+     */
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         // Obtener el ID del producto seleccionado en la tabla
         int idProducto = productoCtrl.obtenerIdProductoSeleccionado(tbProductos);
@@ -510,6 +532,8 @@ public class FormRegistroProductos extends javax.swing.JFrame {
         // Llamar al formulario de confirmación de eliminación
         FormConfEliminacion formConfEliminacion = new FormConfEliminacion(idProducto, tbProductos, infoProducto);
         formConfEliminacion.setVisible(true);
+        // Cerrar la interfaz acctual 
+        this.setVisible(false);
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     /**
@@ -519,15 +543,9 @@ public class FormRegistroProductos extends javax.swing.JFrame {
         // Obtener los datos del formulario
         Producto producto = obtenerDatosFormulario();
 
-        // Verificar si el producto es nulo (error en la conversión)
+        // Verificar si el producto es nulo (error en la validación)
         if (producto == null) {
             return; // Ya se ha mostrado un mensaje de error en obtenerDatosFormulario()
-        }
-
-        // Validar que los campos no estén vacíos
-        if (producto.getProducto().isEmpty() || producto.getCantidad() <= 0 || producto.getPrecio() <= 0 || producto.getCodigo().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Debe ingresar todos los datos correctamente.");
-            return;
         }
 
         try {
@@ -547,19 +565,19 @@ public class FormRegistroProductos extends javax.swing.JFrame {
                 limpiarFormulario();
 
             } else {
-                JOptionPane.showMessageDialog(this, "Debe seleccionar un producto para modificar.");
+                JOptionPane.showMessageDialog(this, "Debe seleccionar un producto para modificar.","Advertencia", JOptionPane.WARNING_MESSAGE);
             }
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error al modificar el producto: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al modificar el producto: " + e.getMessage(), "Error", JOptionPane.ERROR);
         }
     }//GEN-LAST:event_btnModificarActionPerformed
 
-     /**
+    /**
      * Método para importar datos desde un archivo Excel.
      */
     private void btnImportarExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportarExcelActionPerformed
-     // Seleccionar la ruta del archivo Excel usando el método SeleccionRuta
+        // Seleccionar la ruta del archivo Excel usando el método SeleccionRuta
         String rutaExcel = SelecionRuta.obtenerRutaAbrir("Seleccionar archivo Excel");
 
         // Verificar si el usuario seleccionó un archivo
@@ -641,7 +659,7 @@ public class FormRegistroProductos extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnExportarActionPerformed
 
-   /**
+    /**
      * Método para filtrar productos por categoría.
      */
     private void ListCategoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ListCategoriaActionPerformed
@@ -659,7 +677,7 @@ public class FormRegistroProductos extends javax.swing.JFrame {
     private void txtCategoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCategoriaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtCategoriaActionPerformed
-     /**
+    /**
      * Método para limpiar los campos del formulario.
      */
     private void limpiarFormulario() {

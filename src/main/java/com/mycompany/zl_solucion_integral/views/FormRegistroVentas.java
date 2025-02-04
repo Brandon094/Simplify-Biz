@@ -4,6 +4,7 @@ import com.mycompany.zl_solucion_integral.config.EnvioCotizacion;
 import com.mycompany.zl_solucion_integral.config.PantallaCarga;
 import com.mycompany.zl_solucion_integral.config.SelecionRuta;
 import com.mycompany.zl_solucion_integral.config.UtilVentanas;
+import com.mycompany.zl_solucion_integral.config.Validaciones;
 import com.mycompany.zl_solucion_integral.controllers.ProductoController;
 import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
 import com.mycompany.zl_solucion_integral.controllers.VentasController;
@@ -39,12 +40,13 @@ public class FormRegistroVentas extends javax.swing.JFrame {
     // Instancia de la clase sesion
     private Sesion sesion;
     Usuario cliente = new Usuario();
-    Venta venta = new Venta();   
+    Venta venta = new Venta();
     VentasController ventasCtrl = new VentasController(cliente, sesion);
     UsuarioController usuarioCtrl = new UsuarioController();
     ProductoController productoCtrl = new ProductoController();
     EnvioCotizacion envioCotizacion = new EnvioCotizacion();
     private int cantidadDisponibleEnMemoria;
+    Validaciones valid = new Validaciones();
 
     // Define el ArrayList de ventas a nivel de la clase
     private List<Venta> ventasCotizadas = new ArrayList<>();
@@ -75,40 +77,78 @@ public class FormRegistroVentas extends javax.swing.JFrame {
         ventasCtrl.MostrarVentas(tbVentas); // Mostrar las ventas 
         btnMenuPrincipal.setVisible(esAdmin); // Ocultar el boton inicalmente
         tbVentas.setVisible(esAdmin); // Ocultar la tabla inicalmente
-        textVendedor.setText("Vendedor: " + vendedor);               
+        textVendedor.setText("Vendedor: " + vendedor);
     }
 
-    // Método para obtener los datos del formulario
+// Método para obtener los datos del formulario con validaciones mejoradas
+// Método para obtener los datos del formulario con validaciones mejoradas
     private Venta obtenerDatosFormulario() {
         try {
-            // Obtener los datos del formulario
-            // Datos de producto
-            String codigo = txtCodigo.getText().trim();
-            String productoName = txtProducto.getText().trim();
+            // Obtener datos del formulario
+            String codigo = valid.convertirAMayusculas(txtCodigo.getText().trim());
+            String productoName = valid.convertirAMayusculas(txtProducto.getText().trim());
             String cantidadStr = txtCantidad.getText().trim();
             String descuentoStr = txtDescuento.getText().trim();
-            // Datos cliente
             String clienteName = txtCliente.getText().trim();
             String noCcCliente = txtNoCc.getText().trim();
             String telefonoCliente = txtTelefonoCliente.getText().trim();
             String correoCliente = txtCorreoCliente.getText().trim();
             String NIT = txtNit.getText().trim();
             String DIR = txtDir.getText().trim();
-            // Los datos de contraseña y rol 
-            String contraseña = " ";
-            String rol = "2";
+            String metodoPago = checkCredito.isSelected() ? "Crédito" : (checkEfectivo.isSelected() ? "Efectivo" : "");
 
-            // Verificar si se seleccionó efectivo o crédito
-            String metodoPago = "Efectivo"; // Valor por defecto
-            if (checkCredito.isSelected()) {
-                metodoPago = "Crédito";  // Si se selecciona el JCheckBox de crédito
-            } else if (checkEfectivo.isSelected()) {
-                metodoPago = "Efectivo";  // Si se selecciona el JCheckBox de efectivo
+            // Validaciones generales
+            if (!valid.validarNoVacio(codigo, cantidadStr, clienteName, noCcCliente, telefonoCliente, correoCliente, NIT, DIR)) {
+                JOptionPane.showMessageDialog(this, "LLena los campos obligatorios.\n\n- Codigo o Producto\n- Cantidad\n- Nombre cliente\n- Telefono o Correo electronico\n- NIT\n- DIR\n- Metodo de pago", "Error", JOptionPane.ERROR_MESSAGE);
+                return null;
             }
 
-            // Validar datos
-            if (!validarProducto(codigo, productoName, cantidadStr) || !validarCliente(clienteName, noCcCliente, telefonoCliente, correoCliente, NIT, DIR)) {
+            if (!valid.validarProducto(codigo, productoName)) {
+                JOptionPane.showMessageDialog(this, "Debe ingresar el código o el nombre del producto.", "Error", JOptionPane.ERROR_MESSAGE);
                 return null;
+            }
+
+            if (!valid.validarCodigoProducto(valid.convertirAMayusculas(codigo))) {
+                JOptionPane.showMessageDialog(this, "El código del producto debe ingresarse.", "Error", JOptionPane.ERROR_MESSAGE);
+                return null;
+            }
+
+            if (!valid.validarTelefono(telefonoCliente)) {
+                JOptionPane.showMessageDialog(this, "El teléfono debe contener entre 7 y 10 dígitos.", "Error", JOptionPane.ERROR_MESSAGE);
+                return null;
+            }
+
+            if (!valid.validarEmail(correoCliente)) {
+                JOptionPane.showMessageDialog(this, "Ingrese un correo electrónico válido.", "Error", JOptionPane.ERROR_MESSAGE);
+                return null;
+            }
+
+            if (!valid.validarMetodoPago(checkEfectivo.isSelected(), checkCredito.isSelected())) {
+                JOptionPane.showMessageDialog(this, "Debe seleccionar un método de pago.", "Error", JOptionPane.ERROR_MESSAGE);
+                return null;
+            }
+
+            // Validaciones numéricas
+            int cantidadSolicitada;
+            try {
+                cantidadSolicitada = Integer.parseInt(cantidadStr);
+                if (!valid.validarNumeroPositivo(cantidadSolicitada)) {
+                    JOptionPane.showMessageDialog(this, "La cantidad debe ser un número positivo.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return null;
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Ingrese una cantidad válida.", "Error", JOptionPane.ERROR_MESSAGE);
+                return null;
+            }
+
+            // Validar y convertir descuento
+            double descuento = 0.0; // Valor por defecto
+            if (!valid.validarDescuento(descuentoStr)) {
+                JOptionPane.showMessageDialog(this, "El descuento debe estar entre 0 y 100.", "Error", JOptionPane.ERROR_MESSAGE);
+                return null;
+            }
+            if (!descuentoStr.isEmpty()) {
+                descuento = Double.parseDouble(descuentoStr);
             }
 
             // Buscar producto
@@ -120,19 +160,17 @@ public class FormRegistroVentas extends javax.swing.JFrame {
                 return null;
             }
 
-            // Validar cantidad solicitada contra la cantidad disponible en memoria (no la base de datos)
-            int cantidadSolicitada = Integer.parseInt(cantidadStr);
-
+            // Validar cantidad disponible
             cantidadDisponibleEnMemoria = productoEncontrado.getCantidad();
             if (cantidadSolicitada > cantidadDisponibleEnMemoria) {
-                JOptionPane.showMessageDialog(this, "La cantidad solicitada supera la cantidad disponible en inventario (" + cantidadDisponibleEnMemoria + ").", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "La cantidad solicitada supera la cantidad disponible (" + cantidadDisponibleEnMemoria + ").", "Error", JOptionPane.ERROR_MESSAGE);
                 return null;
             }
-            // Acctualizar la cantidad disponible en memoria
-            cantidadDisponibleEnMemoria = cantidadDisponibleEnMemoria - cantidadSolicitada;
 
-            // Calcular total            
-            double descuento = descuentoStr.isEmpty() ? 0.0 : Double.parseDouble(descuentoStr);
+            // Actualizar cantidad en memoria
+            cantidadDisponibleEnMemoria -= cantidadSolicitada;
+
+            // Calcular total
             double precio = productoEncontrado.getPrecio();
             double total = precio * cantidadSolicitada - (precio * cantidadSolicitada * descuento / 100);
 
@@ -143,101 +181,35 @@ public class FormRegistroVentas extends javax.swing.JFrame {
             cliente.setEmail(correoCliente);
             cliente.setNIT(NIT);
             cliente.setDIR(DIR);
-            cliente.setRol(rol);
-            // crear una contraseña 
-            contraseña = clienteName.replaceAll("\\s+", "") + noCcCliente;
-            // Asigna la contraseña creada
-            cliente.setContraseña(contraseña);
+            cliente.setRol("2");
+            cliente.setContraseña(clienteName.replaceAll("\\s+", "") + noCcCliente); // Generar contraseña
 
-            // Inicializar venta si es null
+            // Inicializar venta solo si es null
             if (venta == null) {
                 venta = new Venta();
             }
-            venta.setCliente(cliente); // Asegúrate de asignar el cliente a la venta
-
-            // Cantidad solicitada
+            venta.setCliente(cliente);
             productoEncontrado.setCantidadSolicitada(cantidadSolicitada);
-
-            // Asignar la forma de pago a la venta
             venta.setMetodoPago(metodoPago);
-            // Retornar venta
-            return new Venta(productoEncontrado.getCodigo(), productoEncontrado, productoEncontrado.getCantidadSolicitada(), LocalDate.now(), vendedor, venta.getCliente(), total, descuento, cantidadDisponibleEnMemoria, metodoPago);
+
+            // Retornar nueva instancia de Venta
+            return new Venta(
+                    productoEncontrado.getCodigo(),
+                    productoEncontrado,
+                    cantidadSolicitada,
+                    LocalDate.now(),
+                    vendedor,
+                    venta.getCliente(),
+                    total,
+                    descuento,
+                    cantidadDisponibleEnMemoria,
+                    metodoPago
+            );
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Ocurrió un error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             return null;
         }
-    }
-
-    private boolean validarCliente(String clienteName, String noCcCliente, String telefonoCliente, String correoCliente, String NIT, String DIR) {
-        if (clienteName.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Debe ingresar el nombre del cliente.", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        if (noCcCliente.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Debe ingresar el número de cédula del cliente.", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        if (telefonoCliente.isEmpty() && correoCliente.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Debe ingresar el teléfono o el correo electrónico.", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        if (!telefonoCliente.isEmpty() && !telefonoCliente.matches("\\d{7,10}")) {
-            JOptionPane.showMessageDialog(this, "El teléfono debe contener entre 7 y 10 dígitos.", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        if (!correoCliente.isEmpty() && !correoCliente.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
-            JOptionPane.showMessageDialog(this, "El correo electrónico no tiene un formato válido.", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        if (NIT.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "El NIT no debe estar vacío.", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        if (DIR.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "La Dirección debe ser llenada.", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        // Validar que se haya seleccionado uno de los métodos de pago
-        if (!checkCredito.isSelected() && !checkEfectivo.isSelected()) {
-            JOptionPane.showMessageDialog(this, "Debe seleccionar un método de pago (Efectivo o Crédito).", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        return true;
-    }
-
-    private boolean validarProducto(String codigo, String productoName, String cantidadStr) {
-        if (codigo.isEmpty() && productoName.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Debe ingresar el código o el nombre del producto.", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        if (cantidadStr.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Debe ingresar la cantidad.", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        try {
-            int cantidad = Integer.parseInt(cantidadStr);
-            if (cantidad <= 0) {
-                JOptionPane.showMessageDialog(this, "La cantidad debe ser mayor a 0.", "Error", JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "La cantidad debe ser un número entero.", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        return true;
-    }
-
-    // Método para validar campos antes de procesar la venta
-    public boolean validarCampos() {
-        if (ventasCotizadas.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Debe realizar una cotización antes de registrar la venta.", "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        return true;
     }
 
     @SuppressWarnings("unchecked")
@@ -1086,8 +1058,8 @@ public class FormRegistroVentas extends javax.swing.JFrame {
         textCorreo.setText("Email: ");
         textValorTotal.setText("Precio Total: 0.0");
 
-        JOptionPane.showMessageDialog(this, "La lista de productos cotizados ha sido limpiada.",
-                "Lista Limpiada", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, "El carrito de compras ha sido limpiado.",
+                "Carrito de compras Vacio", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_btnLimpiarCarritoActionPerformed
 
     private void txtTelefonoClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTelefonoClienteActionPerformed
@@ -1135,7 +1107,7 @@ public class FormRegistroVentas extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Producto agregado al carrito con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             limpiarCajas();
         } else {
-            JOptionPane.showMessageDialog(this, "Por favor, completa todos los campos requeridos.", "Error", JOptionPane.ERROR_MESSAGE);
+            return; // Ya mostró un mensaje de error en obtenerDatosFormulario
         }
     }
 //GEN-LAST:event_btnAgregarAlCarritoActionPerformed

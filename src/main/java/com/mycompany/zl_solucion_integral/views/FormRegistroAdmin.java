@@ -1,6 +1,7 @@
 package com.mycompany.zl_solucion_integral.views;
 
 import com.mycompany.zl_solucion_integral.config.UtilVentanas;
+import com.mycompany.zl_solucion_integral.config.Validaciones;
 import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
 import com.mycompany.zl_solucion_integral.models.Usuario;
 import javax.swing.JOptionPane;
@@ -10,7 +11,7 @@ import javax.swing.JOptionPane;
  * @author Dazac
  */
 public class FormRegistroAdmin extends javax.swing.JFrame {
-
+    Validaciones valid = new Validaciones();
     UsuarioController usuarioCtrl = new UsuarioController();
     Usuario administrador = new Usuario();
 
@@ -174,26 +175,33 @@ public class FormRegistroAdmin extends javax.swing.JFrame {
         String email = txtEmail.getText();
         String contraseña = txtContraseña.getText();
 
-        // Validar que los campos no estén vacíos
-        if (nombre.isEmpty() || numTel.isEmpty() || email.isEmpty() || contraseña.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
         // Configurar el administrador
         administrador.setNombre(nombre);
         administrador.setTelefono(numTel);
         administrador.setEmail(email);
         administrador.setContraseña(contraseña);
         administrador.setRol("1"); // Rol de administrador
+        
+        // Validar que los campos no estén vacíos
+        if (!Validaciones.validarNoVacio(administrador.getNombre(), administrador.getTelefono(), administrador.getEmail(), administrador.getRol(), administrador.getContraseña())) {
+            JOptionPane.showMessageDialog(this, "Debe ingresar todos los datos.");
+            return;
+        }
+        
 
-         // Validar formato del correo electrónico
-        if (!administrador.getEmail().matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+        // Validar formato del correo electrónico
+        if (!Validaciones.validarEmail(administrador.getEmail())) {
             JOptionPane.showMessageDialog(this, "El correo electrónico no tiene un formato válido.");
             return;
         }
         
-        // Intentar guardar el usuario
+        // Validar formato de telefono
+        if (!valid.validarTelefono(administrador.getTelefono())){
+            JOptionPane.showMessageDialog(this, "El numero de telefono contiene menos de 10 digitos");
+            return;
+        }
+        
+        // Guardar el usuario
         usuarioCtrl.agregarUsuario(administrador);        
         boolean usuarioCreado = usuarioCtrl.existeAdministrador();
         

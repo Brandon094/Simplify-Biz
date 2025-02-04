@@ -499,8 +499,8 @@ public class ProductoController {
                 );
             } else {
                 // Si no se encuentra el producto, mostrar un mensaje de error
-                JOptionPane.showMessageDialog(null, "Producto no encontrado", "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Selecione un producto", "Advertencia",
+                        JOptionPane.WARNING_MESSAGE);
                 return null;
             }
         } catch (Exception e) {

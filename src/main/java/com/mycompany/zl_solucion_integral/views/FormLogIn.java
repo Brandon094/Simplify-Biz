@@ -1,10 +1,10 @@
 package com.mycompany.zl_solucion_integral.views;
 
 import com.mycompany.zl_solucion_integral.config.UtilVentanas;
+import com.mycompany.zl_solucion_integral.config.Validaciones;
 import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
 import com.mycompany.zl_solucion_integral.models.Sesion;
 import javax.swing.JOptionPane;
-
 
 /**
  * Clase FormLogIn que maneja la interfaz gráfica de inicio de sesión para la
@@ -13,7 +13,8 @@ import javax.swing.JOptionPane;
  * @author Dazac
  */
 public class FormLogIn extends javax.swing.JFrame {
-    
+
+    Validaciones valid = new Validaciones();
     private Sesion sesion; //Obgeto para manejar la sesion del usuario
 
     /**
@@ -24,7 +25,7 @@ public class FormLogIn extends javax.swing.JFrame {
         initComponents(); // Inicializa los componentes gráficos de la interfaz
         setTitle("Inicio de sesión");
         //Aplicar pantalla completa
-        UtilVentanas.aplicarPantallaCompleta(this);        
+        UtilVentanas.aplicarPantallaCompleta(this);
     }
 
     @SuppressWarnings("unchecked")
@@ -254,72 +255,59 @@ public class FormLogIn extends javax.swing.JFrame {
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
         System.exit(0); //termina la ejecucion de la aplicacion
     }//GEN-LAST:event_btnSalirActionPerformed
-    
+
     /**
-     * Acción del botón "Iniciar Sesión" que valida las credenciales del usuario.
+     * Acción del botón "Iniciar Sesión" que valida las credenciales del
+     * usuario.
      *
-     * @param evt Evento de acción generado al hacer clic en el botón "Iniciar Sesión".
+     * @param evt Evento de acción generado al hacer clic en el botón "Iniciar
+     * Sesión".
      */
     private void btnIniciarSecionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarSecionActionPerformed
-      // Instanciar UsuarioController para manejar la lógica de inicio de sesión
+        // Instanciar UsuarioController para manejar la lógica de inicio de sesión
         UsuarioController usuarioCtrl = new UsuarioController();
-        
+
         // Capturar las credenciales ingresadas por el usuario
-        String usuario = txtUsuario.getText();
-        String contraseña = new String(txtContraseña.getPassword());
+        String usuario = txtUsuario.getText().trim();
+        String contraseña = new String(txtContraseña.getPassword()).trim();
 
         // Validar que los campos no estén vacíos
-        if (validarCampos(usuario, contraseña)) {
-            try {
-                // Verificar si el usuario existe en la base de datos
-                if (usuarioCtrl.validarExistenciaUsuario(usuario)) {
-                    // Validar credenciales para administrador
-                    if (usuarioCtrl.validarCredencialesAdmin(usuario, contraseña)) {
-                        // Guardar el usuario en la sesión y mostrar mensaje de bienvenida
-                        sesion.setUsuarioLogueado(usuario);
-                        JOptionPane.showMessageDialog(this, "Inicio de sesión como administrador exitoso\nBienvenido " + sesion.getUsuarioLogueado());
-                        this.setVisible(false); // Ocultar la ventana de inicio de sesión
-                        new FormMainWindow().setVisible(true); // Mostrar la ventana principal del administrador
-                    } 
-                    // Validar credenciales para usuario regular (vendedor)
-                    else if (usuarioCtrl.validarCredencialesUsuarioRegular(usuario, contraseña)) {
-                        // Guardar el usuario en la sesión y mostrar mensaje de bienvenida
-                        sesion.setUsuarioLogueado(usuario);
-                        JOptionPane.showMessageDialog(this, "Inicio de sesión como usuario vendedor\nBienvenido " + sesion.getUsuarioLogueado());
-                        this.setVisible(false); // Ocultar la ventana de inicio de sesión
-                        new FormRegistroVentas(false).setVisible(true); // Mostrar la ventana de registro de ventas
-                    } 
-                    // Si las credenciales son incorrectas
-                    else {
-                        JOptionPane.showMessageDialog(this, "Contraseña incorrecta. Verifique las credenciales.");
-                    }
-                } 
-                // Si el usuario no existe
+        if (usuario.isEmpty() || contraseña.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Debe ingresar un usuario y una contraseña.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            // Verificar si el usuario existe en la base de datos
+            if (usuarioCtrl.validarExistenciaUsuario(usuario)) {
+                // Validar credenciales para administrador
+                if (usuarioCtrl.validarCredencialesAdmin(usuario, contraseña)) {
+                    // Guardar el usuario en la sesión y mostrar mensaje de bienvenida
+                    sesion.setUsuarioLogueado(usuario);
+                    JOptionPane.showMessageDialog(this, "Inicio de sesión como administrador exitoso\n\nBienvenido " + sesion.getUsuarioLogueado(), "Bienvenido", JOptionPane.INFORMATION_MESSAGE);
+                    this.setVisible(false); // Ocultar la ventana de inicio de sesión
+                    new FormMainWindow().setVisible(true); // Mostrar la ventana principal del administrador
+                } // Validar credenciales para usuario regular (vendedor)
+                else if (usuarioCtrl.validarCredencialesUsuarioRegular(usuario, contraseña)) {
+                    // Guardar el usuario en la sesión y mostrar mensaje de bienvenida
+                    sesion.setUsuarioLogueado(usuario);
+                    JOptionPane.showMessageDialog(this, "Inicio de sesión como usuario vendedor\n\nBienvenido " + sesion.getUsuarioLogueado());
+                    this.setVisible(false); // Ocultar la ventana de inicio de sesión
+                    new FormRegistroVentas(false).setVisible(true); // Mostrar la ventana de registro de ventas
+                } // Si las credenciales son incorrectas
                 else {
-                    JOptionPane.showMessageDialog(this, "El usuario no existe. Verifique las credenciales.");
+                    JOptionPane.showMessageDialog(this, "Contraseña incorrecta. Verifique las credenciales.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
-            } catch (Exception e) {
-                // Manejar errores de conexión con la base de datos
-                JOptionPane.showMessageDialog(this, "Error al conectar con la base de datos.");
-                e.printStackTrace(); // Imprimir el error en la consola para depuración
+            } // Si el usuario no existe
+            else {
+                JOptionPane.showMessageDialog(this, "El usuario no existe. Verifique las credenciales.", "Error", JOptionPane.ERROR_MESSAGE);
             }
+        } catch (Exception e) {
+            // Manejar errores de conexión con la base de datos
+            JOptionPane.showMessageDialog(this, "Error al conectar con la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace(); // Imprimir el error en la consola para depuración
         }
     }//GEN-LAST:event_btnIniciarSecionActionPerformed
-    /**
-     * Método para validar que los campos de usuario y contraseña no estén vacíos.
-     *
-     * @param usuario El nombre de usuario ingresado.
-     * @param contraseña La contraseña ingresada.
-     * @return true si los campos no están vacíos, false en caso contrario.
-     */
-    private boolean validarCampos(String usuario, String contraseña) {
-        if (usuario.trim().isEmpty() || contraseña.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Ingrese las credenciales para continuar");
-            return false;
-        }
-        return true;
-    }
-
 
     private void txtUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsuarioActionPerformed
     }//GEN-LAST:event_txtUsuarioActionPerformed
@@ -333,7 +321,7 @@ public class FormLogIn extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtContraseñaActionPerformed
     public static void main(String args[]) {
-         java.awt.EventQueue.invokeLater(new Runnable() {
+        java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new FormLogIn().setVisible(true); // Mostrar la ventana de inicio de sesion
             }
