@@ -1,6 +1,7 @@
 package com.mycompany.zl_solucion_integral.controllers;
 
 import com.mycompany.zl_solucion_integral.config.ConexionDB;
+import com.mycompany.zl_solucion_integral.config.SelecionRuta;
 import com.mycompany.zl_solucion_integral.models.Producto;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,8 +26,10 @@ import javax.swing.table.DefaultTableModel;
  * @author Dazac
  */
 public class ProductoController {
-
-    private final ConexionDB conexion = new ConexionDB();
+    
+    SelecionRuta rutaDB = new SelecionRuta();    
+    
+    private final ConexionDB conexion = new ConexionDB(rutaDB.cargarRutaBaseDatos());
     private final Logger logger = Logger.getLogger(ProductoController.class.getName());
 
     /**

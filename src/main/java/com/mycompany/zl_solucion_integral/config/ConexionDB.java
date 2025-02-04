@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 
 import com.mycompany.zl_solucion_integral.views.FormLogIn;
+import java.sql.SQLException;
 
 /**
  * Clase para manejar la conexión con la base de datos SQLite.
@@ -16,6 +17,18 @@ import com.mycompany.zl_solucion_integral.views.FormLogIn;
  * @author Dazac
  */
 public class ConexionDB {
+    private String rutaDB;        
+
+    // Constructor que recibe la ruta de la base de datos
+    public ConexionDB(String rutaDB) {
+        this.rutaDB = rutaDB;
+    }
+
+    public Connection obtenerConexion() throws SQLException {
+        // Aquí deberías usar la rutaDB para crear la conexión, por ejemplo:
+        String url = "jdbc:sqlite:" + rutaDB + "/mi_base_de_datos.db";
+        return DriverManager.getConnection(url);
+    }
 
     // Objeto de conexión
     Connection conectar = null;

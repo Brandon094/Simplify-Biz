@@ -2,10 +2,6 @@ package com.mycompany.zl_solucion_integral.views;
 
 import com.mycompany.zl_solucion_integral.config.SelecionRuta;
 import com.mycompany.zl_solucion_integral.config.UtilVentanas;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Properties;
-import java.io.OutputStream;
 import javax.swing.JOptionPane;
 
 /*
@@ -30,7 +26,7 @@ import javax.swing.JOptionPane;
  * Autor: Dazac
  */
 public class FormMainWindow extends javax.swing.JFrame {
-    
+
     private FormRegistroUsuarios formUsuarios; // Ventana de registro de usuarios
     private FormRegistroProductos formProductos; // Ventana de registro de productos
     private FormRegistroVentas formVentas; // Ventana de registro de ventas
@@ -61,7 +57,6 @@ public class FormMainWindow extends javax.swing.JFrame {
         btnRegistroUsuarios = new javax.swing.JButton();
         btnRegistroVentas = new javax.swing.JButton();
         btnInformes = new javax.swing.JButton();
-        btnConfig = new javax.swing.JButton();
         jSeparator2 = new javax.swing.JSeparator();
         btnCerrarSecion = new javax.swing.JButton();
 
@@ -136,16 +131,6 @@ public class FormMainWindow extends javax.swing.JFrame {
             }
         });
 
-        btnConfig.setBackground(new java.awt.Color(153, 204, 255));
-        btnConfig.setFont(new java.awt.Font("Candara", 3, 14)); // NOI18N
-        btnConfig.setForeground(new java.awt.Color(0, 0, 0));
-        btnConfig.setText("Configuracion");
-        btnConfig.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnConfigActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -156,8 +141,7 @@ public class FormMainWindow extends javax.swing.JFrame {
                     .addComponent(btnRegistroProductos, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnRegistroUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnRegistroVentas, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnInformes, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnConfig))
+                    .addComponent(btnInformes, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(116, 116, 116))
         );
         jPanel1Layout.setVerticalGroup(
@@ -171,9 +155,7 @@ public class FormMainWindow extends javax.swing.JFrame {
                 .addComponent(btnRegistroVentas, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btnInformes, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnConfig)
-                .addContainerGap(49, Short.MAX_VALUE))
+                .addContainerGap(86, Short.MAX_VALUE))
         );
 
         btnCerrarSecion.setBackground(new java.awt.Color(153, 255, 255));
@@ -245,7 +227,8 @@ public class FormMainWindow extends javax.swing.JFrame {
     /**
      * Método para abrir la ventana de registro de usuarios.
      *
-     * @param evt Evento de acción generado al hacer clic en el botón "Registro de usuarios".
+     * @param evt Evento de acción generado al hacer clic en el botón "Registro
+     * de usuarios".
      */
     private void btnRegistroUsuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistroUsuariosActionPerformed
         this.setVisible(false); // Oculta la ventana actual
@@ -258,7 +241,8 @@ public class FormMainWindow extends javax.swing.JFrame {
     /**
      * Método para abrir la ventana de registro de productos.
      *
-     * @param evt Evento de acción generado al hacer clic en el botón "Registro de productos".
+     * @param evt Evento de acción generado al hacer clic en el botón "Registro
+     * de productos".
      */
     private void btnRegistroProductosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistroProductosActionPerformed
         this.setVisible(false); // Oculta la ventana actual
@@ -271,7 +255,8 @@ public class FormMainWindow extends javax.swing.JFrame {
     /**
      * Método para abrir la ventana de registro de ventas.
      *
-     * @param evt Evento de acción generado al hacer clic en el botón "Registro de ventas".
+     * @param evt Evento de acción generado al hacer clic en el botón "Registro
+     * de ventas".
      */
     private void btnRegistroVentasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistroVentasActionPerformed
         this.setVisible(false); // Oculta la ventana actual
@@ -281,10 +266,11 @@ public class FormMainWindow extends javax.swing.JFrame {
         formVentas.setVisible(true); // Muestra la ventana de registro de ventas
     }//GEN-LAST:event_btnRegistroVentasActionPerformed
 
-     /**
+    /**
      * Método para abrir la ventana de informes.
      *
-     * @param evt Evento de acción generado al hacer clic en el botón "Informes Ventas".
+     * @param evt Evento de acción generado al hacer clic en el botón "Informes
+     * Ventas".
      */
     private void btnInformesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInformesActionPerformed
         this.setVisible(false); // Oculta la ventana actual
@@ -294,10 +280,12 @@ public class FormMainWindow extends javax.swing.JFrame {
         formInfoVentas.setVisible(true); // Muestra la ventana de informes
     }//GEN-LAST:event_btnInformesActionPerformed
 
-     /**
-     * Método para cerrar la sesión actual y volver a la ventana de inicio de sesión.
+    /**
+     * Método para cerrar la sesión actual y volver a la ventana de inicio de
+     * sesión.
      *
-     * @param evt Evento de acción generado al hacer clic en el botón "Cerrar sesión".
+     * @param evt Evento de acción generado al hacer clic en el botón "Cerrar
+     * sesión".
      */
     private void btnCerrarSecionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarSecionActionPerformed
         int confirmed = JOptionPane.showConfirmDialog(this, "¿Estás seguro de que deseas cerrar sesión?", "Confirmación", JOptionPane.YES_NO_OPTION);
@@ -308,28 +296,6 @@ public class FormMainWindow extends javax.swing.JFrame {
             log_In.setVisible(true); // Muestra la ventana de inicio de sesión
         }
     }//GEN-LAST:event_btnCerrarSecionActionPerformed
-
-    /**
-     * Método para configurar la ruta de la base de datos.
-     *
-     * @param evt Evento de acción generado al hacer clic en el botón "Configuración".
-     */
-    private void btnConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfigActionPerformed
-        // Llamamos al método para seleccionar la ruta
-        String rutaSeleccionada = ruta.selecionarRutaDB();
-
-        // Si se obtuvo una ruta, se guarda en un archivo de configuración
-        if (rutaSeleccionada != null) {
-            Properties props = new Properties();
-            props.setProperty("db.path", rutaSeleccionada); // Guarda la ruta en las propiedades
-            try (OutputStream output = new FileOutputStream("config.properties")) {
-                props.store(output, "Configuración de la base de datos"); // Guarda las propiedades en un archivo
-                JOptionPane.showMessageDialog(null, "Ruta de la base de datos configurada:\n" + rutaSeleccionada);
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(null, "Error al guardar la configuración: " + e.getMessage());
-            }
-        }
-    }//GEN-LAST:event_btnConfigActionPerformed
 
     /**
      * Método principal para ejecutar la ventana principal.
@@ -368,7 +334,6 @@ public class FormMainWindow extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCerrarSecion;
-    private javax.swing.JButton btnConfig;
     private javax.swing.JButton btnInformes;
     private javax.swing.JButton btnRegistroProductos;
     private javax.swing.JButton btnRegistroUsuarios;

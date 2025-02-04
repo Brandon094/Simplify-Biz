@@ -1,6 +1,7 @@
 package com.mycompany.zl_solucion_integral.models;
 
 import com.mycompany.zl_solucion_integral.config.ConexionDB;
+import com.mycompany.zl_solucion_integral.config.SelecionRuta;
 
 public class Producto {
 
@@ -14,10 +15,12 @@ public class Producto {
     private String codigo;
     private double total;
     private String categoria;
+    
+    SelecionRuta rutaDB = new SelecionRuta();
 
     // Constructor vacío (útil para instanciar sin datos iniciales)
     public Producto() {
-        this.conexion = new ConexionDB(); // Asegúrate de que ConexionDB esté bien definida.
+        this.conexion = new ConexionDB(rutaDB.cargarRutaBaseDatos()); // Asegúrate de que ConexionDB esté bien definida.
     }
 
     // Constructor con parámetros (para inicializar con datos, incluyendo el total)

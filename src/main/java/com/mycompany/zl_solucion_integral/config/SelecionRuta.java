@@ -1,6 +1,9 @@
 package com.mycompany.zl_solucion_integral.config;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -57,5 +60,17 @@ public class SelecionRuta {
             return fileChooser.getSelectedFile().getAbsolutePath();
         }
         return null; // Si el usuario cancela, retorna null
+    }
+    // Cargar la ruta desde el archivo propierties
+
+    public static String cargarRutaBaseDatos() {
+        Properties props = new Properties();
+        try (FileInputStream input = new FileInputStream("config.properties")) {
+            props.load(input);
+            return props.getProperty("db.path"); // Retorna la ruta de la base de datos
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null; // En caso de error, retorna null
+        }
     }
 }

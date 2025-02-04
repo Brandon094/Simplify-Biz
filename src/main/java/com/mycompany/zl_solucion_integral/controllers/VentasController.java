@@ -11,6 +11,7 @@ package com.mycompany.zl_solucion_integral.controllers;
  * @author Dazac
  */
 import com.mycompany.zl_solucion_integral.config.ConexionDB;
+import com.mycompany.zl_solucion_integral.config.SelecionRuta;
 import com.mycompany.zl_solucion_integral.models.Producto;
 import com.mycompany.zl_solucion_integral.models.Sesion;
 import com.mycompany.zl_solucion_integral.models.Usuario;
@@ -44,21 +45,22 @@ import javax.swing.table.TableModel;
 relacionadas con las ventas en la base de datos*/
 public class VentasController {
 
+    SelecionRuta rutaDB = new SelecionRuta();
     private Usuario cliente;
     private ConexionDB conexion; // Variable global para la conexión
     private Logger logger = Logger.getLogger(VentasController.class.getName());
-    private Sesion sesion;
+    private Sesion sesion;    
 
     // Constructor
     public VentasController(Usuario cliente, Sesion sesion) {
-        this.conexion = new ConexionDB(); // Instancia de la clase de conexión        
+        this.conexion = new ConexionDB(rutaDB.cargarRutaBaseDatos()); // Instancia de la clase de conexión        
         this.sesion = sesion;
         this.cliente = cliente;
     }
 
     // Constructor adicional sin parámetros de Usuario y Sesion
     public VentasController() {
-        this.conexion = new ConexionDB(); // Instancia de la clase de conexión
+        this.conexion = new ConexionDB(rutaDB.cargarRutaBaseDatos()); // Instancia de la clase de conexión
     }
 
     public void guardarVenta(final Venta venta, List<Producto> productosVendidos, JTable tablaVentas) {

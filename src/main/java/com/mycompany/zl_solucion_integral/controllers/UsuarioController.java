@@ -2,6 +2,7 @@ package com.mycompany.zl_solucion_integral.controllers;
 
 import com.mycompany.zl_solucion_integral.config.ConexionDB;
 import com.mycompany.zl_solucion_integral.config.Seguridad;
+import com.mycompany.zl_solucion_integral.config.SelecionRuta;
 import com.mycompany.zl_solucion_integral.models.Usuario;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -27,8 +28,9 @@ import java.util.logging.Logger;
  * @author Dazac
  */
 public class UsuarioController {
+    SelecionRuta rutaDB = new SelecionRuta();
 
-    private final ConexionDB conexion = new ConexionDB();
+    private final ConexionDB conexion = new ConexionDB(rutaDB.cargarRutaBaseDatos());
     private final Logger logger = Logger.getLogger(UsuarioController.class.getName());
 
     /**
@@ -362,7 +364,7 @@ public class UsuarioController {
     // Validar si existe un administrador 
     public boolean existeAdministrador() {
         boolean existe = false;
-        try (Connection con = new ConexionDB().establecerConexion()) {
+        try (Connection con = new ConexionDB(rutaDB.cargarRutaBaseDatos()).establecerConexion()) {
             String sql = "SELECT COUNT(*) FROM usuarios WHERE rol = 1"; // Verifica si hay un admin
             try (PreparedStatement pst = con.prepareStatement(sql); ResultSet rs = pst.executeQuery()) {
                 if (rs.next() && rs.getInt(1) > 0) {

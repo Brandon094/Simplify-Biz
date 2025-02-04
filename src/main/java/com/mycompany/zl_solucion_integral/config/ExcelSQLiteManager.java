@@ -18,9 +18,10 @@ import java.sql.Statement;
  * archivo Excel a una base de datos SQLite.
  */
 public class ExcelSQLiteManager {
+    private static SelecionRuta rutaDB = new SelecionRuta();    
 
     // Se declara 'conexion' como estático para acceder desde un método estático
-    private static ConexionDB conexion = new ConexionDB();
+    private static ConexionDB conexion = new ConexionDB(rutaDB.cargarRutaBaseDatos());
 
     public static void importarExcel(String rutaExcel, String nombreTabla) {
         Connection conn = null;
