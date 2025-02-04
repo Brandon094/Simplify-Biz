@@ -43,6 +43,7 @@ La aplicación está desarrollada en **Java 17** y no requiere instalación. Sim
 🔎 Ahora, al iniciar la aplicación, se verifica si existe un usuario administrador. Si no se encuentra ninguno, se solicitará el registro de un administrador antes de continuar con el uso del sistema.
 
 ⚙️ Luego de iniciar sesión, hay un botón de Configuración que permite seleccionar la ruta donde deseas que se almacene la base de datos, brindando mayor flexibilidad en la gestión de los datos.
+
 ---
 
 ## **🚀 Ejecutar la aplicación**
