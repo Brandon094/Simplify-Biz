@@ -4,6 +4,6 @@
 /target/maven-archiver/
 /target/maven-status/
 /target/test-classes/
-/target/original-Simplify-Biz-1.2.0.jar/
 
-/db/
+db/
+target/original-Simplify-Biz-1.2.0.jar
