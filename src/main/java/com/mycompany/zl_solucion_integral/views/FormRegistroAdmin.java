@@ -11,13 +11,14 @@ import javax.swing.JOptionPane;
  * @author Dazac
  */
 public class FormRegistroAdmin extends javax.swing.JFrame {
+
     Validaciones valid = new Validaciones();
     UsuarioController usuarioCtrl = new UsuarioController();
     Usuario administrador = new Usuario();
 
     public FormRegistroAdmin() {
         initComponents();
-        UtilVentanas.aplicarPantallaCompleta(this);     
+        UtilVentanas.aplicarPantallaCompleta(this);
     }
 
     @SuppressWarnings("unchecked")
@@ -181,31 +182,30 @@ public class FormRegistroAdmin extends javax.swing.JFrame {
         administrador.setEmail(email);
         administrador.setContraseña(contraseña);
         administrador.setRol("1"); // Rol de administrador
-        
+
         // Validar que los campos no estén vacíos
         if (!Validaciones.validarNoVacio(administrador.getNombre(), administrador.getTelefono(), administrador.getEmail(), administrador.getRol(), administrador.getContraseña())) {
-            JOptionPane.showMessageDialog(this, "Debe ingresar todos los datos.");
+            JOptionPane.showMessageDialog(this, "LLena los campos obligatorios.\n\n- Nombre\n- Telefono\n- Correo electronicol\n- Contraseña", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
 
         // Validar formato del correo electrónico
         if (!Validaciones.validarEmail(administrador.getEmail())) {
             JOptionPane.showMessageDialog(this, "El correo electrónico no tiene un formato válido.");
             return;
         }
-        
+
         // Validar formato de telefono
-        if (!valid.validarTelefono(administrador.getTelefono())){
+        if (!valid.validarTelefono(administrador.getTelefono())) {
             JOptionPane.showMessageDialog(this, "El numero de telefono contiene menos de 10 digitos");
             return;
         }
-        
+
         // Guardar el usuario
-        usuarioCtrl.agregarUsuario(administrador);        
+        usuarioCtrl.agregarUsuario(administrador);
         boolean usuarioCreado = usuarioCtrl.existeAdministrador();
-        
-        if (usuarioCreado) {           
+
+        if (usuarioCreado) {
             this.dispose(); // Cierra el formulario actual
 
             // Abrir la ventana de inicio de sesión
