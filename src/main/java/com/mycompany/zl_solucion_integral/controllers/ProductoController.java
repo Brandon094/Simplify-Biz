@@ -54,7 +54,7 @@ public class ProductoController {
         // Consulta SQL para insertar un nuevo producto si no existe en la base de datos
         String sqlInsert = "INSERT INTO productos (producto, precio, cantidad, codigo, categoria) VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection conn = conexion.establecerConexion()) {
+        try (Connection conn = conexion.obtenerConexion()) {
             // Verificar si el producto ya existe en la base de datos mediante su código
             try (PreparedStatement pstmtSelect = conn.prepareStatement(sqlSelect)) {
                 pstmtSelect.setString(1, producto.getCodigo());
@@ -90,8 +90,6 @@ public class ProductoController {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error al agregar o actualizar producto", e);
             JOptionPane.showMessageDialog(null, "Error al procesar producto: " + e.getMessage());
-        } finally {
-            conexion.cerrarConexion();
         }
     }
 
@@ -112,7 +110,7 @@ public class ProductoController {
         // Consulta SQL para actualizar los datos del producto en la base de datos
         String sqlUpdate = "UPDATE productos SET producto = ?, precio = ?, cantidad = ?, codigo = ?, categoria = ? WHERE id = ?";
 
-        try (Connection conn = conexion.establecerConexion()) {
+        try (Connection conn = conexion.obtenerConexion()) {
 
             // Verificar si el código del producto ya está registrado en otro producto con diferente ID
             try (PreparedStatement pstmtCheck = conn.prepareStatement(sqlCheck)) {
@@ -146,8 +144,6 @@ public class ProductoController {
             // Maneja cualquier excepción que ocurra durante el proceso de modificación
             logger.log(Level.SEVERE, "Error al modificar producto", e);
             JOptionPane.showMessageDialog(null, "Error al modificar producto: " + e.getMessage());
-        } finally {
-            conexion.cerrarConexion();
         }
     }
 
@@ -181,7 +177,7 @@ public class ProductoController {
         // Consulta SQL para eliminar el producto
         String sql = "DELETE FROM productos WHERE id = ?";
 
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, idProducto);  // Asignar el ID del producto a eliminar en la consulta
 
@@ -200,10 +196,7 @@ public class ProductoController {
             // Manejo de errores en caso de que ocurra un problema durante la eliminación
             JOptionPane.showMessageDialog(null, "Error al eliminar el producto: " + e.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
-        } finally {
-            // Cerrar la conexión a la base de datos
-            conexion.cerrarConexion();
-        }
+        } 
     }
 
     /**
@@ -241,7 +234,7 @@ public class ProductoController {
         String sqlSelect = "SELECT cantidad FROM productos WHERE id = ?";
         String sqlUpdate = "UPDATE productos SET cantidad = ? WHERE id = ?";
 
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement pstmtSelect = conn.prepareStatement(sqlSelect)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pstmtSelect = conn.prepareStatement(sqlSelect)) {
 
             // Buscar la cantidad actual del producto
             pstmtSelect.setInt(1, idProducto);
@@ -281,10 +274,7 @@ public class ProductoController {
             // Manejo de errores en la eliminación parcial de stock
             JOptionPane.showMessageDialog(null, "Error al eliminar cantidad del producto: "
                     + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        } finally {
-            // Cerrar la conexión a la base de datos
-            conexion.cerrarConexion();
-        }
+        } 
     }
 
     /**
@@ -348,7 +338,7 @@ public class ProductoController {
         // Consulta SQL para obtener todos los productos
         final String sql = "SELECT * FROM productos";
 
-        try (Connection conn = conexion.establecerConexion(); // Conexión a la base de datos
+        try (Connection conn = conexion.obtenerConexion(); // Conexión a la base de datos
                  Statement st = conn.createStatement(); // Crear un Statement
                  ResultSet rs = st.executeQuery(sql)) {  // Ejecutar la consulta SQL y obtener el resultado
 
@@ -373,9 +363,7 @@ public class ProductoController {
             // Manejo de errores si ocurre un problema al obtener los productos
             logger.log(Level.SEVERE, "Error al mostrar productos", e);
             JOptionPane.showMessageDialog(null, "Error al mostrar productos: " + e.getMessage());
-        } finally {
-            conexion.cerrarConexion();
-        }
+        } 
     }
 
     // Metodo para filtar los productos por categorias
@@ -388,7 +376,7 @@ public class ProductoController {
             query += " WHERE categoria = ?";
         }
 
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
             if (!categoria.equals("Todas")) {
                 stmt.setString(1, categoria);
@@ -420,7 +408,7 @@ public class ProductoController {
 
         int total = 0;
 
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement pstmt = conn.prepareStatement(query)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             if (!categoria.equals("Todas")) {
                 pstmt.setString(1, categoria);
@@ -481,7 +469,7 @@ public class ProductoController {
         // Consulta SQL para seleccionar el producto por su ID
         String sql = "SELECT * FROM productos WHERE id = ?";
 
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             // Establecer el ID del producto en la consulta
             pstmt.setInt(1, id);
@@ -512,8 +500,6 @@ public class ProductoController {
             JOptionPane.showMessageDialog(null, "Error al obtener producto: " + e.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
             return null;
-        } finally {
-            conexion.cerrarConexion();
         }
     }
 
@@ -524,7 +510,7 @@ public class ProductoController {
         Producto producto = null;
         final String sql = "SELECT * FROM productos WHERE codigo = ?";
 
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, codigoProducto);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -542,8 +528,6 @@ public class ProductoController {
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Error al buscar producto por código", e);
             JOptionPane.showMessageDialog(null, "Error al buscar el producto: " + e.getMessage());
-        } finally {
-            conexion.cerrarConexion();
         }
         return producto;
     }
@@ -555,7 +539,7 @@ public class ProductoController {
         Producto producto = null;
         final String sql = "SELECT * FROM productos WHERE producto = ?";
 
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, nombreProducto);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -573,8 +557,6 @@ public class ProductoController {
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Error al buscar producto por nombre", e);
             JOptionPane.showMessageDialog(null, "Error al buscar el producto: " + e.getMessage());
-        } finally {
-            conexion.cerrarConexion();
         }
         return producto;
     }
@@ -582,7 +564,7 @@ public class ProductoController {
     public void actualizarCantidadProducto(String codigoProducto, int nuevaCantidad) {
         // Actualiza la cantidad del producto en la base de datos
         String query = "UPDATE productos SET cantidad = ? WHERE codigo = ?";
-        try (Connection conn = conexion.establecerConexion(); // Utiliza ConexionDB para obtener la conexión
+        try (Connection conn = conexion.obtenerConexion(); // Utiliza ConexionDB para obtener la conexión
                  PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, nuevaCantidad);
             stmt.setString(2, codigoProducto);

@@ -76,7 +76,7 @@ public class VentasController {
 
         try {
             // Establecer conexión y preparar transacción
-            conn = conexion.establecerConexion();
+            conn = conexion.obtenerConexion();
             conn.setAutoCommit(false);
 
             // Verificar stock de productos antes de comenzar
@@ -164,7 +164,7 @@ public class VentasController {
                 }
                 if (conn != null) {
                     conn.setAutoCommit(true);
-                    conexion.cerrarConexion();
+                    conexion.cerrarConexion(conn);
                 }
             } catch (SQLException ex) {
                 logger.log(Level.SEVERE, "Error al cerrar conexiones", ex);
@@ -184,7 +184,7 @@ public class VentasController {
         PreparedStatement psStockNuevo = null;
 
         try {
-            conn = conexion.establecerConexion();
+            conn = conexion.obtenerConexion();
             conn.setAutoCommit(false);  // Iniciar una transacción
 
             // Restaurar el stock del producto basado en la venta anterior
@@ -251,7 +251,7 @@ public class VentasController {
                 if (conn != null) {
                     conn.setAutoCommit(true);  // Restaurar el auto-commit
                 }
-                conexion.cerrarConexion();
+                conexion.cerrarConexion(conn);
             } catch (SQLException ex) {
                 logger.log(Level.SEVERE, "Error al cerrar conexiones", ex);
             }
@@ -261,7 +261,7 @@ public class VentasController {
 // Método para obtener la cantidad anterior de una venta
     private int obtenerCantidadAnterior(int idVenta) {
         String sql = "SELECT cantidad FROM ventas WHERE id = ?";
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idVenta);
             ResultSet rs = ps.executeQuery();
@@ -294,7 +294,7 @@ public class VentasController {
     public void guardarNumeroCotizacionEnBaseDeDatos(String numeroCotizacion) {
         String sqlActualizar = "UPDATE configuracion SET ultimoNumeroCotizacion = ? WHERE id = 1";
 
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement pstmt = conn.prepareStatement(sqlActualizar)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pstmt = conn.prepareStatement(sqlActualizar)) {
             pstmt.setString(1, numeroCotizacion);
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -311,7 +311,7 @@ public class VentasController {
         String sqlConsulta = "SELECT ultimoNumeroCotizacion FROM configuracion WHERE id = 1";
         String sqlActualizar = "UPDATE configuracion SET ultimoNumeroCotizacion = ? WHERE id = 1";
 
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement psConsulta = conn.prepareStatement(sqlConsulta); PreparedStatement psActualizar = conn.prepareStatement(sqlActualizar)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement psConsulta = conn.prepareStatement(sqlConsulta); PreparedStatement psActualizar = conn.prepareStatement(sqlActualizar)) {
 
             // Consultar el último número de cotización
             ResultSet rs = psConsulta.executeQuery();
@@ -377,7 +377,7 @@ public class VentasController {
                 + "FROM ventas v "
                 + "JOIN detalles_venta d ON v.id = d.venta_id";
 
-        try (Connection conn = conexion.establecerConexion(); Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+        try (Connection conn = conexion.obtenerConexion(); Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
                 double precio = rs.getDouble("precio");
@@ -424,8 +424,6 @@ public class VentasController {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error al mostrar ventas", e);
             JOptionPane.showMessageDialog(null, "Error al mostrar ventas: " + e.getMessage());
-        } finally {
-            conexion.cerrarConexion();
         }
     }
 
@@ -492,7 +490,7 @@ public class VentasController {
                 + "JOIN detalles_venta d ON v.id = d.venta_id "
                 + "WHERE v.fecha BETWEEN ? AND ?";
 
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement pst = conn.prepareStatement(sql)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pst = conn.prepareStatement(sql)) {
             // Establecer los valores del rango de fechas (timestamps) en la consulta
             pst.setLong(1, timestampInicio);
             pst.setLong(2, timestampFin);
@@ -542,8 +540,6 @@ public class VentasController {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error al mostrar ventas", e);
             JOptionPane.showMessageDialog(null, "Error al mostrar ventas: " + e.getMessage());
-        } finally {
-            conexion.cerrarConexion();
         }
     }
 
@@ -601,7 +597,7 @@ public class VentasController {
                 + "JOIN detalles_venta d ON v.id = d.venta_id "
                 + "WHERE v.fecha BETWEEN ? AND ?";
 
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement pst = conn.prepareStatement(sql)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pst = conn.prepareStatement(sql)) {
             // Establecer los valores del rango de fechas (timestamps) en la consulta
             pst.setLong(1, inicioDia);
             pst.setLong(2, finDia);
@@ -652,8 +648,6 @@ public class VentasController {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error al mostrar ventas por día", e);
             JOptionPane.showMessageDialog(null, "Error al mostrar ventas por día: " + e.getMessage());
-        } finally {
-            conexion.cerrarConexion();
         }
     }
 
@@ -786,7 +780,7 @@ public class VentasController {
 
     public void actualizarPagoConfirmado(int ventaId, String pagoConfirmado) {
         String sql = "UPDATE ventas SET pago_confirmado = ? WHERE id = ?";
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, pagoConfirmado);
             ps.setInt(2, ventaId);

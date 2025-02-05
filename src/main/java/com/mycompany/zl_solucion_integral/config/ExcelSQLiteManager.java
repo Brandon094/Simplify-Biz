@@ -27,7 +27,7 @@ public class ExcelSQLiteManager {
         Connection conn = null;
 
         try {
-            conn = conexion.establecerConexion();
+            conn = conexion.obtenerConexion();
             if (conn != null) {
                 System.out.println("Conexión a SQLite establecida.");
 
@@ -117,7 +117,7 @@ public class ExcelSQLiteManager {
         FileOutputStream fos = null;
 
         try {
-            conn = conexion.establecerConexion();
+            conn = conexion.obtenerConexion();
             if (conn != null) {
                 System.out.println("Conexión a SQLite establecida.");
 

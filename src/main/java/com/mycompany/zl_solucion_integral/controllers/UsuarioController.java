@@ -58,7 +58,7 @@ public class UsuarioController {
 
         final String sql = "INSERT INTO usuarios (nombre, telefono, email, contraseña, rol) VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             // Encriptar la contraseña antes de guardarla
             String contraseñaEncriptada = Seguridad.encriptarContraseña(usuario.getContraseña());
@@ -108,7 +108,7 @@ public class UsuarioController {
     public void modificarUsuario(final String nombre, final String telefono, final String email, final String rol, final String contraseña, final int idUsuario) {
         final String sql = "UPDATE usuarios SET nombre = ?, telefono = ?, email = ?, rol = ?, contraseña = ? WHERE id = ?";
 
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             // Establecer los valores en la consulta
             pstmt.setString(1, nombre);
@@ -134,8 +134,6 @@ public class UsuarioController {
             logger.log(Level.SEVERE, "Error al modificar el usuario", e);
             JOptionPane.showMessageDialog(null, "Error al modificar el usuario: "
                     + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        } finally {
-            conexion.cerrarConexion();
         }
     }
 
@@ -167,7 +165,7 @@ public class UsuarioController {
 
         String sql = "DELETE FROM usuarios WHERE id = ?";
 
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, idUsuario);
 
@@ -184,8 +182,6 @@ public class UsuarioController {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error al eliminar el usuario: "
                     + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        } finally {
-            conexion.cerrarConexion();
         }
     }
 
@@ -248,7 +244,7 @@ public class UsuarioController {
         tablaUsuarios.getColumnModel().getColumn(4).setPreferredWidth(50); // Tamaño preferido
         tablaUsuarios.getColumnModel().getColumn(4).setMaxWidth(50); // Tamaño máximo        
 
-        try (Connection conn = conexion.establecerConexion(); Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+        try (Connection conn = conexion.obtenerConexion(); Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
                 modelo.addRow(new Object[]{
@@ -264,8 +260,6 @@ public class UsuarioController {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error al mostrar usuarios", e);
             JOptionPane.showMessageDialog(null, "Error al mostrar: " + e.toString());
-        } finally {
-            conexion.cerrarConexion();
         }
     }
 
@@ -287,7 +281,7 @@ public class UsuarioController {
             query += " WHERE rol = ?";
         }
 
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement stmt = conn.prepareStatement(query)) {
             if (filtrarPorRol) {
                 // Extrae el número del rol del texto seleccionado
                 int rolNumerico = Integer.parseInt(rolSeleccionado.split(":")[0].trim());
@@ -316,7 +310,7 @@ public class UsuarioController {
     public boolean validarCredencialesUsuarioRegular(final String usuario, final String contraseña) {
         final String sql = "SELECT contraseña FROM usuarios WHERE nombre = ? AND rol != 1";
 
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, usuario);
 
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -330,8 +324,6 @@ public class UsuarioController {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error al validar credenciales del usuario regular", e);
             JOptionPane.showMessageDialog(null, "Error al validar credenciales: " + e.getMessage());
-        } finally {
-            conexion.cerrarConexion();
         }
         return false;
     }
@@ -341,7 +333,7 @@ public class UsuarioController {
         String usuarioEnMinusculas = usuario.toLowerCase();
         final String sql = "SELECT contraseña FROM usuarios WHERE nombre = ? AND rol = 1";
 
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, usuarioEnMinusculas);
 
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -355,8 +347,6 @@ public class UsuarioController {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error al validar credenciales del administrador", e);
             JOptionPane.showMessageDialog(null, "Error al validar credenciales: " + e.getMessage());
-        } finally {
-            conexion.cerrarConexion();
         }
         return false;
     }
@@ -364,7 +354,7 @@ public class UsuarioController {
     // Validar si existe un administrador 
     public boolean existeAdministrador() {
         boolean existe = false;
-        try (Connection con = new ConexionDB(rutaDB.cargarRutaBaseDatos()).establecerConexion()) {
+        try (Connection con = new ConexionDB(rutaDB.cargarRutaBaseDatos()).obtenerConexion()) {
             String sql = "SELECT COUNT(*) FROM usuarios WHERE rol = 1"; // Verifica si hay un admin
             try (PreparedStatement pst = con.prepareStatement(sql); ResultSet rs = pst.executeQuery()) {
                 if (rs.next() && rs.getInt(1) > 0) {
@@ -386,7 +376,7 @@ public class UsuarioController {
     public boolean validarExistenciaUsuario(final String nombreUsuario) {
         final String sql = "SELECT COUNT(*) AS total FROM usuarios WHERE nombre = ?";
 
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, nombreUsuario);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -397,8 +387,6 @@ public class UsuarioController {
             logger.log(Level.SEVERE, "Error al validar existencia del usuario", e);
             JOptionPane.showMessageDialog(null, "Error al validar existencia de usuario: "
                     + e.getMessage());
-        } finally {
-            conexion.cerrarConexion();
         }
         return false;
     }
@@ -406,7 +394,7 @@ public class UsuarioController {
     public boolean validarExistenciaPorCorreo(final String email) {
         final String sql = "SELECT COUNT(*) AS total FROM usuarios WHERE email = ?";
 
-        try (Connection conn = conexion.establecerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, email);
             try (ResultSet rs = pstmt.executeQuery()) {
                 return rs.next() && rs.getInt("total") > 0;
@@ -414,8 +402,6 @@ public class UsuarioController {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error al validar existencia del correo", e);
             JOptionPane.showMessageDialog(null, "Error al validar existencia de correo: " + e.getMessage());
-        } finally {
-            conexion.cerrarConexion();
         }
         return false;
     }
