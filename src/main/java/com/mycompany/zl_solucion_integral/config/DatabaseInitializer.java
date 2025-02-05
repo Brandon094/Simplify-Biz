@@ -13,10 +13,6 @@ public class DatabaseInitializer {
 
     // Metodo que crea todas las tablas necesarias
     public void inicializarTablas() {
-        conexion.crearTablaUsuariosSiNoExiste();
-        conexion.crearTablaVentasSiNoExiste();
-        conexion.crearTablaProductosSiNoExiste();
-        conexion.crearTablaDetallesVentaSiNoExiste();
-        conexion.crearTablaConfiguracionSiNoExiste();
+        conexion.inicializarBaseDeDatos();
     }
 }
