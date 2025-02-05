@@ -23,9 +23,6 @@ import javax.swing.JOptionPane;
  * @author Dazac
  */
 public class Main {
-    // Instancia de SelecionRuta para manejar la configuración de la ruta
-    static SelecionRuta rutaDB = new SelecionRuta();
-
     /**
      * Método principal que inicia la aplicación.
      *
@@ -47,9 +44,11 @@ public class Main {
      * caso contrario.
      */
     private static boolean inicializarBaseDatos() {
+        // Instancia de SelecionRuta para manejar la configuración de la ruta
+        SelecionRuta rutaDB = new SelecionRuta();        
         // Se lee el archivo de configuración para obtener la ruta de la base de datos
         String ruta = rutaDB.cargarRutaBaseDatos();
-        
+
         if (ruta == null) {
             // Si no se encuentra la ruta, le pedimos al usuario que seleccione una
             ruta = rutaDB.selecionarRutaDB(); // Se llama al método para seleccionar la ruta de la base de datos
@@ -72,10 +71,10 @@ public class Main {
             dbInit.inicializarTablas();
             return true; // La inicialización fue exitosa.
         } catch (Exception e) {
-            e.printStackTrace();
             JOptionPane.showMessageDialog(null,
-                    "Error al inicializar la base de datos: " + e.getMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
+                    "Ocurrió un error al intentar inicializar la base de datos.\n"
+                    + "Detalles técnicos: " + e.getMessage(),
+                    "Error de Base de Datos", JOptionPane.ERROR_MESSAGE);
             return false;
         }
     }
@@ -90,12 +89,12 @@ public class Main {
         try (FileInputStream input = new FileInputStream("config.properties")) {
             props.load(input);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Archivo de configuración no encontrado. Creando uno nuevo...");
         }
 
         try (FileOutputStream output = new FileOutputStream("config.properties")) {
-            props.setProperty("db.path", ruta); // Guardamos la ruta de la base de datos
-            props.store(output, null);
+            props.setProperty("db.path", ruta);
+            props.store(output, "Configuración de la base de datos");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -116,16 +115,15 @@ public class Main {
         boolean existeAdmin = usuarioCtrl.existeAdministrador();
 
         if (!existeAdmin) {
+            // Se muestra el formulario de registro de administrador.
+            FormRegistroAdmin registro = new FormRegistroAdmin();
+            registro.setVisible(true);
             // Si no existe un administrador, se muestra un mensaje de bienvenida y se solicita la creación de uno.
             JOptionPane.showMessageDialog(null,
                     "Bienvenido a Simplify Biz.\n\n"
                     + "Para comenzar a usar la aplicación, primero debes configurar una cuenta de administrador.\n\n"
                     + "Por favor, completa el siguiente formulario con tus datos.",
                     "Configuración Inicial", JOptionPane.INFORMATION_MESSAGE);
-
-            // Se muestra el formulario de registro de administrador.
-            FormRegistroAdmin registro = new FormRegistroAdmin();
-            registro.setVisible(true);
         } else {
             // Si ya existe un administrador, se muestra el formulario de inicio de sesión.
             FormLogIn loginForm = new FormLogIn();
