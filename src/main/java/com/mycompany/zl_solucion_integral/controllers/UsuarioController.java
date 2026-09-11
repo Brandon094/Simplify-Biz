@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  * existencia de usuarios. Utiliza una instancia de `ConexionDB` para
  * interactuar con la base de datos.
  *
- * @author Dazac
+ * @author ChopCode Solutions
  */
 public class UsuarioController {
     SelecionRuta rutaDB = new SelecionRuta();
@@ -248,7 +248,7 @@ public class UsuarioController {
 
             while (rs.next()) {
                 modelo.addRow(new Object[]{
-                    rs.getString("id"),
+                    rs.getInt("id"),
                     rs.getString("nombre"),
                     rs.getString("email"),
                     rs.getString("telefono"),
@@ -283,8 +283,9 @@ public class UsuarioController {
 
         try (Connection conn = conexion.obtenerConexion(); PreparedStatement stmt = conn.prepareStatement(query)) {
             if (filtrarPorRol) {
-                // Extrae el número del rol del texto seleccionado
-                int rolNumerico = Integer.parseInt(rolSeleccionado.split(":")[0].trim());
+                // Extrae el número del rol del texto seleccionado (soporta "2" o "2: Cliente")
+                String rolLimpio = rolSeleccionado.contains(":") ? rolSeleccionado.split(":")[0].trim() : rolSeleccionado.trim();
+                int rolNumerico = Integer.parseInt(rolLimpio);
                 stmt.setInt(1, rolNumerico);
             }
 

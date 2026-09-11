@@ -33,7 +33,7 @@ import javax.swing.SwingUtilities;
  * botón para regresar al menú principal.
  * </p>
  *
- * @autor Dazac
+ * @author ChopCode Solutions
  */
 public class FormRegistroVentas extends javax.swing.JFrame {
 

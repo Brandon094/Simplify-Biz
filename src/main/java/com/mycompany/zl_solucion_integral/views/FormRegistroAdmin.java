@@ -8,7 +8,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Dazac
+ * @author ChopCode Solutions
  */
 public class FormRegistroAdmin extends javax.swing.JFrame {
 

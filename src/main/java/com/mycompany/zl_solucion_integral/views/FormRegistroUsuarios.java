@@ -13,7 +13,7 @@ import javax.swing.JTextField;
 * Ventana para registrar y gestionar usuarios. Controla el registro,
 * modifica y eliminacion de usuarios.
 *
-* @author Dazac
+* @author ChopCode Solutions
  */
 public class FormRegistroUsuarios extends javax.swing.JFrame {
 

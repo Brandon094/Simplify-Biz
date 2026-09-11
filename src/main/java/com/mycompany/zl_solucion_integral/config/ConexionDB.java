@@ -12,7 +12,7 @@ import java.sql.SQLException;
  * Esta clase proporciona métodos para conectar, cerrar la conexión y crear las
  * tablas necesarias si no existen.
  *
- * @author Dazac
+ * @author ChopCode Solutions
  */
 public class ConexionDB {
 

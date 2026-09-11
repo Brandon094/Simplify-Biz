@@ -8,7 +8,7 @@ package com.mycompany.zl_solucion_integral.controllers;
  * </p>
  * Utiliza una instancia de `ConexionDB` para interactuar con la base de datos.
  *
- * @author Dazac
+ * @author ChopCode Solutions
  */
 import com.mycompany.zl_solucion_integral.config.ConexionDB;
 import com.mycompany.zl_solucion_integral.config.SelecionRuta;
@@ -797,4 +797,68 @@ public class VentasController {
         }
     }
 
+    /**
+     * Obtiene el total de ventas diarias de los últimos 7 días.
+     * @return Lista de totales de ventas.
+     */
+    public List<Double> obtenerVentasUltimos7Dias() {
+        List<Double> ventas = new java.util.ArrayList<>();
+        String sql = "SELECT fecha, SUM(total) as total_dia FROM ventas WHERE fecha >= date('now', '-7 days') GROUP BY fecha ORDER BY fecha ASC";
+        
+        try (Connection conn = conexion.obtenerConexion(); Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                ventas.add(rs.getDouble("total_dia"));
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al obtener ventas de los últimos 7 días", e);
+        }
+        
+        // Rellenar con ceros si hay menos de 7 días de datos para el gráfico
+        while (ventas.size() < 7) {
+            ventas.add(0, 0.0);
+        }
+        return ventas;
+    }
+    
+    public double obtenerVentasTotales() {
+        String sql = "SELECT SUM(total) FROM ventas";
+        try (Connection conn = conexion.obtenerConexion(); Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            if (rs.next()) return rs.getDouble(1);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    public int contarRegistros(String filtro) {
+        String sql = "SELECT COUNT(*) FROM ventas";
+        try (Connection conn = conexion.obtenerConexion(); Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    /**
+     * Obtiene las últimas ventas registradas para el Dashboard.
+     */
+    public Object[][] obtenerUltimasVentas(int limite) {
+        String sql = "SELECT v.fecha, v.cliente, d.producto, v.total "
+                + "FROM ventas v "
+                + "JOIN detalles_venta d ON v.id = d.venta_id "
+                + "ORDER BY v.id DESC LIMIT ?";
+        
+        List<Object[]> data = new java.util.ArrayList<>();
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, limite);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                data.add(new Object[]{
+                    rs.getString("fecha"),
+                    rs.getString("cliente"),
+                    rs.getString("producto"),
+                    "$ " + String.format("%.2f", rs.getDouble("total"))
+                });
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        
+        return data.toArray(new Object[0][]);
+    }
 }

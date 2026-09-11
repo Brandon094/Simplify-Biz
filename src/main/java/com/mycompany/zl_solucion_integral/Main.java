@@ -4,8 +4,10 @@ import com.mycompany.zl_solucion_integral.config.ConexionDB;
 import com.mycompany.zl_solucion_integral.config.DatabaseInitializer;
 import com.mycompany.zl_solucion_integral.config.SelecionRuta;
 import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
-import com.mycompany.zl_solucion_integral.views.FormLogIn;
-import com.mycompany.zl_solucion_integral.views.FormRegistroAdmin;
+import com.mycompany.zl_solucion_integral.views.ModernLoginPage;
+import com.mycompany.zl_solucion_integral.views.ModernAdminRegistrationPage;
+import com.mycompany.zl_solucion_integral.views.components.UIUtils;
+import com.formdev.flatlaf.FlatDarkLaf;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,7 +22,7 @@ import javax.swing.JOptionPane;
  * inicializar la base de datos y de mostrar el formulario de inicio de sesión
  * de la aplicación.
  *
- * @author Dazac
+ * @author ChopCode Solutions
  */
 public class Main {
     /**
@@ -30,6 +32,10 @@ public class Main {
      * caso).
      */
     public static void main(String[] args) {
+        // Inicializar Look and Feel Moderno
+        FlatDarkLaf.setup();
+        UIUtils.configureGlobalStyles();
+        
         // Primero, se intenta inicializar la base de datos.
         if (inicializarBaseDatos()) {
             // Si la base de datos se inicializa correctamente, se inicia la aplicación.
@@ -116,7 +122,7 @@ public class Main {
 
         if (!existeAdmin) {
             // Se muestra el formulario de registro de administrador.
-            FormRegistroAdmin registro = new FormRegistroAdmin();
+            ModernAdminRegistrationPage registro = new ModernAdminRegistrationPage();
             registro.setVisible(true);
             // Si no existe un administrador, se muestra un mensaje de bienvenida y se solicita la creación de uno.
             JOptionPane.showMessageDialog(null,
@@ -126,7 +132,7 @@ public class Main {
                     "Configuración Inicial", JOptionPane.INFORMATION_MESSAGE);
         } else {
             // Si ya existe un administrador, se muestra el formulario de inicio de sesión.
-            FormLogIn loginForm = new FormLogIn();
+            ModernLoginPage loginForm = new ModernLoginPage();
             loginForm.setVisible(true);
         }
     }

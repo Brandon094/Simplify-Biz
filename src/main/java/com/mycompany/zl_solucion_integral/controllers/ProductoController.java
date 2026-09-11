@@ -23,7 +23,7 @@ import javax.swing.table.DefaultTableModel;
  * </p>
  * Utiliza una instancia de `ConexionDB` para interactuar con la base de datos.
  *
- * @author Dazac
+ * @author ChopCode Solutions
  */
 public class ProductoController {
     
@@ -573,5 +573,34 @@ public class ProductoController {
             e.printStackTrace();
             throw new RuntimeException("Error al actualizar la cantidad del producto en inventario");
         }
+    }
+
+    /**
+     * Obtiene la distribución de productos por categoría para gráficos.
+     * @return Mapa con Categoría y Cantidad total de productos en esa categoría.
+     */
+    public java.util.Map<String, Double> obtenerDistribucionCategorias() {
+        java.util.Map<String, Double> distribucion = new java.util.HashMap<>();
+        String sql = "SELECT categoria, COUNT(*) as total FROM productos GROUP BY categoria";
+        try (Connection conn = conexion.obtenerConexion(); Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                String cat = rs.getString("categoria");
+                if (cat == null || cat.isEmpty()) cat = "Sin Categoría";
+                distribucion.put(cat, rs.getDouble("total"));
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al obtener distribución de categorías", e);
+        }
+        return distribucion;
+    }
+
+    public int obtenerCantidadStockCritico(int limite) {
+        String sql = "SELECT COUNT(*) FROM productos WHERE cantidad <= ?";
+        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, limite);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
     }
 }

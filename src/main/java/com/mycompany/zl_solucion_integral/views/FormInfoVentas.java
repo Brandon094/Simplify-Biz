@@ -18,7 +18,7 @@ import javax.swing.SwingWorker;
 
 /**
  *
- * @author Dazac
+ * @author ChopCode Solutions
  */
 public class FormInfoVentas extends javax.swing.JFrame {
 

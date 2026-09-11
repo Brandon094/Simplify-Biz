@@ -2,7 +2,7 @@ package com.mycompany.zl_solucion_integral.models;
 
 /**
  *
- * @author Dazac
+ * @author ChopCode Solutions
  */
 public class Informe {
 

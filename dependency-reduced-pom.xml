@@ -18,9 +18,6 @@
         <configuration>
           <source>${maven.compiler.source}</source>
           <target>${maven.compiler.target}</target>
-          <compilerArgs>
-            <arg>--enable-preview</arg>
-          </compilerArgs>
         </configuration>
       </plugin>
       <plugin>
@@ -53,9 +50,9 @@
     </dependency>
   </dependencies>
   <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.target>17</maven.compiler.target>
     <exec.mainClass>com.mycompany.zl_solucion_integral.Main</exec.mainClass>
     <maven.compiler.source>17</maven.compiler.source>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 </project>

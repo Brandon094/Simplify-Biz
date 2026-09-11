@@ -23,7 +23,7 @@ import javax.swing.JOptionPane;
  * acción seleccionada, y la interfaz actual se oculta mientras el usuario interactúa 
  * con la nueva interfaz.
  * 
- * Autor: Dazac
+ * Autor: ChopCode Solutions
  */
 public class FormMainWindow extends javax.swing.JFrame {
 

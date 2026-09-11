@@ -5,7 +5,7 @@ import javax.swing.JFrame;
 
 /**
  *
- * @author Dazac
+ * @author ChopCode Solutions
  */
 public class UtilVentanas {
 

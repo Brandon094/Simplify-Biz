@@ -1,6 +1,6 @@
 package com.mycompany.zl_solucion_integral.views;
 
-// @author Dazac
+// @author ChopCode Solutions
 import com.mycompany.zl_solucion_integral.config.UtilVentanas;
 
 public class FormMenuInformes extends javax.swing.JFrame {

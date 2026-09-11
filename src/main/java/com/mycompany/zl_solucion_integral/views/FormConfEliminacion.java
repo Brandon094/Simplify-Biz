@@ -7,7 +7,7 @@ import javax.swing.JTable;
 
 /**
  *
- * @author Dazac
+ * @author ChopCode Solutions
  */
 public class FormConfEliminacion extends javax.swing.JFrame {
 

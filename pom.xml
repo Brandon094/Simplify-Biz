@@ -42,6 +42,23 @@
             <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- FlatLaf para UI Moderna -->
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
+            <version>3.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf-extras</artifactId>
+            <version>3.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf-intellij-themes</artifactId>
+            <version>3.5.1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -54,9 +71,6 @@
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
-                    <compilerArgs>
-                        <arg>--enable-preview</arg>
-                    </compilerArgs>
                 </configuration>
             </plugin>
 

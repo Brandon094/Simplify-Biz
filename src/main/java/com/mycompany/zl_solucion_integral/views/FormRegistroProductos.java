@@ -19,7 +19,7 @@ import javax.swing.SwingWorker;
  * Ventana para registrar y gestionar productos. Controla el registro,
  * modificación y eliminación de productos.
  *
- * @author Dazac
+ * @author ChopCode Solutions
  */
 public class FormRegistroProductos extends javax.swing.JFrame {
     // Controlador para manejar las operaciones con los productos

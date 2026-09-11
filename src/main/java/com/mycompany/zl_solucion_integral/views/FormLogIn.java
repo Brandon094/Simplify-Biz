@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
  * Clase FormLogIn que maneja la interfaz gráfica de inicio de sesión para la
  * aplicación. Extiende JFrame para crear una ventana de inicio de sesión.
  *
- * @author Dazac
+ * @author ChopCode Solutions
  */
 public class FormLogIn extends javax.swing.JFrame {
 
@@ -284,14 +284,14 @@ public class FormLogIn extends javax.swing.JFrame {
                     sesion.setUsuarioLogueado(usuario);
                     JOptionPane.showMessageDialog(this, "Inicio de sesión como administrador exitoso\n\nBienvenido " + sesion.getUsuarioLogueado(), "Bienvenido", JOptionPane.INFORMATION_MESSAGE);
                     this.setVisible(false); // Ocultar la ventana de inicio de sesión
-                    new FormMainWindow().setVisible(true); // Mostrar la ventana principal del administrador
+                    new MainTemplate("1").setVisible(true); // Mostrar la ventana principal moderna
                 } // Validar credenciales para usuario regular (vendedor)
                 else if (usuarioCtrl.validarCredencialesUsuarioRegular(usuario, contraseña)) {
                     // Guardar el usuario en la sesión y mostrar mensaje de bienvenida
                     sesion.setUsuarioLogueado(usuario);
                     JOptionPane.showMessageDialog(this, "Inicio de sesión como usuario vendedor\n\nBienvenido " + sesion.getUsuarioLogueado());
                     this.setVisible(false); // Ocultar la ventana de inicio de sesión
-                    new FormRegistroVentas(false).setVisible(true); // Mostrar la ventana de registro de ventas
+                    new MainTemplate("0").setVisible(true); // Mostrar la ventana moderna para vendedor
                 } // Si las credenciales son incorrectas
                 else {
                     JOptionPane.showMessageDialog(this, "Contraseña incorrecta. Verifique las credenciales.", "Error", JOptionPane.ERROR_MESSAGE);

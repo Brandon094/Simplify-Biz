@@ -1,0 +1,179 @@
+package com.mycompany.zl_solucion_integral.views;
+
+import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
+import com.mycompany.zl_solucion_integral.views.components.atoms.NeonButton;
+import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
+import com.formdev.flatlaf.FlatClientProperties;
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+
+public class ProvidersPage extends JPanel {
+    private JTable tbProviders;
+    private JTextField txtName, txtNIT, txtContact, txtPhone, txtEmail;
+    private JComboBox<String> cbCategory;
+
+    public ProvidersPage() {
+        setOpaque(false);
+        setLayout(new BorderLayout(20, 20));
+        setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+
+        // Header
+        JLabel title = new JLabel("🏭 Alianza con Proveedores");
+        title.setForeground(ThemeConstants.TEXT_PRIMARY);
+        title.setFont(ThemeConstants.FONT_TITLE);
+        add(title, BorderLayout.NORTH);
+
+        // Contenido Principal
+        JPanel mainContent = new JPanel(new BorderLayout(25, 0));
+        mainContent.setOpaque(false);
+
+        // Formulario (Izquierda)
+        mainContent.add(createFormPanel(), BorderLayout.WEST);
+
+        // Tabla (Derecha)
+        mainContent.add(createTablePanel(), BorderLayout.CENTER);
+
+        add(mainContent, BorderLayout.CENTER);
+        
+        refreshData();
+    }
+
+    private JPanel createFormPanel() {
+        RoundedPanel p = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
+        p.setPreferredSize(new Dimension(380, 0));
+        p.setLayout(new GridBagLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        gbc.gridx = 0;
+        gbc.insets = new Insets(0, 0, 5, 0);
+
+        gbc.gridy = 0; p.add(createLabel("🏢 RAZÓN SOCIAL / EMPRESA"), gbc);
+        txtName = createTextField("Nombre de la empresa");
+        setupFieldIcon(txtName, "🏢");
+        gbc.gridy = 1; p.add(txtName, gbc);
+
+        gbc.gridy = 2; gbc.insets = new Insets(15, 0, 5, 0);
+        p.add(createLabel("🆔 NIT"), gbc);
+        txtNIT = createTextField("Número de identificación tributaria");
+        setupFieldIcon(txtNIT, "🆔");
+        gbc.gridy = 3; p.add(txtNIT, gbc);
+
+        gbc.gridy = 4; gbc.insets = new Insets(15, 0, 5, 0);
+        p.add(createLabel("👤 PERSONA DE CONTACTO"), gbc);
+        txtContact = createTextField("Nombre del asesor");
+        setupFieldIcon(txtContact, "👤");
+        gbc.gridy = 5; p.add(txtContact, gbc);
+
+        gbc.gridy = 6; gbc.insets = new Insets(15, 0, 5, 0);
+        p.add(createLabel("📞 TELÉFONO DE CONTACTO"), gbc);
+        txtPhone = createTextField("Celular o fijo");
+        setupFieldIcon(txtPhone, "📞");
+        gbc.gridy = 7; p.add(txtPhone, gbc);
+
+        gbc.gridy = 8; gbc.insets = new Insets(15, 0, 5, 0);
+        p.add(createLabel("📧 CORREO ELECTRÓNICO"), gbc);
+        txtEmail = createTextField("comercial@proveedor.com");
+        setupFieldIcon(txtEmail, "📧");
+        gbc.gridy = 9; gbc.insets = new Insets(0, 0, 5, 0);
+        p.add(txtEmail, gbc);
+
+        gbc.gridy = 10; gbc.insets = new Insets(15, 0, 5, 0);
+        p.add(createLabel("🏷️ CATEGORÍA DE SUMINISTRO"), gbc);
+        cbCategory = new JComboBox<>(new String[]{"DOTACIÓN", "SEGURIDAD", "ELECTRÓNICA", "PAPELERÍA", "OTROS"});
+        cbCategory.setBackground(new Color(15, 23, 42));
+        cbCategory.setForeground(ThemeConstants.TEXT_PRIMARY);
+        gbc.gridy = 11; gbc.insets = new Insets(0, 0, 30, 0);
+        p.add(cbCategory, gbc);
+
+        // Botones
+        NeonButton btnSave = new NeonButton("VINCULAR PROVEEDOR 🔗");
+        btnSave.setNeonColor(ThemeConstants.NEON_CYAN);
+        btnSave.addActionListener(e -> JOptionPane.showMessageDialog(this, "UI Lista: Implementaremos la lógica de persistencia en la siguiente fase."));
+        gbc.gridy = 12; gbc.insets = new Insets(0, 0, 10, 0);
+        p.add(btnSave, gbc);
+
+        return p;
+    }
+
+    private JPanel createTablePanel() {
+        RoundedPanel p = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
+        p.setLayout(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        String[] cols = {"ID", "Empresa", "Contacto", "Teléfono", "Email"};
+        DefaultTableModel model = new DefaultTableModel(new Object[][]{
+            {"1", "Suministros Globales SAS", "Carlos Vaca", "3104567890", "carlos@suministros.com"},
+            {"2", "Textiles del Caribe", "Marta Ruiz", "3007654321", "ventas@textiles.co"},
+            {"3", "Seguridad Total", "Jorge Luis", "3159876543", "info@seguridadtotal.com"}
+        }, cols);
+
+        tbProviders = new JTable(model);
+        tbProviders.setBackground(ThemeConstants.CARD_BACKGROUND);
+        tbProviders.setForeground(ThemeConstants.TEXT_PRIMARY);
+        tbProviders.setRowHeight(35);
+        tbProviders.setShowGrid(false);
+
+        JScrollPane scroll = new JScrollPane(tbProviders);
+        scroll.setOpaque(false);
+        scroll.getViewport().setOpaque(false);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+        
+        p.add(scroll, BorderLayout.CENTER);
+        return p;
+    }
+
+    private void refreshData() {
+        estilizarTabla();
+    }
+
+    private void estilizarTabla() {
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (isSelected) {
+                    c.setBackground(new Color(6, 182, 212, 40));
+                } else {
+                    c.setBackground(ThemeConstants.CARD_BACKGROUND);
+                }
+                setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+                return c;
+            }
+        };
+        for (int i = 0; i < tbProviders.getColumnCount(); i++) {
+            tbProviders.getColumnModel().getColumn(i).setCellRenderer(renderer);
+        }
+    }
+
+    private JLabel createLabel(String t) {
+        JLabel l = new JLabel(t);
+        l.setForeground(ThemeConstants.TEXT_SECONDARY);
+        l.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
+        return l;
+    }
+
+    private void setupFieldIcon(JTextField f, String icon) {
+        JLabel lbl = new JLabel(icon);
+        lbl.setForeground(ThemeConstants.TEXT_SECONDARY);
+        lbl.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        f.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_COMPONENT, lbl);
+    }
+
+    private JTextField createTextField(String placeholder) {
+        JTextField f = new JTextField();
+        f.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, placeholder);
+        f.setBackground(new Color(15, 23, 42));
+        f.setForeground(ThemeConstants.TEXT_PRIMARY);
+        f.setCaretColor(ThemeConstants.NEON_CYAN);
+        f.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(51, 65, 85), 1),
+            BorderFactory.createEmptyBorder(10, 15, 10, 15)
+        ));
+        return f;
+    }
+}

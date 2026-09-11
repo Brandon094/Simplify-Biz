@@ -1,6 +1,6 @@
 package com.mycompany.zl_solucion_integral.config;
 
-// @author Dazac
+// @author ChopCode Solutions
 public class DatabaseInitializer {
 
     // Instancia de la clase de conexion

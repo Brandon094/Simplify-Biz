@@ -3,7 +3,7 @@ package com.mycompany.zl_solucion_integral.models;
 /**
  * Clase que representa a un usuario en el sistema.
  *
- * @author Dazac
+ * @author ChopCode Solutions
  */
 public class Usuario {
 
