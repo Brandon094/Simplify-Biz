@@ -5,14 +5,16 @@ import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonButton;
 import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
 import com.formdev.flatlaf.FlatClientProperties;
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
-import java.util.List;
 
 public class ReportsPage extends JPanel {
     private final VentasController ventasCtrl = new VentasController();
     private JTable tbReports;
+    private JScrollPane reportsScroll;
     private JTextField txtStartDate, txtEndDate;
 
     public ReportsPage() {
@@ -21,7 +23,7 @@ public class ReportsPage extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
         // Header
-        JLabel title = new JLabel("📈 Centro de Inteligencia y Reportes");
+        JLabel title = new JLabel("Centro de reportes", createIcon("icons/reports.svg", ThemeConstants.NEON_PURPLE, 24, 24), SwingConstants.LEFT);
         title.setForeground(ThemeConstants.TEXT_PRIMARY);
         title.setFont(ThemeConstants.FONT_TITLE);
         add(title, BorderLayout.NORTH);
@@ -48,20 +50,22 @@ public class ReportsPage extends JPanel {
         RoundedPanel p = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
         p.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 20));
         
-        p.add(createLabel("📅 FECHA INICIO:"));
+        p.add(createLabel("FECHA INICIO"));
         txtStartDate = createTextField("DD/MM/YYYY");
-        setupFieldIcon(txtStartDate, "📅");
+        setupFieldIcon(txtStartDate, "icons/calendar.svg");
         txtStartDate.setPreferredSize(new Dimension(150, 35));
         p.add(txtStartDate);
 
-        p.add(createLabel("📅 FECHA FIN:"));
+        p.add(createLabel("FECHA FIN"));
         txtEndDate = createTextField("DD/MM/YYYY");
-        setupFieldIcon(txtEndDate, "📅");
+        setupFieldIcon(txtEndDate, "icons/calendar.svg");
         txtEndDate.setPreferredSize(new Dimension(150, 35));
         p.add(txtEndDate);
 
-        NeonButton btnFilter = new NeonButton("FILTRAR DATOS 🔍");
+        NeonButton btnFilter = new NeonButton("Filtrar datos");
         btnFilter.setNeonColor(ThemeConstants.NEON_BLUE);
+        btnFilter.setIcon(createIcon("icons/search.svg", ThemeConstants.NEON_BLUE, 17, 17));
+        btnFilter.setIconTextGap(8);
         btnFilter.setPreferredSize(new Dimension(180, 35));
         btnFilter.addActionListener(e -> applyFilter());
         p.add(btnFilter);
@@ -74,18 +78,28 @@ public class ReportsPage extends JPanel {
         p.setLayout(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
+        JLabel tableTitle = new JLabel("Ventas registradas");
+        tableTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
+        tableTitle.setFont(ThemeConstants.FONT_SUBTITLE);
+        tableTitle.setBorder(BorderFactory.createEmptyBorder(0, 8, 12, 8));
+        p.add(tableTitle, BorderLayout.NORTH);
+
         tbReports = new JTable();
         tbReports.setBackground(ThemeConstants.CARD_BACKGROUND);
         tbReports.setForeground(ThemeConstants.TEXT_PRIMARY);
         tbReports.setRowHeight(35);
         tbReports.setShowGrid(false);
+        tbReports.setFillsViewportHeight(true);
+        tbReports.setFont(ThemeConstants.FONT_SMALL);
+        tbReports.setSelectionBackground(new Color(168, 85, 247, 70));
+        tbReports.setSelectionForeground(ThemeConstants.TEXT_PRIMARY);
 
-        JScrollPane scroll = new JScrollPane(tbReports);
-        scroll.setOpaque(false);
-        scroll.getViewport().setOpaque(false);
-        scroll.setBorder(BorderFactory.createEmptyBorder());
+        reportsScroll = new JScrollPane(tbReports);
+        reportsScroll.setOpaque(false);
+        reportsScroll.getViewport().setOpaque(false);
+        reportsScroll.setBorder(BorderFactory.createEmptyBorder());
         
-        p.add(scroll, BorderLayout.CENTER);
+        p.add(reportsScroll, BorderLayout.CENTER);
         return p;
     }
 
@@ -93,13 +107,17 @@ public class ReportsPage extends JPanel {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 0));
         p.setOpaque(false);
 
-        NeonButton btnExcel = new NeonButton("EXPORTAR A EXCEL 📗");
+        NeonButton btnExcel = new NeonButton("Exportar a Excel");
         btnExcel.setNeonColor(ThemeConstants.NEON_GREEN);
+        btnExcel.setIcon(createIcon("icons/excel.svg", ThemeConstants.NEON_GREEN, 17, 17));
+        btnExcel.setIconTextGap(8);
         btnExcel.setPreferredSize(new Dimension(200, 45));
         btnExcel.addActionListener(e -> exportToExcel());
         
-        NeonButton btnPDF = new NeonButton("GENERAR PDF 📄");
+        NeonButton btnPDF = new NeonButton("Generar PDF");
         btnPDF.setNeonColor(ThemeConstants.NEON_PURPLE);
+        btnPDF.setIcon(createIcon("icons/pdf.svg", ThemeConstants.NEON_PURPLE, 17, 17));
+        btnPDF.setIconTextGap(8);
         btnPDF.setPreferredSize(new Dimension(200, 45));
         
         p.add(btnPDF);
@@ -137,7 +155,10 @@ public class ReportsPage extends JPanel {
                 if (isSelected) {
                     c.setBackground(new Color(168, 85, 247, 40));
                 } else {
-                    c.setBackground(ThemeConstants.CARD_BACKGROUND);
+                    c.setBackground(row % 2 == 0
+                            ? ThemeConstants.CARD_BACKGROUND
+                            : new Color(30, 41, 59, 150));
+                    c.setForeground(ThemeConstants.TEXT_SECONDARY);
                 }
                 setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
                 return c;
@@ -146,6 +167,40 @@ public class ReportsPage extends JPanel {
         for (int i = 0; i < tbReports.getColumnCount(); i++) {
             tbReports.getColumnModel().getColumn(i).setCellRenderer(renderer);
         }
+
+        JTableHeader header = tbReports.getTableHeader();
+        header.setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
+        header.setForeground(ThemeConstants.TEXT_SECONDARY);
+        header.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
+        header.setPreferredSize(new Dimension(0, 32));
+        header.setReorderingAllowed(false);
+
+        actualizarEstadoVacio();
+    }
+
+    private void actualizarEstadoVacio() {
+        if (tbReports.getRowCount() == 0) {
+            boolean hasFilter = !txtStartDate.getText().trim().isEmpty()
+                    || !txtEndDate.getText().trim().isEmpty();
+            reportsScroll.setViewportView(createEmptyState(
+                    hasFilter ? "No hay ventas en el periodo seleccionado" : "Aún no hay ventas registradas"));
+        } else {
+            reportsScroll.setViewportView(tbReports);
+        }
+        reportsScroll.revalidate();
+        reportsScroll.repaint();
+    }
+
+    private JPanel createEmptyState(String message) {
+        JPanel state = new JPanel(new GridBagLayout());
+        state.setOpaque(false);
+        FlatSVGIcon icon = createIcon("icons/reports.svg", ThemeConstants.NEON_PURPLE, 24, 24);
+        JLabel label = new JLabel(message, icon, SwingConstants.CENTER);
+        label.setForeground(ThemeConstants.TEXT_SECONDARY);
+        label.setFont(ThemeConstants.FONT_BODY);
+        label.setIconTextGap(10);
+        state.add(label);
+        return state;
     }
 
     private JLabel createLabel(String t) {
@@ -156,10 +211,16 @@ public class ReportsPage extends JPanel {
     }
 
     private void setupFieldIcon(JTextField f, String icon) {
-        JLabel lbl = new JLabel(icon);
+        JLabel lbl = new JLabel(createIcon(icon, ThemeConstants.TEXT_SECONDARY, 17, 17));
         lbl.setForeground(ThemeConstants.TEXT_SECONDARY);
         lbl.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
         f.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_COMPONENT, lbl);
+    }
+
+    private FlatSVGIcon createIcon(String path, Color color, int width, int height) {
+        FlatSVGIcon icon = new FlatSVGIcon(path, width, height);
+        icon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, color));
+        return icon;
     }
 
     private JTextField createTextField(String placeholder) {

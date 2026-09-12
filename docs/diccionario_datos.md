@@ -1,52 +1,67 @@
-# Diccionario de Datos - Simplify Biz
+# Diccionario de datos - ERP+ Business
 
-Este documento detalla cada campo de las tablas de la base de datos.
+Este documento describe las tablas creadas por la aplicación y el uso funcional de cada campo.
 
-## Tabla: `usuarios`
+## Tabla `usuarios`
+
 | Campo | Tipo | Descripción |
 | :--- | :--- | :--- |
-| id | INTEGER | Identificador único (Auto-incremental). |
-| nombre | TEXT | Nombre completo del usuario. |
+| id | INTEGER | Identificador único autoincremental. |
+| nombre | TEXT | Nombre del usuario. |
 | telefono | TEXT | Número de contacto. |
-| email | TEXT | Correo electrónico (usado para login/notificaciones). |
-| rol | INTEGER | Nivel de permisos (ej: 1 para Admin, 2 para Vendedor). |
-| contraseña | TEXT | Contraseña encriptada o plana (según implementación). |
+| email | TEXT | Correo del usuario. |
+| rol | INTEGER | `1` administrador, `0` vendedor/empleado, `2` cliente. |
+| contraseña | TEXT | Contraseña almacenada mediante el mecanismo de seguridad de la aplicación. |
 
-## Tabla: `productos`
+## Tabla `productos`
+
 | Campo | Tipo | Descripción |
 | :--- | :--- | :--- |
 | id | INTEGER | Identificador único del producto. |
 | producto | TEXT | Nombre del producto. |
 | precio | REAL | Precio unitario de venta. |
 | cantidad | INTEGER | Stock disponible. |
-| codigo | TEXT | Código de barras o SKU del producto. |
-| categoria | TEXT | Categoría a la que pertenece el producto. |
+| codigo | TEXT | Código o SKU. |
+| categoria | TEXT | Categoría del producto. |
 
-## Tabla: `ventas`
+## Tabla `ventas`
+
 | Campo | Tipo | Descripción |
 | :--- | :--- | :--- |
-| id | INTEGER | Número de factura/venta. |
-| cliente | TEXT | Nombre del cliente. |
-| cc_cliente | TEXT | Cédula o NIT del cliente. |
-| vendedor | TEXT | Nombre del usuario que realizó la venta. |
+| id | INTEGER | Identificador de la venta. |
+| cliente | TEXT | Nombre histórico del cliente. |
+| cc_cliente | TEXT | Cédula, NIT o `N/A` en venta mostrador. |
+| vendedor | TEXT | Usuario que realizó la venta. |
 | fecha | DATE | Fecha de la transacción. |
-| total | REAL | Valor total de la venta. |
-| metodo_pago | TEXT | Efectivo, Transferencia, etc. |
-| pago_confirmado | TEXT | Estado del pago (Si/No). |
+| total | REAL | Total de la venta. |
+| metodo_pago | TEXT | Efectivo, crédito, transferencia u otro. |
+| pago_confirmado | TEXT | Estado asociado al pago; crédito puede indicar `deudor`. |
 
-## Tabla: `detalles_venta`
+## Tabla `detalles_venta`
+
 | Campo | Tipo | Descripción |
 | :--- | :--- | :--- |
-| id | INTEGER | ID del registro de detalle. |
-| venta_id | INTEGER | Referencia a la tabla `ventas`. |
-| producto | TEXT | Nombre del producto al momento de la venta. |
-| cantidad | INTEGER | Cantidad vendida. |
+| id | INTEGER | Identificador del detalle. |
+| venta_id | INTEGER | Referencia a `ventas.id`. |
+| producto | TEXT | Producto al momento de la venta. |
+| cantidad | INTEGER | Unidades vendidas. |
 | codigo | TEXT | Código del producto. |
-| precio | REAL | Precio unitario al que se vendió. |
-| total | REAL | Subtotal (cantidad * precio). |
+| precio | REAL | Precio unitario vendido. |
+| total | REAL | Subtotal del detalle. |
 
-## Tabla: `configuracion`
+## Tabla `configuracion`
+
 | Campo | Tipo | Descripción |
 | :--- | :--- | :--- |
-| id | INTEGER | ID único (usualmente 1). |
-| ultimoNumeroCotizacion | TEXT | Formato `YYYYMMDD-XXX` para el control de documentos. |
+| id | INTEGER | Identificador, normalmente `1`. |
+| ultimoNumeroCotizacion | TEXT | Formato `YYYYMMDD-XXX`. |
+
+## Convenciones funcionales
+
+- `rol = 1`: administrador.
+- `rol = 0`: vendedor o empleado.
+- `rol = 2`: cliente.
+- Clientes se consultan desde la vista de clientes, pero se crean desde una venta cuando entregan sus datos.
+- Las ventas mostrador usan `CONSUMIDOR FINAL` y `N/A` y no crean un usuario ficticio.
+- `contraseña` no debe mostrarse en interfaces de consulta.
+- `ventas` conserva datos históricos como texto y no depende de una clave foránea hacia `usuarios`.

@@ -1,11 +1,11 @@
-# Esquema de Base de Datos - Simplify Biz
+# Esquema de base de datos - ERP+ Business
 
-El sistema utiliza **SQLite** como motor de base de datos, lo que permite que sea portable y no requiera una instalación de servidor de base de datos compleja.
+ERP+ Business utiliza SQLite como motor local. No requiere un servidor de base de datos y sus archivos pueden respaldarse y trasladarse con cuidado.
 
-## Tablas del Sistema
+## Tablas
 
-### 1. usuarios
-Almacena la información de los usuarios que acceden al sistema.
+### `usuarios`
+
 ```sql
 CREATE TABLE IF NOT EXISTS usuarios (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
 );
 ```
 
-### 2. productos
-Gestiona el inventario de productos disponibles para la venta.
+### `productos`
+
 ```sql
 CREATE TABLE IF NOT EXISTS productos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS productos (
 );
 ```
 
-### 3. ventas
-Registra el encabezado de las transacciones de venta.
+### `ventas`
+
 ```sql
 CREATE TABLE IF NOT EXISTS ventas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS ventas (
 );
 ```
 
-### 4. detalles_venta
-Almacena el detalle de los productos incluidos en cada venta (relación muchos a uno con `ventas`).
+### `detalles_venta`
+
 ```sql
 CREATE TABLE IF NOT EXISTS detalles_venta (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,11 +60,23 @@ CREATE TABLE IF NOT EXISTS detalles_venta (
 );
 ```
 
-### 5. configuracion
-Almacena configuraciones generales del sistema, como el contador de cotizaciones.
+### `configuracion`
+
 ```sql
 CREATE TABLE IF NOT EXISTS configuracion (
     id INTEGER PRIMARY KEY,
     ultimoNumeroCotizacion TEXT
 );
 ```
+
+## Reglas de operación
+
+- `ventas` y `detalles_venta` se relacionan mediante `detalles_venta.venta_id`.
+- Una venta puede usar `CONSUMIDOR FINAL` cuando no se suministran datos personales.
+- El cliente genérico no requiere un registro en `usuarios`.
+- El stock se descuenta al confirmar la venta y la transacción se revierte si falla la actualización.
+- Actualmente no existe una tabla propia de proveedores; `ProvidersPage` usa datos de demostración y no representa persistencia real.
+
+## Inicialización y evolución
+
+Las tablas se crean con `CREATE TABLE IF NOT EXISTS` durante el arranque. Este mecanismo no realiza migraciones de columnas para bases existentes. Todo cambio futuro del esquema debe incluir una migración explícita y una copia de seguridad previa.

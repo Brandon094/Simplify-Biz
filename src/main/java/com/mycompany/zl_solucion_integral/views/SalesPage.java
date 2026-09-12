@@ -10,8 +10,11 @@ import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonButton;
 import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
 import com.formdev.flatlaf.FlatClientProperties;
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -26,6 +29,7 @@ public class SalesPage extends JPanel {
     private JTextField txtSearch, txtQty, txtDiscount;
     private JTextField txtClientName, txtClientCC, txtClientTel, txtClientEmail;
     private JComboBox<String> cbPaymentMethod;
+    private JCheckBox chkGenericClient;
     private JTable tbCart;
     private DefaultTableModel cartModel;
     private JLabel lblTotal;
@@ -39,7 +43,7 @@ public class SalesPage extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
         // Header
-        JLabel title = new JLabel("Punto de Venta Neón");
+        JLabel title = new JLabel("Punto de venta", createIcon("icons/sales.svg", ThemeConstants.NEON_GREEN, 24, 24), SwingConstants.LEFT);
         title.setForeground(ThemeConstants.TEXT_PRIMARY);
         title.setFont(ThemeConstants.FONT_TITLE);
         add(title, BorderLayout.NORTH);
@@ -67,28 +71,30 @@ public class SalesPage extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0; gbc.gridx = 0; gbc.insets = new Insets(0,0,10,0);
 
-        gbc.gridy = 0; p.add(createLabel("🔍 BUSCAR PRODUCTO (CÓDIGO/NOMBRE)"), gbc);
+        gbc.gridy = 0; p.add(createLabel("BUSCAR PRODUCTO (CÓDIGO/NOMBRE)"), gbc);
         txtSearch = createTextField("Ej: SKU-001...");
-        setupFieldIcon(txtSearch, "🔎");
+        setupFieldIcon(txtSearch, "icons/products.svg");
         txtSearch.addActionListener(e -> searchProduct());
         gbc.gridy = 1; p.add(txtSearch, gbc);
 
         gbc.gridy = 2; gbc.insets = new Insets(20,0,5,0);
-        p.add(createLabel("🔢 CANTIDAD"), gbc);
+        p.add(createLabel("CANTIDAD"), gbc);
         txtQty = createTextField("1");
-        setupFieldIcon(txtQty, "📦");
+        setupFieldIcon(txtQty, "icons/dashboard.svg");
         gbc.gridy = 3; gbc.insets = new Insets(0,0,10,0);
         p.add(txtQty, gbc);
 
         gbc.gridy = 4; gbc.insets = new Insets(10,0,5,0);
-        p.add(createLabel("🏷️ DESCUENTO %"), gbc);
+        p.add(createLabel("DESCUENTO %"), gbc);
         txtDiscount = createTextField("0");
-        setupFieldIcon(txtDiscount, "📉");
+        setupFieldIcon(txtDiscount, "icons/reports.svg");
         gbc.gridy = 5; gbc.insets = new Insets(0,0,30,0);
         p.add(txtDiscount, gbc);
 
-        NeonButton btnAdd = new NeonButton("AGREGAR AL CARRITO 🛒");
+        NeonButton btnAdd = new NeonButton("Agregar al carrito");
         btnAdd.setNeonColor(ThemeConstants.NEON_PURPLE);
+        btnAdd.setIcon(createIcon("icons/sales.svg", ThemeConstants.NEON_PURPLE, 17, 17));
+        btnAdd.setIconTextGap(8);
         btnAdd.addActionListener(e -> addToCart());
         gbc.gridy = 6; p.add(btnAdd, gbc);
 
@@ -100,7 +106,7 @@ public class SalesPage extends JPanel {
         p.setLayout(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JLabel title = new JLabel("🛍️ CARRITO DE COMPRAS");
+        JLabel title = new JLabel("Carrito de compras", createIcon("icons/sales.svg", ThemeConstants.NEON_CYAN, 20, 20), SwingConstants.LEFT);
         title.setForeground(ThemeConstants.TEXT_PRIMARY);
         title.setFont(ThemeConstants.FONT_SUBTITLE);
         p.add(title, BorderLayout.NORTH);
@@ -110,6 +116,35 @@ public class SalesPage extends JPanel {
         tbCart.setBackground(ThemeConstants.CARD_BACKGROUND);
         tbCart.setForeground(ThemeConstants.TEXT_PRIMARY);
         tbCart.setRowHeight(30);
+        tbCart.setFont(ThemeConstants.FONT_SMALL);
+        tbCart.setShowGrid(false);
+        tbCart.setFillsViewportHeight(true);
+        tbCart.setSelectionBackground(new Color(6, 182, 212, 70));
+        tbCart.setSelectionForeground(ThemeConstants.TEXT_PRIMARY);
+
+        tbCart.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                Component component = super.getTableCellRendererComponent(
+                        table, value, isSelected, hasFocus, row, column);
+                if (!isSelected) {
+                    component.setBackground(row % 2 == 0
+                            ? ThemeConstants.CARD_BACKGROUND
+                            : new Color(30, 41, 59, 150));
+                    component.setForeground(ThemeConstants.TEXT_SECONDARY);
+                }
+                setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+                return component;
+            }
+        });
+
+        JTableHeader cartHeader = tbCart.getTableHeader();
+        cartHeader.setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
+        cartHeader.setForeground(ThemeConstants.TEXT_SECONDARY);
+        cartHeader.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
+        cartHeader.setPreferredSize(new Dimension(0, 32));
+        cartHeader.setReorderingAllowed(false);
         
         JScrollPane scroll = new JScrollPane(tbCart);
         scroll.setOpaque(false);
@@ -133,36 +168,46 @@ public class SalesPage extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0; gbc.gridx = 0; gbc.insets = new Insets(0,0,10,0);
 
-        gbc.gridy = 0; p.add(createLabel("👤 NOMBRE DEL CLIENTE"), gbc);
+        gbc.gridy = 0; p.add(createLabel("NOMBRE DEL CLIENTE"), gbc);
         txtClientName = createTextField("Nombre completo");
-        setupFieldIcon(txtClientName, "👤");
+        setupFieldIcon(txtClientName, "icons/user.svg");
         gbc.gridy = 1; p.add(txtClientName, gbc);
 
-        gbc.gridy = 2; p.add(createLabel("🆔 CÉDULA / NIT"), gbc);
+        gbc.gridy = 2; p.add(createLabel("CÉDULA / NIT"), gbc);
         txtClientCC = createTextField("Documento");
-        setupFieldIcon(txtClientCC, "📄");
+        setupFieldIcon(txtClientCC, "icons/reports.svg");
         gbc.gridy = 3; p.add(txtClientCC, gbc);
 
-        gbc.gridy = 4; p.add(createLabel("📞 TELÉFONO"), gbc);
+        gbc.gridy = 4; p.add(createLabel("TELÉFONO"), gbc);
         txtClientTel = createTextField("Contacto");
-        setupFieldIcon(txtClientTel, "📱");
+        setupFieldIcon(txtClientTel, "icons/user.svg");
         gbc.gridy = 5; p.add(txtClientTel, gbc);
 
-        gbc.gridy = 6; p.add(createLabel("📧 CORREO ELECTRÓNICO"), gbc);
+        gbc.gridy = 6; p.add(createLabel("CORREO ELECTRÓNICO"), gbc);
         txtClientEmail = createTextField("cliente@correo.com");
-        setupFieldIcon(txtClientEmail, "✉️");
+        setupFieldIcon(txtClientEmail, "icons/settings.svg");
         gbc.gridy = 7; p.add(txtClientEmail, gbc);
 
-        gbc.gridy = 8; p.add(createLabel("💳 MÉTODO DE PAGO"), gbc);
+        gbc.gridy = 8; p.add(createLabel("MÉTODO DE PAGO"), gbc);
         cbPaymentMethod = new JComboBox<>(new String[]{"Efectivo", "Crédito", "Transferencia", "Otro"});
         cbPaymentMethod.setBackground(new Color(15, 23, 42));
         cbPaymentMethod.setForeground(ThemeConstants.TEXT_PRIMARY);
         gbc.gridy = 9; gbc.insets = new Insets(0, 0, 10, 0);
         p.add(cbPaymentMethod, gbc);
 
-        gbc.gridy = 10; gbc.insets = new Insets(30, 0, 10, 0);
-        NeonButton btnConfirm = new NeonButton("CONFIRMAR VENTA 💎");
+        chkGenericClient = new JCheckBox("Cliente no desea suministrar datos");
+        chkGenericClient.setOpaque(false);
+        chkGenericClient.setForeground(ThemeConstants.TEXT_SECONDARY);
+        chkGenericClient.setFont(ThemeConstants.FONT_SMALL);
+        chkGenericClient.addActionListener(e -> toggleGenericClient());
+        gbc.gridy = 10; gbc.insets = new Insets(12, 0, 10, 0);
+        p.add(chkGenericClient, gbc);
+
+        gbc.gridy = 11; gbc.insets = new Insets(20, 0, 10, 0);
+        NeonButton btnConfirm = new NeonButton("Confirmar venta");
         btnConfirm.setNeonColor(ThemeConstants.NEON_GREEN);
+        btnConfirm.setIcon(createIcon("icons/sales.svg", ThemeConstants.NEON_GREEN, 17, 17));
+        btnConfirm.setIconTextGap(8);
         btnConfirm.addActionListener(e -> finishSale());
         p.add(btnConfirm, gbc);
 
@@ -227,12 +272,13 @@ public class SalesPage extends JPanel {
             return;
         }
 
-        String clientName = txtClientName.getText().trim();
-        String clientCC = txtClientCC.getText().trim();
-        String clientTel = txtClientTel.getText().trim();
-        String clientEmail = txtClientEmail.getText().trim();
+        boolean genericClient = chkGenericClient.isSelected();
+        String clientName = genericClient ? "CONSUMIDOR FINAL" : txtClientName.getText().trim();
+        String clientCC = genericClient ? "N/A" : txtClientCC.getText().trim();
+        String clientTel = genericClient ? "N/A" : txtClientTel.getText().trim();
+        String clientEmail = genericClient ? "N/A" : txtClientEmail.getText().trim();
 
-        if (clientName.isEmpty() || clientCC.isEmpty()) {
+        if (!genericClient && (clientName.isEmpty() || clientCC.isEmpty())) {
             JOptionPane.showMessageDialog(this, "Nombre y Cédula del cliente son obligatorios.");
             return;
         }
@@ -266,12 +312,14 @@ public class SalesPage extends JPanel {
             // 4. Llamar al Controller para persistir en SQLite
             ventasCtrl.guardarVenta(finalVenta, productsToSave, new JTable()); 
             
-            // 5. Automatización: Crear cliente si no existe
-            client.setRol("2"); 
-            client.setContraseña(clientCC); 
-            
-            if (!usuarioCtrl.validarExistenciaUsuario(clientName)) {
-                usuarioCtrl.agregarUsuario(client);
+            // 5. Registrar el cliente solo cuando entregó sus datos.
+            if (!genericClient) {
+                client.setRol("2");
+                client.setContraseña(clientCC);
+
+                if (!usuarioCtrl.validarExistenciaUsuario(clientName)) {
+                    usuarioCtrl.agregarUsuario(client);
+                }
             }
 
             JOptionPane.showMessageDialog(this, "¡Venta procesada con éxito!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
@@ -289,6 +337,29 @@ public class SalesPage extends JPanel {
         txtClientName.setText("");
         txtClientCC.setText("");
         txtClientTel.setText("");
+        txtClientEmail.setText("");
+        chkGenericClient.setSelected(false);
+        toggleGenericClient();
+    }
+
+    private void toggleGenericClient() {
+        boolean genericClient = chkGenericClient.isSelected();
+        txtClientName.setEnabled(!genericClient);
+        txtClientCC.setEnabled(!genericClient);
+        txtClientTel.setEnabled(!genericClient);
+        txtClientEmail.setEnabled(!genericClient);
+
+        if (genericClient) {
+            txtClientName.setText("CONSUMIDOR FINAL");
+            txtClientCC.setText("N/A");
+            txtClientTel.setText("N/A");
+            txtClientEmail.setText("N/A");
+        } else {
+            txtClientName.setText("");
+            txtClientCC.setText("");
+            txtClientTel.setText("");
+            txtClientEmail.setText("");
+        }
     }
 
     private JLabel createLabel(String text) {
@@ -299,10 +370,16 @@ public class SalesPage extends JPanel {
     }
 
     private void setupFieldIcon(JTextField f, String icon) {
-        JLabel lbl = new JLabel(icon);
+        JLabel lbl = new JLabel(createIcon(icon, ThemeConstants.TEXT_SECONDARY, 17, 17));
         lbl.setForeground(ThemeConstants.TEXT_SECONDARY);
         lbl.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
         f.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_COMPONENT, lbl);
+    }
+
+    private FlatSVGIcon createIcon(String path, Color color, int width, int height) {
+        FlatSVGIcon icon = new FlatSVGIcon(path, width, height);
+        icon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, color));
+        return icon;
     }
 
     private JTextField createTextField(String placeholder) {

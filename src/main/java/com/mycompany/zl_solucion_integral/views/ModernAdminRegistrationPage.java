@@ -20,7 +20,7 @@ public class ModernAdminRegistrationPage extends JFrame {
     private UsuarioController usuarioCtrl = new UsuarioController();
 
     public ModernAdminRegistrationPage() {
-        setTitle("Vortex ERP - Registro Inicial");
+        setTitle("ERP+ Business - Registro Inicial");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         
@@ -44,7 +44,7 @@ public class ModernAdminRegistrationPage extends JFrame {
         gbc.insets = new Insets(0, 0, 10, 0);
         regCard.add(lblTitle, gbc);
         
-        JLabel lblSub = new JLabel("Configura tu cuenta de administrador", SwingConstants.CENTER);
+        JLabel lblSub = new JLabel("Configura la cuenta principal del negocio", SwingConstants.CENTER);
         lblSub.setForeground(ThemeConstants.TEXT_SECONDARY);
         lblSub.setFont(ThemeConstants.FONT_SMALL);
         gbc.gridy = 1;

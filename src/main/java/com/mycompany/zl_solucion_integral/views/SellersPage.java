@@ -6,13 +6,17 @@ import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonButton;
 import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
 import com.formdev.flatlaf.FlatClientProperties;
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 
 public class SellersPage extends JPanel {
     private final UsuarioController usuarioCtrl = new UsuarioController();
     private JTable tbSellers;
+    private JScrollPane sellersScroll;
     private JTextField txtName, txtTel, txtEmail, txtPassword;
     private int selectedSellerId = -1;
 
@@ -22,7 +26,7 @@ public class SellersPage extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
         // Header
-        JLabel title = new JLabel("👷 Gestión de Equipo de Ventas");
+        JLabel title = new JLabel("Gestión de empleados", createIcon("icons/staff.svg", ThemeConstants.NEON_PURPLE, 24, 24), SwingConstants.LEFT);
         title.setForeground(ThemeConstants.TEXT_PRIMARY);
         title.setFont(ThemeConstants.FONT_TITLE);
         add(title, BorderLayout.NORTH);
@@ -54,43 +58,52 @@ public class SellersPage extends JPanel {
         gbc.gridx = 0;
         gbc.insets = new Insets(0, 0, 5, 0);
 
-        gbc.gridy = 0; p.add(createLabel("👤 NOMBRE DEL VENDEDOR"), gbc);
-        txtName = createTextField("Nombre y Apellido");
-        setupFieldIcon(txtName, "👤");
-        gbc.gridy = 1; p.add(txtName, gbc);
+        JLabel formTitle = new JLabel("Registrar empleado");
+        formTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
+        formTitle.setFont(ThemeConstants.FONT_SUBTITLE);
+        gbc.gridy = 0; p.add(formTitle, gbc);
 
-        gbc.gridy = 2; gbc.insets = new Insets(15, 0, 5, 0);
-        p.add(createLabel("📞 TELÉFONO / CELULAR"), gbc);
+        gbc.gridy = 1; p.add(createLabel("NOMBRE DEL EMPLEADO"), gbc);
+        txtName = createTextField("Nombre y Apellido");
+        setupFieldIcon(txtName, "icons/user.svg");
+        gbc.gridy = 2; p.add(txtName, gbc);
+
+        gbc.gridy = 3; gbc.insets = new Insets(15, 0, 5, 0);
+        p.add(createLabel("TELÉFONO / CELULAR"), gbc);
         txtTel = createTextField("Ej: 3001234567");
-        setupFieldIcon(txtTel, "📞");
-        gbc.gridy = 3; gbc.insets = new Insets(0, 0, 5, 0);
+        setupFieldIcon(txtTel, "icons/user.svg");
+        gbc.gridy = 4; gbc.insets = new Insets(0, 0, 5, 0);
         p.add(txtTel, gbc);
 
-        gbc.gridy = 4; gbc.insets = new Insets(15, 0, 5, 0);
-        p.add(createLabel("📧 CORREO ELECTRÓNICO"), gbc);
+        gbc.gridy = 5; gbc.insets = new Insets(15, 0, 5, 0);
+        p.add(createLabel("CORREO ELECTRÓNICO"), gbc);
         txtEmail = createTextField("vendedor@chopcode.com");
-        setupFieldIcon(txtEmail, "📧");
-        gbc.gridy = 5; gbc.insets = new Insets(0, 0, 5, 0);
+        setupFieldIcon(txtEmail, "icons/settings.svg");
+        gbc.gridy = 6; gbc.insets = new Insets(0, 0, 5, 0);
         p.add(txtEmail, gbc);
 
-        gbc.gridy = 6; gbc.insets = new Insets(15, 0, 5, 0);
-        p.add(createLabel("🔑 CONTRASEÑA DE ACCESO"), gbc);
+        gbc.gridy = 7; gbc.insets = new Insets(15, 0, 5, 0);
+        p.add(createLabel("CONTRASEÑA DE ACCESO"), gbc);
         txtPassword = createTextField("Defina una clave segura");
-        setupFieldIcon(txtPassword, "🔑");
-        gbc.gridy = 7; gbc.insets = new Insets(0, 0, 25, 0);
+        setupFieldIcon(txtPassword, "icons/lock.svg");
+        gbc.gridy = 8; gbc.insets = new Insets(0, 0, 25, 0);
         p.add(txtPassword, gbc);
 
         // Botones
-        NeonButton btnSave = new NeonButton("REGISTRAR VENDEDOR ✅");
+        NeonButton btnSave = new NeonButton("Registrar empleado");
         btnSave.setNeonColor(ThemeConstants.NEON_GREEN);
+        btnSave.setIcon(createIcon("icons/staff.svg", ThemeConstants.NEON_GREEN, 17, 17));
+        btnSave.setIconTextGap(8);
         btnSave.addActionListener(e -> saveSeller());
-        gbc.gridy = 8; gbc.insets = new Insets(0, 0, 10, 0);
+        gbc.gridy = 9; gbc.insets = new Insets(0, 0, 10, 0);
         p.add(btnSave, gbc);
 
-        NeonButton btnUpdate = new NeonButton("ACTUALIZAR DATOS 🔄");
+        NeonButton btnUpdate = new NeonButton("Actualizar datos");
         btnUpdate.setNeonColor(ThemeConstants.NEON_BLUE);
+        btnUpdate.setIcon(createIcon("icons/settings.svg", ThemeConstants.NEON_BLUE, 17, 17));
+        btnUpdate.setIconTextGap(8);
         btnUpdate.addActionListener(e -> updateSeller());
-        gbc.gridy = 9;
+        gbc.gridy = 10;
         p.add(btnUpdate, gbc);
 
         return p;
@@ -101,22 +114,33 @@ public class SellersPage extends JPanel {
         p.setLayout(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
+        JLabel tableTitle = new JLabel("Empleados registrados");
+        tableTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
+        tableTitle.setFont(ThemeConstants.FONT_SUBTITLE);
+        tableTitle.setBorder(BorderFactory.createEmptyBorder(0, 8, 12, 8));
+        p.add(tableTitle, BorderLayout.NORTH);
+
         tbSellers = new JTable();
+        tbSellers.setModel(new DefaultTableModel(
+            new String[]{"Id", "Usuario", "Email", "Teléfono", "Rol", "Contraseña"}, 0));
         tbSellers.setBackground(ThemeConstants.CARD_BACKGROUND);
         tbSellers.setForeground(ThemeConstants.TEXT_PRIMARY);
         tbSellers.setRowHeight(35);
         tbSellers.setShowGrid(false);
+        tbSellers.setFillsViewportHeight(true);
+        tbSellers.setFont(ThemeConstants.FONT_SMALL);
+        tbSellers.setSelectionBackground(new Color(34, 197, 94, 70));
+        tbSellers.setSelectionForeground(ThemeConstants.TEXT_PRIMARY);
         
         tbSellers.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) loadSelectedSeller();
         });
 
-        JScrollPane scroll = new JScrollPane(tbSellers);
-        scroll.setOpaque(false);
-        scroll.getViewport().setOpaque(false);
-        scroll.setBorder(BorderFactory.createEmptyBorder());
-        
-        p.add(scroll, BorderLayout.CENTER);
+        sellersScroll = new JScrollPane(tbSellers);
+        sellersScroll.setOpaque(false);
+        sellersScroll.getViewport().setOpaque(false);
+        sellersScroll.setBorder(BorderFactory.createEmptyBorder());
+        p.add(sellersScroll, BorderLayout.CENTER);
         return p;
     }
 
@@ -179,7 +203,10 @@ public class SellersPage extends JPanel {
                 if (isSelected) {
                     c.setBackground(new Color(34, 197, 94, 40)); // Verde neón suave
                 } else {
-                    c.setBackground(ThemeConstants.CARD_BACKGROUND);
+                    c.setBackground(row % 2 == 0
+                            ? ThemeConstants.CARD_BACKGROUND
+                            : new Color(30, 41, 59, 150));
+                    c.setForeground(ThemeConstants.TEXT_SECONDARY);
                 }
                 setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
                 return c;
@@ -188,6 +215,14 @@ public class SellersPage extends JPanel {
         for (int i = 0; i < tbSellers.getColumnCount(); i++) {
             tbSellers.getColumnModel().getColumn(i).setCellRenderer(renderer);
         }
+
+        JTableHeader header = tbSellers.getTableHeader();
+        header.setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
+        header.setForeground(ThemeConstants.TEXT_SECONDARY);
+        header.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
+        header.setPreferredSize(new Dimension(0, 32));
+        header.setReorderingAllowed(false);
+        actualizarEstadoVacio();
     }
 
     private JLabel createLabel(String t) {
@@ -198,10 +233,38 @@ public class SellersPage extends JPanel {
     }
 
     private void setupFieldIcon(JTextField f, String icon) {
-        JLabel lbl = new JLabel(icon);
+        JLabel lbl = new JLabel(createIcon(icon, ThemeConstants.TEXT_SECONDARY, 17, 17));
         lbl.setForeground(ThemeConstants.TEXT_SECONDARY);
         lbl.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
         f.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_COMPONENT, lbl);
+    }
+
+    private FlatSVGIcon createIcon(String path, Color color, int width, int height) {
+        FlatSVGIcon icon = new FlatSVGIcon(path, width, height);
+        icon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, color));
+        return icon;
+    }
+
+    private void actualizarEstadoVacio() {
+        if (tbSellers.getRowCount() == 0) {
+            sellersScroll.setViewportView(createEmptyState());
+        } else {
+            sellersScroll.setViewportView(tbSellers);
+        }
+        sellersScroll.revalidate();
+        sellersScroll.repaint();
+    }
+
+    private JPanel createEmptyState() {
+        JPanel state = new JPanel(new GridBagLayout());
+        state.setOpaque(false);
+        FlatSVGIcon icon = createIcon("icons/staff.svg", ThemeConstants.NEON_GREEN, 24, 24);
+        JLabel label = new JLabel("Aún no hay empleados registrados", icon, SwingConstants.CENTER);
+        label.setForeground(ThemeConstants.TEXT_SECONDARY);
+        label.setFont(ThemeConstants.FONT_BODY);
+        label.setIconTextGap(10);
+        state.add(label);
+        return state;
     }
 
     private JTextField createTextField(String placeholder) {

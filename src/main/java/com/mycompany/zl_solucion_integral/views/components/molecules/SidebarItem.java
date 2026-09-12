@@ -1,5 +1,6 @@
 package com.mycompany.zl_solucion_integral.views.components.molecules;
 
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
 import javax.swing.*;
 import java.awt.*;
@@ -13,14 +14,20 @@ public class SidebarItem extends JPanel {
     private Runnable onClick;
 
     public SidebarItem(String text, String iconCode) {
-        setLayout(new FlowLayout(FlowLayout.LEFT, 20, 15));
+        setLayout(new FlowLayout(FlowLayout.LEFT, 18, 14));
         setOpaque(false);
         setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // Icono (Usando Unicode para demo, pero preparado para SVG)
-        iconLabel = new JLabel(iconCode);
-        iconLabel.setForeground(ThemeConstants.TEXT_SECONDARY);
-        iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
+        if (iconCode != null && iconCode.startsWith("icons/")) {
+            FlatSVGIcon icon = new FlatSVGIcon(iconCode, 18, 18);
+            iconLabel = new JLabel(icon);
+        } else {
+            iconLabel = new JLabel(iconCode == null ? "" : iconCode);
+            iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
+        }
+
+        iconLabel.setForeground(ThemeConstants.TEXT_PRIMARY);
+        iconLabel.setVerticalAlignment(SwingConstants.CENTER);
         add(iconLabel);
 
         label = new JLabel(text);
@@ -44,7 +51,7 @@ public class SidebarItem extends JPanel {
             public void mouseExited(MouseEvent e) {
                 if (!active) {
                     label.setForeground(ThemeConstants.TEXT_SECONDARY);
-                    iconLabel.setForeground(ThemeConstants.TEXT_SECONDARY);
+                    iconLabel.setForeground(ThemeConstants.TEXT_PRIMARY);
                     setOpaque(false);
                     repaint();
                 }
@@ -64,10 +71,10 @@ public class SidebarItem extends JPanel {
             iconLabel.setForeground(ThemeConstants.NEON_PURPLE);
             label.setFont(ThemeConstants.FONT_BODY.deriveFont(Font.BOLD));
             setOpaque(true);
-            setBackground(new Color(168, 85, 247, 30)); 
+            setBackground(new Color(168, 85, 247, 30));
         } else {
             label.setForeground(ThemeConstants.TEXT_SECONDARY);
-            iconLabel.setForeground(ThemeConstants.TEXT_SECONDARY);
+            iconLabel.setForeground(ThemeConstants.TEXT_PRIMARY);
             label.setFont(ThemeConstants.FONT_BODY);
             setOpaque(false);
         }

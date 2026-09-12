@@ -126,9 +126,9 @@ public class Main {
             registro.setVisible(true);
             // Si no existe un administrador, se muestra un mensaje de bienvenida y se solicita la creación de uno.
             JOptionPane.showMessageDialog(null,
-                    "Bienvenido a Simplify Biz.\n\n"
-                    + "Para comenzar a usar la aplicación, primero debes configurar una cuenta de administrador.\n\n"
-                    + "Por favor, completa el siguiente formulario con tus datos.",
+                    "Bienvenido a ERP+ Business.\n\n"
+                    + "Para comenzar a usar la aplicación, primero debes configurar la cuenta principal del negocio.\n\n"
+                    + "Completa el siguiente formulario para crear el administrador inicial.",
                     "Configuración Inicial", JOptionPane.INFORMATION_MESSAGE);
         } else {
             // Si ya existe un administrador, se muestra el formulario de inicio de sesión.
