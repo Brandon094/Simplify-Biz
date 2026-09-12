@@ -51,8 +51,8 @@
   </dependencies>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.target>25</maven.compiler.target>
     <exec.mainClass>com.mycompany.zl_solucion_integral.Main</exec.mainClass>
-    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.source>25</maven.compiler.source>
   </properties>
 </project>
