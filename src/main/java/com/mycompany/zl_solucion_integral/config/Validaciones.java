@@ -226,4 +226,60 @@ public class Validaciones {
         return true;
     }
 
+    /**
+     * Parsea un entero positivo. Devuelve {@code null} si no es válido.
+     */
+    public static Integer parseEnteroPositivo(String valor) {
+        Integer n = parseEntero(valor);
+        if (n == null || n <= 0) {
+            return null;
+        }
+        return n;
+    }
+
+    /**
+     * Parsea un entero (incluye cero y negativos). {@code null} si no es número.
+     */
+    public static Integer parseEntero(String valor) {
+        if (valor == null || valor.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(valor.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Parsea un decimal mayor o igual a cero. {@code null} si no es válido.
+     */
+    public static Double parseDecimalNoNegativo(String valor) {
+        if (valor == null || valor.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            double n = Double.parseDouble(valor.trim().replace(',', '.'));
+            return n >= 0 ? n : null;
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Parsea una fecha estricta {@code dd/MM/yyyy}. {@code null} si no es válida.
+     */
+    public static java.util.Date parseFecha(String fecha) {
+        if (fecha == null || fecha.trim().isEmpty()) {
+            return null;
+        }
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+        sdf.setLenient(false);
+        try {
+            return sdf.parse(fecha.trim());
+        } catch (java.text.ParseException e) {
+            return null;
+        }
+    }
+
 }

@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
 import com.mycompany.zl_solucion_integral.models.Sesion;
+import com.mycompany.zl_solucion_integral.views.components.LayoutResponsive;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
 import com.mycompany.zl_solucion_integral.views.components.UIMessages;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonButton;
@@ -16,22 +17,27 @@ public class ModernLoginPage extends JFrame {
     private JPasswordField txtPassword;
     private NeonButton btnLogin;
     private Sesion sesion = new Sesion();
+    private JPanel mainPanel;
+    private JSplitPane splitPane;
+    private RoundedPanel brandPanel;
 
     public ModernLoginPage() {
         setTitle("ERP+ Business - Inicio de sesión");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setMinimumSize(new Dimension(1024, 640));
+        // Tamaño mínimo pequeño (móvil) para permitir reflow a una columna.
+        setMinimumSize(new Dimension(360, 640));
+        setSize(1100, 720);
+        setLocationRelativeTo(null);
         setUndecorated(false);
 
-        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(ThemeConstants.BACKGROUND);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(50, 80, 50, 80));
 
-        RoundedPanel brandPanel = createBrandPanel();
+        brandPanel = createBrandPanel();
         RoundedPanel loginCard = createLoginCard();
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, brandPanel, loginCard);
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, brandPanel, loginCard);
         splitPane.setOpaque(false);
         splitPane.setBorder(null);
         splitPane.setDividerSize(0);
@@ -47,6 +53,23 @@ public class ModernLoginPage extends JFrame {
         txtPassword.addActionListener(e -> performLogin());
         getRootPane().setDefaultButton(btnLogin);
         SwingUtilities.invokeLater(() -> txtUsuario.requestFocusInWindow());
+
+        // Adaptabilidad: en móvil la marca y el formulario se apilan en vertical.
+        LayoutResponsive.listen(this, this::aplicarBreakpoint);
+    }
+
+    /** Reorganiza la pantalla de login según el ancho (horizontal o vertical). */
+    private void aplicarBreakpoint(LayoutResponsive.Breakpoint bp) {
+        boolean movil = LayoutResponsive.esColumnaUnica(bp);
+        int pad = movil ? 16 : 80;
+        int vPad = movil ? 16 : 50;
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(vPad, pad, vPad, pad));
+
+        splitPane.setOrientation(movil ? JSplitPane.VERTICAL_SPLIT : JSplitPane.HORIZONTAL_SPLIT);
+        splitPane.setResizeWeight(movil ? 0.35 : 0.52);
+        brandPanel.setVisible(true);
+        mainPanel.revalidate();
+        mainPanel.repaint();
     }
 
     private RoundedPanel createBrandPanel() {
@@ -69,16 +92,15 @@ public class ModernLoginPage extends JFrame {
         lblSubtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         lblSubtitle.setBorder(BorderFactory.createEmptyBorder(12, 0, 18, 0));
 
-        JLabel lblDescription = new JLabel("Gestiona inventario, ventas, clientes, proveedores y reportes desde una sola plataforma.");
+        JLabel lblDescription = new JLabel("<html><body style='width: 320px;'>Gestiona inventario, ventas, clientes, proveedores y reportes desde una sola plataforma.</body></html>");
         lblDescription.setForeground(ThemeConstants.TEXT_SECONDARY);
         lblDescription.setFont(ThemeConstants.FONT_BODY);
         lblDescription.setAlignmentX(Component.LEFT_ALIGNMENT);
-        lblDescription.setMaximumSize(new Dimension(520, 60));
-        lblDescription.setVerticalAlignment(SwingConstants.TOP);
 
         JPanel badges = new JPanel();
         badges.setOpaque(false);
-        badges.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        badges.setLayout(new FlowLayout(FlowLayout.LEFT, 8, 8));
+        badges.setAlignmentX(Component.LEFT_ALIGNMENT);
         badges.add(createBadge("Inventario"));
         badges.add(createBadge("Ventas"));
         badges.add(createBadge("Reportes"));
@@ -105,7 +127,7 @@ public class ModernLoginPage extends JFrame {
         RoundedPanel card = new RoundedPanel(32, ThemeConstants.SIDEBAR_BACKGROUND);
         card.setLayout(new GridBagLayout());
         card.setBorder(BorderFactory.createEmptyBorder(36, 36, 36, 36));
-        card.setPreferredSize(new Dimension(430, 0));
+        card.setPreferredSize(new Dimension(440, 0));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -114,16 +136,16 @@ public class ModernLoginPage extends JFrame {
 
         JLabel lblWelcome = new JLabel("Iniciar sesión");
         lblWelcome.setForeground(ThemeConstants.TEXT_PRIMARY);
-        lblWelcome.setFont(new Font("Segoe UI", Font.BOLD, 30));
+        lblWelcome.setFont(new Font("Segoe UI", Font.BOLD, 28));
         gbc.gridy = 0;
-        gbc.insets = new Insets(0, 0, 8, 0);
+        gbc.insets = new Insets(0, 0, 6, 0);
         card.add(lblWelcome, gbc);
 
         JLabel lblInfo = new JLabel("Accede a tu panel de administración");
         lblInfo.setForeground(ThemeConstants.TEXT_SECONDARY);
         lblInfo.setFont(ThemeConstants.FONT_BODY);
         gbc.gridy = 1;
-        gbc.insets = new Insets(0, 0, 28, 0);
+        gbc.insets = new Insets(0, 0, 24, 0);
         card.add(lblInfo, gbc);
 
         gbc.gridy = 2;
@@ -132,7 +154,7 @@ public class ModernLoginPage extends JFrame {
 
         txtUsuario = createTextField("Ingrese su usuario");
         gbc.gridy = 3;
-        gbc.insets = new Insets(0, 0, 18, 0);
+        gbc.insets = new Insets(0, 0, 16, 0);
         card.add(txtUsuario, gbc);
 
         gbc.gridy = 4;
@@ -141,34 +163,66 @@ public class ModernLoginPage extends JFrame {
 
         txtPassword = createPasswordField("Ingrese su contraseña");
         gbc.gridy = 5;
-        gbc.insets = new Insets(0, 0, 18, 0);
+        gbc.insets = new Insets(0, 0, 16, 0);
         card.add(txtPassword, gbc);
 
-        JPanel metaRow = new JPanel(new BorderLayout());
+        JPanel metaRow = new JPanel(new BorderLayout(10, 0));
         metaRow.setOpaque(false);
         JCheckBox remember = new JCheckBox("Recordarme");
         remember.setOpaque(false);
         remember.setForeground(ThemeConstants.TEXT_SECONDARY);
         remember.setFocusPainted(false);
         remember.setFont(ThemeConstants.FONT_SMALL);
+
+        // Cargar usuario recordado si existe
+        String usuarioGuardado = com.mycompany.zl_solucion_integral.config.SelecionRuta.cargarUsuarioRecordado();
+        if (usuarioGuardado != null && !usuarioGuardado.trim().isEmpty()) {
+            txtUsuario.setText(usuarioGuardado.trim());
+            remember.setSelected(true);
+        }
+
         metaRow.add(remember, BorderLayout.WEST);
 
         JLabel forgot = new JLabel("¿Olvidaste tu contraseña?");
         forgot.setForeground(ThemeConstants.NEON_BLUE);
         forgot.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
         forgot.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        forgot.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                forgot.setForeground(ThemeConstants.NEON_PURPLE);
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                forgot.setForeground(ThemeConstants.NEON_BLUE);
+            }
+
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                new com.mycompany.zl_solucion_integral.views.components.organisms.PasswordRecoveryDialog(ModernLoginPage.this).setVisible(true);
+            }
+        });
         metaRow.add(forgot, BorderLayout.EAST);
 
         gbc.gridy = 6;
-        gbc.insets = new Insets(0, 0, 22, 0);
+        gbc.insets = new Insets(4, 0, 24, 0);
         card.add(metaRow, gbc);
 
         NeonButton btnLogin = new NeonButton("INGRESAR");
         btnLogin.setNeonColor(ThemeConstants.NEON_PURPLE);
-        btnLogin.setPreferredSize(new Dimension(0, 52));
-        btnLogin.addActionListener(e -> performLogin());
+        btnLogin.setPreferredSize(new Dimension(0, 50));
+        btnLogin.addActionListener(e -> {
+            if (remember.isSelected()) {
+                com.mycompany.zl_solucion_integral.config.SelecionRuta.guardarUsuarioRecordado(txtUsuario.getText());
+            } else {
+                com.mycompany.zl_solucion_integral.config.SelecionRuta.guardarUsuarioRecordado(null);
+            }
+            performLogin();
+        });
         this.btnLogin = btnLogin;
         gbc.gridy = 7;
+        gbc.insets = new Insets(0, 0, 0, 0);
         card.add(btnLogin, gbc);
 
         JLabel lblFooter = new JLabel("Versión 1.0 • Seguridad y control empresarial");
@@ -176,8 +230,37 @@ public class ModernLoginPage extends JFrame {
         lblFooter.setHorizontalAlignment(SwingConstants.CENTER);
         lblFooter.setFont(ThemeConstants.FONT_SMALL);
         gbc.gridy = 8;
-        gbc.insets = new Insets(18, 0, 0, 0);
+        gbc.insets = new Insets(16, 0, 4, 0);
         card.add(lblFooter, gbc);
+
+        JLabel lblPoweredBy = new JLabel("Powered by: ChopCode Solutions");
+        lblPoweredBy.setForeground(ThemeConstants.NEON_BLUE);
+        lblPoweredBy.setHorizontalAlignment(SwingConstants.CENTER);
+        lblPoweredBy.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
+        lblPoweredBy.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        lblPoweredBy.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                lblPoweredBy.setForeground(ThemeConstants.NEON_PURPLE);
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                lblPoweredBy.setForeground(ThemeConstants.NEON_BLUE);
+            }
+
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                try {
+                    java.awt.Desktop.getDesktop().browse(new java.net.URI("https://portafolio-brandon-daza.web.app/"));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        gbc.gridy = 9;
+        gbc.insets = new Insets(4, 0, 0, 0);
+        card.add(lblPoweredBy, gbc);
 
         return card;
     }
@@ -207,8 +290,8 @@ public class ModernLoginPage extends JFrame {
         f.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, placeholder);
 
         FlatSVGIcon userIcon = new FlatSVGIcon("icons/user.svg", 18, 18);
+        userIcon.setColorFilter(new FlatSVGIcon.ColorFilter(color -> ThemeConstants.TEXT_SECONDARY));
         JLabel icon = new JLabel(userIcon);
-        icon.setForeground(ThemeConstants.TEXT_PRIMARY);
         icon.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
         f.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_COMPONENT, icon);
 
@@ -221,8 +304,8 @@ public class ModernLoginPage extends JFrame {
         f.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, placeholder);
 
         FlatSVGIcon lockIcon = new FlatSVGIcon("icons/lock.svg", 18, 18);
+        lockIcon.setColorFilter(new FlatSVGIcon.ColorFilter(color -> ThemeConstants.TEXT_SECONDARY));
         JLabel icon = new JLabel(lockIcon);
-        icon.setForeground(ThemeConstants.TEXT_PRIMARY);
         icon.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
         f.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_COMPONENT, icon);
 

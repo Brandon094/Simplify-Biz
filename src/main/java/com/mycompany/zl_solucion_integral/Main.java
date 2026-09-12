@@ -2,6 +2,7 @@ package com.mycompany.zl_solucion_integral;
 
 import com.mycompany.zl_solucion_integral.config.ConexionDB;
 import com.mycompany.zl_solucion_integral.config.DatabaseInitializer;
+import com.mycompany.zl_solucion_integral.config.GestorConexion;
 import com.mycompany.zl_solucion_integral.config.SelecionRuta;
 import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
 import com.mycompany.zl_solucion_integral.views.ModernLoginPage;
@@ -74,32 +75,21 @@ public class Main {
      * caso contrario.
      */
     private static boolean inicializarBaseDatos() {
-        // Instancia de SelecionRuta para manejar la configuración de la ruta
-        SelecionRuta rutaDB = new SelecionRuta();        
-        // Se lee el archivo de configuración para obtener la ruta de la base de datos
-        String ruta = rutaDB.cargarRutaBaseDatos();
-
-        if (ruta == null) {
-            // Si no se encuentra la ruta, le pedimos al usuario que seleccione una
-            ruta = rutaDB.selecionarRutaDB(); // Se llama al método para seleccionar la ruta de la base de datos
-            if (ruta == null) {
-                JOptionPane.showMessageDialog(null,
-                        "No se seleccionó una ruta válida. La aplicación no puede continuar.",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                return false; // No se puede continuar si no se selecciona una ruta
-            }
-
-            // Si el usuario selecciona una ruta, la guardamos en el archivo de configuración
-            guardarRutaEnConfig(ruta);
+        // Se obtiene la ruta de la base de datos protegida por defecto o la configurada previamente
+        String ruta = SelecionRuta.cargarRutaBaseDatos();
+        if (ruta == null || ruta.trim().isEmpty()) {
+            ruta = SelecionRuta.obtenerRutaProtegidaPredeterminada();
         }
 
-        // Se crea una instancia de la conexión a la base de datos usando la ruta leída.
-        ConexionDB conexion = new ConexionDB(ruta);
+        // Guardar la ruta en config.properties si no estaba registrada
+        guardarRutaEnConfig(ruta);
+
         try {
-            // Se inicializa la base de datos y se crean las tablas necesarias.
-            DatabaseInitializer dbInit = new DatabaseInitializer(conexion);
+            GestorConexion.getInstancia().inicializar(ruta);
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> GestorConexion.getInstancia().cerrar()));
+            DatabaseInitializer dbInit = new DatabaseInitializer(new ConexionDB());
             dbInit.inicializarTablas();
-            return true; // La inicialización fue exitosa.
+            return true;
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null,
                     "Ocurrió un error al intentar inicializar la base de datos.\n"

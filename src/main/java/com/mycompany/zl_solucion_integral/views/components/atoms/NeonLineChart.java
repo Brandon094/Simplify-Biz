@@ -40,13 +40,14 @@ public class NeonLineChart extends JPanel {
         g2.setFont(ThemeConstants.FONT_SMALL);
         g2.drawString(title, left, 20);
 
-        if (data == null || data.size() < 2 || data.stream().allMatch(value -> value == null || value <= 0)) {
+        boolean tieneAlMenosUnaVenta = data != null && data.stream().anyMatch(value -> value != null && value > 0);
+        if (data == null || data.size() < 2 || !tieneAlMenosUnaVenta) {
             FlatSVGIcon emptyIcon = new FlatSVGIcon("icons/sales.svg", 22, 22);
             emptyIcon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, ThemeConstants.NEON_BLUE));
             emptyIcon.paintIcon(this, g2, left, height / 2 - 28);
             g2.setColor(ThemeConstants.TEXT_SECONDARY);
             g2.setFont(ThemeConstants.FONT_BODY);
-            g2.drawString("Aún no hay ventas registradas", left + 32, height / 2 - 10);
+            g2.drawString("Aún no hay ventas registradas en los últimos 7 días", left + 32, height / 2 - 10);
             g2.dispose();
             return;
         }

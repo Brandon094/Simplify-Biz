@@ -33,9 +33,9 @@ public class ClientsPage extends JPanel {
         title.setFont(ThemeConstants.FONT_TITLE);
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel subtitle = new JLabel("Consulta la información de contacto de todos tus clientes registrados");
-        subtitle.setForeground(ThemeConstants.TEXT_SECONDARY);
-        subtitle.setFont(ThemeConstants.FONT_SMALL);
+        JTextArea subtitle = UIUtils.createWrappingLabel(
+                "Consulta la información de contacto de todos tus clientes registrados",
+                ThemeConstants.FONT_SMALL, ThemeConstants.TEXT_SECONDARY);
         subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         headerPanel.add(title);
@@ -60,10 +60,10 @@ public class ClientsPage extends JPanel {
 
         tbClientes = new JTable();
         tbClientes.setModel(new DefaultTableModel(
-            new String[]{"Id", "Usuario", "Email", "Teléfono", "Rol", "Contraseña"}, 0));
+            new String[]{"Id", "Usuario", "Email", "Teléfono", "Rol"}, 0));
         tbClientes.setBackground(ThemeConstants.CARD_BACKGROUND);
         tbClientes.setForeground(ThemeConstants.TEXT_PRIMARY);
-        tbClientes.setRowHeight(35);
+        tbClientes.setRowHeight(ThemeConstants.TABLE_ROW_HEIGHT);
         tbClientes.setShowGrid(false);
         tbClientes.setFillsViewportHeight(true);
         tbClientes.setFont(ThemeConstants.FONT_SMALL);
@@ -117,7 +117,7 @@ public class ClientsPage extends JPanel {
     }
 
     private void ocultarColumnasInternas() {
-        String[] hiddenColumns = {"Id", "Rol", "Contraseña"};
+        String[] hiddenColumns = {"Id", "Rol"};
         for (String columnName : hiddenColumns) {
             for (int column = 0; column < tbClientes.getColumnCount(); column++) {
                 if (columnName.equals(tbClientes.getColumnName(column))) {

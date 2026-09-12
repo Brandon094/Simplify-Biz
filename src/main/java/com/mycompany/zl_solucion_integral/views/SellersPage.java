@@ -2,8 +2,10 @@ package com.mycompany.zl_solucion_integral.views;
 
 import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
 import com.mycompany.zl_solucion_integral.models.Usuario;
+import com.mycompany.zl_solucion_integral.views.components.LayoutResponsive;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
 import com.mycompany.zl_solucion_integral.views.components.UIUtils;
+import com.mycompany.zl_solucion_integral.views.components.UIMessages;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonButton;
 import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
 import com.formdev.flatlaf.FlatClientProperties;
@@ -20,6 +22,7 @@ public class SellersPage extends JPanel {
     private JScrollPane sellersScroll;
     private JTextField txtName, txtTel, txtEmail, txtPassword;
     private int selectedSellerId = -1;
+    private JPanel mainContent, formPanel, tablePanel;
 
     public SellersPage() {
         setOpaque(false);
@@ -36,9 +39,9 @@ public class SellersPage extends JPanel {
         title.setFont(ThemeConstants.FONT_TITLE);
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel subtitle = new JLabel("Registra y administra el personal con acceso al sistema");
-        subtitle.setForeground(ThemeConstants.TEXT_SECONDARY);
-        subtitle.setFont(ThemeConstants.FONT_SMALL);
+        JTextArea subtitle = UIUtils.createWrappingLabel(
+                "Registra y administra el personal con acceso al sistema",
+                ThemeConstants.FONT_SMALL, ThemeConstants.TEXT_SECONDARY);
         subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         headerPanel.add(title);
@@ -47,23 +50,53 @@ public class SellersPage extends JPanel {
         add(headerPanel, BorderLayout.NORTH);
 
         // Contenido Principal
-        JPanel mainContent = new JPanel(new BorderLayout(25, 0));
+        mainContent = new JPanel(new BorderLayout(25, 0));
         mainContent.setOpaque(false);
 
-        // Formulario (Izquierda)
-        mainContent.add(createFormPanel(), BorderLayout.WEST);
+        // Formulario (Izquierda) envuelto en JScrollPane para evitar desbordamiento vertical
+        JScrollPane formScroll = new JScrollPane(createFormPanel());
+        formScroll.setOpaque(false);
+        formScroll.getViewport().setOpaque(false);
+        formScroll.setBorder(BorderFactory.createEmptyBorder());
+        formScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        formScroll.setPreferredSize(new Dimension(360, 0));
 
-        // Tabla (Derecha)
-        mainContent.add(createTablePanel(), BorderLayout.CENTER);
+        formPanel = new JPanel(new BorderLayout());
+        formPanel.setOpaque(false);
+        formPanel.add(formScroll, BorderLayout.CENTER);
+
+        tablePanel = createTablePanel();
+        mainContent.add(formPanel, BorderLayout.WEST);
+        mainContent.add(tablePanel, BorderLayout.CENTER);
 
         add(mainContent, BorderLayout.CENTER);
+
+        // Reflow adaptable: en móvil el formulario pasa arriba (una columna).
+        LayoutResponsive.listenWidth(this, (bp, ancho) -> aplicarBreakpoint(bp, ancho));
 
         refreshData();
     }
 
+    /** Reorganiza formulario y tabla según el ancho (vertical en móvil). */
+    private void aplicarBreakpoint(LayoutResponsive.Breakpoint bp, int anchoDisponible) {
+        boolean movil = LayoutResponsive.esColumnaUnica(bp);
+        formPanel.setPreferredSize(movil ? null : new Dimension(360, 0));
+        mainContent.removeAll();
+        if (movil) {
+            mainContent.setLayout(new BorderLayout(0, 20));
+            mainContent.add(formPanel, BorderLayout.NORTH);
+            mainContent.add(tablePanel, BorderLayout.CENTER);
+        } else {
+            mainContent.setLayout(new BorderLayout(25, 0));
+            mainContent.add(formPanel, BorderLayout.WEST);
+            mainContent.add(tablePanel, BorderLayout.CENTER);
+        }
+        mainContent.revalidate();
+        mainContent.repaint();
+    }
+
     private JPanel createFormPanel() {
         RoundedPanel p = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
-        p.setPreferredSize(new Dimension(350, 0));
         p.setLayout(new GridBagLayout());
         p.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
 
@@ -71,78 +104,115 @@ public class SellersPage extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
         gbc.gridx = 0;
-        gbc.insets = new Insets(0, 0, 5, 0);
 
+        gbc.gridy = 0; gbc.insets = new Insets(0, 0, 16, 0);
         JLabel formTitle = new JLabel("Registrar empleado");
         formTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
         formTitle.setFont(ThemeConstants.FONT_SUBTITLE);
-        gbc.gridy = 0; p.add(formTitle, gbc);
+        p.add(formTitle, gbc);
 
-        gbc.gridy = 1; p.add(createLabel("NOMBRE DEL EMPLEADO"), gbc);
+        gbc.gridy = 1; gbc.insets = new Insets(0, 0, 4, 0);
+        p.add(createLabel("NOMBRE DEL EMPLEADO"), gbc);
         txtName = createTextField("Nombre y Apellido");
         setupFieldIcon(txtName, "icons/user.svg");
-        gbc.gridy = 2; p.add(txtName, gbc);
+        gbc.gridy = 2; gbc.insets = new Insets(0, 0, 12, 0);
+        p.add(txtName, gbc);
 
-        gbc.gridy = 3; gbc.insets = new Insets(15, 0, 5, 0);
+        gbc.gridy = 3; gbc.insets = new Insets(0, 0, 4, 0);
         p.add(createLabel("TELÉFONO / CELULAR"), gbc);
         txtTel = createTextField("Ej: 3001234567");
         setupFieldIcon(txtTel, "icons/user.svg");
-        gbc.gridy = 4; gbc.insets = new Insets(0, 0, 5, 0);
+        gbc.gridy = 4; gbc.insets = new Insets(0, 0, 12, 0);
         p.add(UIUtils.createFieldWithHelper(txtTel, "Debe tener 10 dígitos numéricos"), gbc);
 
-        gbc.gridy = 5; gbc.insets = new Insets(15, 0, 5, 0);
+        gbc.gridy = 5; gbc.insets = new Insets(0, 0, 4, 0);
         p.add(createLabel("CORREO ELECTRÓNICO"), gbc);
         txtEmail = createTextField("vendedor@chopcode.com");
         setupFieldIcon(txtEmail, "icons/settings.svg");
-        gbc.gridy = 6; gbc.insets = new Insets(0, 0, 5, 0);
+        gbc.gridy = 6; gbc.insets = new Insets(0, 0, 12, 0);
         p.add(txtEmail, gbc);
 
-        gbc.gridy = 7; gbc.insets = new Insets(15, 0, 5, 0);
+        gbc.gridy = 7; gbc.insets = new Insets(0, 0, 4, 0);
         p.add(createLabel("CONTRASEÑA DE ACCESO"), gbc);
         txtPassword = createTextField("Defina una clave segura");
         setupFieldIcon(txtPassword, "icons/lock.svg");
-        gbc.gridy = 8; gbc.insets = new Insets(0, 0, 20, 0);
+        gbc.gridy = 8; gbc.insets = new Insets(0, 0, 18, 0);
         p.add(UIUtils.createFieldWithHelper(txtPassword, "La usará el empleado para iniciar sesión"), gbc);
 
-        // Botones
+        // Botones de Acción
+        JPanel btnRow = new JPanel(new GridLayout(1, 2, 10, 0));
+        btnRow.setOpaque(false);
+
         NeonButton btnSave = new NeonButton("Registrar empleado");
         btnSave.setNeonColor(ThemeConstants.NEON_GREEN);
-        btnSave.setIcon(createIcon("icons/staff.svg", ThemeConstants.NEON_GREEN, 17, 17));
-        btnSave.setIconTextGap(8);
+        btnSave.setIcon(createIcon("icons/plus.svg", ThemeConstants.NEON_GREEN, 16, 16));
+        btnSave.setIconTextGap(6);
+        btnSave.setPreferredSize(new Dimension(0, 42));
         btnSave.addActionListener(e -> saveSeller());
         btnSave.setToolTipText("Registra un nuevo empleado con acceso al sistema");
-        gbc.gridy = 9; gbc.insets = new Insets(0, 0, 10, 0);
-        p.add(btnSave, gbc);
 
-        NeonButton btnUpdate = new NeonButton("Actualizar datos");
-        btnUpdate.setNeonColor(ThemeConstants.NEON_BLUE);
-        btnUpdate.setIcon(createIcon("icons/settings.svg", ThemeConstants.NEON_BLUE, 17, 17));
-        btnUpdate.setIconTextGap(8);
-        btnUpdate.addActionListener(e -> updateSeller());
-        btnUpdate.setToolTipText("Actualiza los datos del empleado seleccionado en la tabla");
-        gbc.gridy = 10;
-        p.add(btnUpdate, gbc);
+        NeonButton btnClear = new NeonButton("Limpiar");
+        btnClear.setNeonColor(ThemeConstants.NEON_BLUE);
+        btnClear.setIcon(createIcon("icons/settings.svg", ThemeConstants.NEON_BLUE, 16, 16));
+        btnClear.setIconTextGap(6);
+        btnClear.setPreferredSize(new Dimension(0, 42));
+        btnClear.addActionListener(e -> clearFields());
+        btnClear.setToolTipText("Limpia el formulario");
+
+        btnRow.add(btnSave);
+        btnRow.add(btnClear);
+
+        gbc.gridy = 9; gbc.insets = new Insets(0, 0, 0, 0);
+        p.add(btnRow, gbc);
 
         return p;
     }
 
     private JPanel createTablePanel() {
         RoundedPanel p = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
-        p.setLayout(new BorderLayout());
+        p.setLayout(new BorderLayout(0, 10));
         p.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setOpaque(false);
 
         JLabel tableTitle = new JLabel("Empleados registrados");
         tableTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
         tableTitle.setFont(ThemeConstants.FONT_SUBTITLE);
-        tableTitle.setBorder(BorderFactory.createEmptyBorder(0, 8, 12, 8));
-        p.add(tableTitle, BorderLayout.NORTH);
+        headerPanel.add(tableTitle, BorderLayout.WEST);
+
+        // Acciones por registro (Actualizar y Eliminar)
+        JPanel actionRow = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        actionRow.setOpaque(false);
+
+        NeonButton btnUpdate = new NeonButton("Actualizar");
+        btnUpdate.setNeonColor(ThemeConstants.NEON_BLUE);
+        btnUpdate.setIcon(createIcon("icons/update.svg", ThemeConstants.NEON_BLUE, 16, 16));
+        btnUpdate.setIconTextGap(6);
+        btnUpdate.setPreferredSize(new Dimension(115, 34));
+        btnUpdate.addActionListener(e -> updateSeller());
+        btnUpdate.setToolTipText("Actualiza los datos del empleado seleccionado");
+
+        NeonButton btnDelete = new NeonButton("Eliminar");
+        btnDelete.setNeonColor(ThemeConstants.NEON_PURPLE);
+        btnDelete.setIcon(createIcon("icons/trash.svg", ThemeConstants.NEON_PURPLE, 16, 16));
+        btnDelete.setIconTextGap(6);
+        btnDelete.setPreferredSize(new Dimension(110, 34));
+        btnDelete.addActionListener(e -> deleteSeller());
+        btnDelete.setToolTipText("Elimina el empleado seleccionado tras confirmar");
+
+        actionRow.add(btnUpdate);
+        actionRow.add(btnDelete);
+        headerPanel.add(actionRow, BorderLayout.EAST);
+
+        p.add(headerPanel, BorderLayout.NORTH);
 
         tbSellers = new JTable();
         tbSellers.setModel(new DefaultTableModel(
-            new String[]{"Id", "Usuario", "Email", "Teléfono", "Rol", "Contraseña"}, 0));
+            new String[]{"Id", "Usuario", "Email", "Teléfono", "Rol"}, 0));
         tbSellers.setBackground(ThemeConstants.CARD_BACKGROUND);
         tbSellers.setForeground(ThemeConstants.TEXT_PRIMARY);
-        tbSellers.setRowHeight(35);
+        tbSellers.setRowHeight(ThemeConstants.TABLE_ROW_HEIGHT);
         tbSellers.setShowGrid(false);
         tbSellers.setFillsViewportHeight(true);
         tbSellers.setFont(ThemeConstants.FONT_SMALL);
@@ -168,24 +238,84 @@ public class SellersPage extends JPanel {
         String pass = txtPassword.getText().trim();
 
         if (name.isEmpty() || email.isEmpty() || pass.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Nombre, Email y Contraseña son obligatorios.");
+            UIUtils.showError(this, UIMessages.MSG_CAMPOS_OBLIGATORIOS);
+            return;
+        }
+        if (!com.mycompany.zl_solucion_integral.config.Validaciones.validarEmail(email)) {
+            UIUtils.showError(this, UIMessages.MSG_EMAIL_INVALIDO);
+            return;
+        }
+        if (!com.mycompany.zl_solucion_integral.config.Validaciones.validarTelefono(tel)) {
+            UIUtils.showError(this, "El teléfono debe contener entre 7 y 10 dígitos numéricos.");
             return;
         }
 
         Usuario u = new Usuario(0, name, tel, email, pass, "0"); // Rol 0 = Vendedor
-        usuarioCtrl.agregarUsuario(u);
-        refreshData();
-        clearFields();
+        com.mycompany.zl_solucion_integral.config.ResultadoOperacion res = usuarioCtrl.agregarUsuario(u);
+        if (res.esExito()) {
+            UIUtils.showSuccess(this, res.getMensaje());
+            refreshData();
+            clearFields();
+        } else {
+            UIUtils.showError(this, res.getMensaje());
+        }
     }
 
     private void updateSeller() {
         if (selectedSellerId == -1) {
-            JOptionPane.showMessageDialog(this, "Seleccione un vendedor de la tabla.");
+            UIUtils.showError(this, "Seleccione un vendedor de la tabla.");
             return;
         }
-        usuarioCtrl.modificarUsuario(txtName.getText(), txtTel.getText(), txtEmail.getText(), "0", txtPassword.getText(), selectedSellerId);
-        refreshData();
-        clearFields();
+        String name = txtName.getText().trim();
+        String tel = txtTel.getText().trim();
+        String email = txtEmail.getText().trim();
+        String pass = txtPassword.getText().trim();
+
+        if (name.isEmpty() || email.isEmpty()) {
+            UIUtils.showError(this, UIMessages.MSG_CAMPOS_OBLIGATORIOS);
+            return;
+        }
+        if (!com.mycompany.zl_solucion_integral.config.Validaciones.validarEmail(email)) {
+            UIUtils.showError(this, UIMessages.MSG_EMAIL_INVALIDO);
+            return;
+        }
+        if (!com.mycompany.zl_solucion_integral.config.Validaciones.validarTelefono(tel)) {
+            UIUtils.showError(this, "El teléfono debe contener entre 7 y 10 dígitos numéricos.");
+            return;
+        }
+
+        com.mycompany.zl_solucion_integral.config.ResultadoOperacion res = usuarioCtrl.modificarUsuario(name, tel, email, "0", pass, selectedSellerId);
+        if (res.esExito()) {
+            UIUtils.showSuccess(this, res.getMensaje());
+            refreshData();
+            clearFields();
+        } else {
+            UIUtils.showError(this, res.getMensaje());
+        }
+    }
+
+    private void deleteSeller() {
+        if (selectedSellerId == -1) {
+            UIUtils.showError(this, "Seleccione un vendedor de la tabla.");
+            return;
+        }
+        int confirmacion = JOptionPane.showConfirmDialog(
+                this,
+                "¿Está seguro de eliminar el empleado seleccionado?",
+                "Confirmar eliminación",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+        );
+        if (confirmacion == JOptionPane.YES_OPTION) {
+            com.mycompany.zl_solucion_integral.config.ResultadoOperacion res = usuarioCtrl.eliminarUsuario(selectedSellerId);
+            if (res.esExito()) {
+                UIUtils.showSuccess(this, res.getMensaje());
+                refreshData();
+                clearFields();
+            } else {
+                UIUtils.showError(this, res.getMensaje());
+            }
+        }
     }
 
     private void loadSelectedSeller() {

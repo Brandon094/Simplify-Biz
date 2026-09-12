@@ -19,9 +19,8 @@ public class SelecionRuta {
         int resultado = chooser.showOpenDialog(null);
         if (resultado == JFileChooser.APPROVE_OPTION) {
             File carpetaSeleccionada = chooser.getSelectedFile();
-            // Aquí definimos el nombre del archivo de la base de datos, por ejemplo "db.sqlite"
-            String ruta = carpetaSeleccionada.getAbsolutePath() + File.separator + "db.sqlite";
-            return ruta;
+            // db.path es la carpeta de datos; el archivo efectivo es db.db
+            return carpetaSeleccionada.getAbsolutePath();
         } else {
             // Si el usuario cancela, podemos retornar null o una ruta por defecto.
             JOptionPane.showMessageDialog(null, "No se seleccionó ninguna carpeta. Se usará la ruta por defecto.");
@@ -62,17 +61,48 @@ public class SelecionRuta {
         }
         return null; // Si el usuario cancela, retorna null
     }
-    // Cargar la ruta desde el archivo propierties
+    /**
+     * Devuelve la ruta por defecto protegida en la carpeta de datos de la aplicación del usuario
+     * (%APPDATA%\ERPPlusBusiness en Windows / ~/.config/ERPPlusBusiness en Linux/Mac).
+     */
+    public static String obtenerRutaProtegidaPredeterminada() {
+        String userHome = System.getProperty("user.home");
+        String os = System.getProperty("os.name", "").toLowerCase();
+        File folder;
 
+        if (os.contains("win")) {
+            String appData = System.getenv("APPDATA");
+            if (appData != null && !appData.isEmpty()) {
+                folder = new File(appData, "ERPPlusBusiness");
+            } else {
+                folder = new File(userHome, "AppData/Roaming/ERPPlusBusiness");
+            }
+        } else if (os.contains("mac")) {
+            folder = new File(userHome, "Library/Application Support/ERPPlusBusiness");
+        } else {
+            // Linux/Unix por defecto
+            folder = new File(userHome, ".config/ERPPlusBusiness");
+        }
+
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+        return new File(folder, "db.db").getAbsolutePath();
+    }
+
+    // Cargar la ruta desde el archivo properties; si no existe, usar la ruta protegida por defecto.
     public static String cargarRutaBaseDatos() {
         Properties props = new Properties();
         try (FileInputStream input = new FileInputStream("config.properties")) {
             props.load(input);
-            return props.getProperty("db.path"); // Retorna la ruta de la base de datos
+            String rutaGuardada = props.getProperty("db.path");
+            if (rutaGuardada != null && !rutaGuardada.trim().isEmpty()) {
+                return rutaGuardada.trim();
+            }
         } catch (IOException e) {
-            e.printStackTrace();
-            return null; // En caso de error, retorna null
+            // Archivo de configuración aún no existe
         }
+        return obtenerRutaProtegidaPredeterminada();
     }
 
     /**
@@ -112,6 +142,43 @@ public class SelecionRuta {
 
         try (FileOutputStream output = new FileOutputStream("config.properties")) {
             props.setProperty("theme.dark", String.valueOf(dark));
+            props.store(output, "Configuración de la aplicación");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Carga el usuario recordado si existe la clave remember.user en config.properties.
+     */
+    public static String cargarUsuarioRecordado() {
+        Properties props = new Properties();
+        try (FileInputStream input = new FileInputStream("config.properties")) {
+            props.load(input);
+            return props.getProperty("remember.user");
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Guarda o borra el usuario recordado en config.properties.
+     * Si usuario es null o vacío, remueve la clave.
+     */
+    public static void guardarUsuarioRecordado(String usuario) {
+        Properties props = new Properties();
+        try (FileInputStream input = new FileInputStream("config.properties")) {
+            props.load(input);
+        } catch (IOException e) {
+            // Ignorar si no existe aún
+        }
+
+        try (FileOutputStream output = new FileOutputStream("config.properties")) {
+            if (usuario != null && !usuario.trim().isEmpty()) {
+                props.setProperty("remember.user", usuario.trim());
+            } else {
+                props.remove("remember.user");
+            }
             props.store(output, "Configuración de la aplicación");
         } catch (IOException e) {
             e.printStackTrace();

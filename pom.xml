@@ -11,6 +11,23 @@
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
         <exec.mainClass>com.mycompany.zl_solucion_integral.Main</exec.mainClass>
+
+        <!--
+          Carpeta de compilación (target) redirigida FUERA de la carpeta del proyecto.
+          Motivo: el proyecto vive en una partición NTFS montada por FUSE (fuseblk).
+          Al borrar rápidamente, NTFS-3G deja archivos `.
+          fuse_hidden...` colgados y `mvn clean` falla con
+          "Failed to delete .../target". Apuntar target a un disco Linux nativo
+          (ext4) resuelve el problema de raíz y hace que `mvn clean package`
+          funcione siempre. Cambia la ruta si lo prefieres.
+        -->
+        <target.dir>${user.home}/.m2-tmp/${project.artifactId}/target</target.dir>
+
+        <!--
+          Carpeta visible dentro del proyecto donde se copia el JAR final tras
+          el `package`, para ejecutarlo como `java -jar dist/Simplify-Biz-1.2.0.jar`.
+        -->
+        <dist.dir>${project.basedir}/dist</dist.dir>
     </properties>
 
     <dependencies>
@@ -26,6 +43,17 @@
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.46.1.0</version>
+        </dependency>
+
+        <!--
+          Implementación de SLF4J para silenciar el aviso
+          "Failed to load class org.slf4j.impl.StaticLoggerBinder" que emite
+          sqlite-jdbc al no encontrar un binding de logging.
+        -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.36</version>
         </dependency>
 
         <!-- Dependencia de JavaMail -->
@@ -54,15 +82,35 @@
             <artifactId>flatlaf-extras</artifactId>
             <version>3.5.1</version>
         </dependency>
+        <!-- JUnit 5 para Pruebas Automatizadas -->
         <dependency>
-            <groupId>com.formdev</groupId>
-            <artifactId>flatlaf-intellij-themes</artifactId>
-            <version>3.5.1</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.10.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.10.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
+        <!--
+          Directorio de salida de la compilación, redirigido a disco nativo
+          para evitar el fallo de `mvn clean` en particiones NTFS/FUSE.
+        -->
+        <directory>${target.dir}</directory>
         <plugins>
+            <!-- Plugin para ejecutar pruebas automatizadas JUnit 5 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+            </plugin>
+
             <!-- Plugin para compilar con soporte para versiones recientes de Java -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -89,14 +137,51 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>${exec.mainClass}</mainClass>
+                                    <!--
+                                      Habilita el acceso nativo para SQLite (evita el aviso
+                                      "Restricted methods will be blocked in a future release"
+                                      al cargar la librería nativa de sqlite-jdbc).
+                                    -->
+                                    <manifestEntries>
+                                        <Enable-Native-Access>ALL-UNNAMED</Enable-Native-Access>
+                                    </manifestEntries>
                                 </transformer>
                             </transformers>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
+            <!--
+              Copia el JAR final a ./dist/ tras el package, para que quede a mano
+              dentro del proyecto (el target real vive fuera, en disco nativo).
+              Ejecutar con:  java -jar dist/Simplify-Biz-1.2.0.jar
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>copiar-jar-a-dist</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${dist.dir}"/>
+                                <copy file="${target.dir}/${project.build.finalName}.jar"
+                                      tofile="${dist.dir}/${project.build.finalName}.jar"
+                                      overwrite="true" verbose="true"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
-        <!-- Agregar los recursos -->
+        <!-- Nota: los artefactos se generan en ${target.dir} (ver <directory>). -->
+        <!-- Cliente de compilación con soporte para versiones recientes de Java -->
         <resources>
             <resource>
                 <directory>src/main/resources</directory> <!-- Carpeta de recursos -->

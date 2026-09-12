@@ -7,6 +7,156 @@ import javax.swing.*;
 import java.awt.*;
 
 public class UIUtils {
+
+    /**
+     * Crea un "label" multilínea que envuelve su texto automáticamente al
+     * ancho disponible. Se implementa con un {@link JTextArea} transparente y
+     * no editable, porque un {@code JLabel} nunca parte el texto y se corta con
+     * puntos suspensivos en pantallas estrechas.
+     *
+     * @param texto a mostrar.
+     * @param fuente a usar.
+     * @param color  color del texto.
+     * @return componente listo para usar en lugar de un JLabel de texto largo.
+     */
+    public static JTextArea createWrappingLabel(String texto, Font fuente, Color color) {
+        return new WrappingLabel(texto, fuente, color);
+    }
+
+    /**
+     * Etiqueta multilínea que ajusta su altura preferida al ancho disponible
+     * usando HTML interno de Swing (estrategia determinista que no entra en
+     * conflicto con los layout managers).
+     *
+     * <p>Se recalcula el ancho de wrap cada vez que la etiqueta cambia de
+     * tama\u00f1o, de modo que el texto siempre envuelve sin recortarse.</p>
+     */
+    /**
+     * Panel que se ajusta al ancho (y alto) del viewport cuando se usa como
+     * vista de un {@link javax.swing.JScrollPane}. Necesario para que el estado
+     * vacío no desborde horizontalmente y su texto pueda envolver.
+     */
+    public static class ScrollablePanel extends JPanel
+            implements javax.swing.Scrollable {
+
+        @Override
+        public Dimension getPreferredScrollableViewportSize() {
+            return getPreferredSize();
+        }
+
+        @Override
+        public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+            return 16;
+        }
+
+        @Override
+        public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+            return 64;
+        }
+
+        @Override
+        public boolean getScrollableTracksViewportWidth() {
+            return true;
+        }
+
+        @Override
+        public boolean getScrollableTracksViewportHeight() {
+            return true;
+        }
+    }
+
+    public static class WrappingLabel extends JTextArea {
+        private final String textoOriginal;
+
+        public WrappingLabel(String texto, Font fuente, Color color) {
+            super(texto);
+            this.textoOriginal = texto == null ? "" : texto;
+            setEditable(false);
+            setFocusable(false);
+            setOpaque(false);
+            setLineWrap(true);
+            setWrapStyleWord(true);
+            setFont(fuente);
+            setForeground(color);
+            setBorder(null);
+            setMargin(new Insets(0, 0, 0, 0));
+            setAlignmentY(TOP_ALIGNMENT);
+        }
+
+        /**
+         * Un JTextArea con lineWrap no calcula su alto para un ancho dado en
+         * getPreferredSize (devuelve una sola linea). Lo calculamos contando
+         * lineas con las metricas de la fuente, de modo que el layout reserve
+         * el alto correcto y el texto nunca se recorte.
+         */
+        @Override
+        public Dimension getPreferredSize() {
+            FontMetrics fm = getFontMetrics(getFont());
+            int anchoNatural = fm.stringWidth(textoOriginal)
+                    + getInsets().left + getInsets().right;
+            int anchoDisponible = getWidth() > 0 ? getWidth() : anchoNatural;
+            int lineas = contarLineas(textoOriginal, Math.max(1,
+                    anchoDisponible - getInsets().left - getInsets().right), fm);
+            int alto = lineas * fm.getHeight();
+            return new Dimension(anchoDisponible, alto);
+        }
+
+        @Override
+        public Dimension getMinimumSize() {
+            return new Dimension(0, getFontMetrics(getFont()).getHeight());
+        }
+
+        /** Cuenta cuantas lineas ocupa el texto al ancho indicado. */
+        private int contarLineas(String texto, int ancho, FontMetrics fm) {
+            if (texto == null || texto.isEmpty()) {
+                return 1;
+            }
+            int lineas = 1;
+            int anchoLinea = 0;
+            for (String palabra : texto.split(" ")) {
+                int anchoPalabra = fm.stringWidth(palabra);
+                int anchoEspacio = anchoLinea == 0 ? 0 : fm.stringWidth(" ");
+                if (anchoLinea + anchoEspacio + anchoPalabra > ancho && anchoLinea > 0) {
+                    lineas++;
+                    anchoLinea = anchoPalabra;
+                } else {
+                    anchoLinea += anchoEspacio + anchoPalabra;
+                }
+            }
+            return lineas;
+        }
+    }
+
+    /**
+     * Crea una fila de título compuesta por un icono SVG y un texto que
+     * envuelve. Usa BorderLayout (icono al oeste, texto al centro) para que el
+     * texto reciba el ancho restante y pueda envolver correctamente, algo que
+     * FlowLayout no garantiza.
+     *
+     * @param iconPath ruta del icono SVG.
+     * @param iconColor color del icono.
+     * @param iconSize tamaño del icono en px (cuadrado).
+     * @param texto del título (puede envolver).
+     * @param fuente del título.
+     * @param color del texto.
+     * @return panel con la fila de título.
+     */
+    public static JPanel createWrappingTitleRow(String iconPath, Color iconColor, int iconSize,
+                                                String texto, Font fuente, Color color) {
+        JPanel row = new JPanel(new BorderLayout(10, 0));
+        row.setOpaque(false);
+
+        FlatSVGIcon icon = new FlatSVGIcon(iconPath, iconSize, iconSize);
+        icon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, iconColor));
+        JLabel iconLabel = new JLabel(icon);
+        iconLabel.setVerticalAlignment(SwingConstants.TOP);
+        row.add(iconLabel, BorderLayout.WEST);
+
+        JTextArea textLabel = createWrappingLabel(texto, fuente, color);
+        row.add(textLabel, BorderLayout.CENTER);
+        return row;
+    }
+
     /** Fábrica de cabeceras de módulo: icono + título + microcopy de contexto (DRY). */
     public static JPanel createHeader(String iconPath, Color iconColor, String title, String subtitle) {
         JPanel header = new JPanel(new GridBagLayout());
@@ -20,9 +170,10 @@ public class UIUtils {
         lblTitle.setFont(ThemeConstants.FONT_TITLE);
         lblTitle.setIconTextGap(12);
 
-        JLabel lblSubtitle = new JLabel(subtitle);
-        lblSubtitle.setForeground(ThemeConstants.TEXT_SECONDARY);
-        lblSubtitle.setFont(ThemeConstants.FONT_SMALL);
+        // El subtítulo usa un área de texto que envuelve por sí misma, así nunca
+        // se corta con puntos suspensivos en pantallas estrechas.
+        JTextArea lblSubtitle = createWrappingLabel(subtitle,
+                ThemeConstants.FONT_SMALL, ThemeConstants.TEXT_SECONDARY);
         lblSubtitle.setBorder(BorderFactory.createEmptyBorder(4, 36, 0, 0));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -35,6 +186,79 @@ public class UIUtils {
         header.add(lblSubtitle, gbc);
 
         return header;
+    }
+
+    /**
+     * Ajusta el envoltura del texto de una cabecera creada con
+     * {@link #createHeader}. En móvil el título y el subtítulo se envuelven en
+     * varias líneas para no cortarse con puntos suspensivos.
+     *
+     * @param header  cabecera devuelta por {@code createHeader}.
+     * @param ancho   ancho disponible (px) para el texto.
+     * @param envolver true para envolver (móvil), false para una sola línea.
+     */
+    public static void ajustarHeaderResponsive(JPanel header, int ancho, boolean envolver) {
+        if (header == null) {
+            return;
+        }
+        Object tl = header.getClientProperty("header.titleLabel");
+        Object tt = header.getClientProperty("header.titleText");
+        Object sl = header.getClientProperty("header.subtitleLabel");
+        Object st = header.getClientProperty("header.subtitleText");
+        if (tl instanceof JLabel && tt instanceof String) {
+            ajustarTextoResponsive((JLabel) tl, (String) tt, Math.max(120, ancho - 40), envolver);
+        }
+        if (sl instanceof JLabel && st instanceof String) {
+            ajustarTextoResponsive((JLabel) sl, (String) st, Math.max(120, ancho - 60), envolver);
+        }
+    }
+
+    /**
+     * Prepara un componente de formulario (campo, combo, etc.) para que pueda
+     * encogerse por debajo de su ancho preferido. Sin esto, los JComboBox y
+     * algunos campos imponen un ancho mínimo (su texto más largo) que hace que
+     * el formulario desborde y se corte en móvil.
+     *
+     * @param c componente a flexibilizar.
+     * @return el mismo componente, para encadenar llamadas.
+     */
+    public static <T extends javax.swing.JComponent> T fluid(T c) {
+        if (c != null) {
+            c.setMinimumSize(new Dimension(0, ThemeConstants.TOUCH_TARGET_MIN));
+            // Evita que una longitud de texto grande fije el preferredSize.
+            if (c instanceof javax.swing.JComboBox && ((javax.swing.JComboBox<?>) c).isEditable()) {
+                // Los editables ya se comportan bien; no hacemos nada extra.
+            }
+        }
+        return c;
+    }
+
+    /**
+     * Ajusta un JLabel para que su texto se envuelva (multilínea) cuando el
+     * ancho disponible es estrecho (móvil) y vuelva a una sola línea en anchos
+     * amplios. Usa HTML interno de Swing para el wrap de forma controlada.
+     *
+     * @param label          etiqueta a ajustar.
+     * @param textoOriginal  texto plano original (sin HTML).
+     * @param anchoDisponible ancho (px) a considerar; <=0 usa el ancho actual.
+     * @param envolver       true para permitir varias líneas (móvil), false para una sola.
+     */
+    public static void ajustarTextoResponsive(JLabel label, String textoOriginal,
+                                              int anchoDisponible, boolean envolver) {
+        if (label == null || textoOriginal == null) {
+            return;
+        }
+        if (envolver && anchoDisponible > 0) {
+            label.setText("<html><body style='width:" + anchoDisponible + "px'>"
+                    + escaparHtml(textoOriginal) + "</body></html>");
+        } else {
+            label.setText(textoOriginal);
+        }
+    }
+
+    /** Escapa caracteres especiales de HTML para inserción segura en texto. */
+    private static String escaparHtml(String s) {
+        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     /** Fábrica de textos de ayuda (helper text) para campos clave. */
@@ -71,42 +295,130 @@ public class UIUtils {
      */
     public static JPanel createEmptyState(String iconPath, Color iconColor, String title,
                                           String message, String ctaText, Runnable ctaAction) {
-        JPanel state = new JPanel(new GridBagLayout());
-        state.setOpaque(false);
+        // ScrollablePanel contenedor principal
+        ScrollablePanel wrapper = new ScrollablePanel();
+        wrapper.setLayout(new GridBagLayout());
+        wrapper.setOpaque(false);
 
-        FlatSVGIcon icon = new FlatSVGIcon(iconPath, 28, 28);
+        // Panel de contenido interno centrado vertical y horizontalmente con ancho controlado
+        JPanel content = new JPanel(new GridBagLayout());
+        content.setOpaque(false);
+
+        FlatSVGIcon icon = new FlatSVGIcon(iconPath, 36, 36);
         icon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, iconColor));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.anchor = GridBagConstraints.CENTER;
         gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
 
-        JLabel lblTitle = new JLabel(title, icon, SwingConstants.CENTER);
-        lblTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
-        lblTitle.setFont(ThemeConstants.FONT_BODY.deriveFont(Font.BOLD, 15f));
-        lblTitle.setIconTextGap(12);
+        // Fila 0: Icono centrado con espacio amplio
+        JLabel iconLabel = new JLabel(icon, SwingConstants.CENTER);
+        iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
         gbc.gridy = 0;
-        gbc.insets = new Insets(0, 0, 6, 0);
-        state.add(lblTitle, gbc);
+        gbc.insets = new Insets(0, 0, 14, 0);
+        content.add(iconLabel, gbc);
 
-        JLabel lblMessage = new JLabel(message, SwingConstants.CENTER);
-        lblMessage.setForeground(ThemeConstants.TEXT_SECONDARY);
-        lblMessage.setFont(ThemeConstants.FONT_SMALL);
+        // Fila 1: Título centrado fluido (ancho máximo 320px)
+        JLabel lblTitle = new JLabel("<html><div style='text-align: center; width: 320px; line-height: 1.3;'>" + escaparHtml(title) + "</div></html>", SwingConstants.CENTER);
+        lblTitle.setFont(ThemeConstants.FONT_BODY.deriveFont(Font.BOLD, 15f));
+        lblTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
+        lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
+
         gbc.gridy = 1;
-        state.add(lblMessage, gbc);
+        gbc.insets = new Insets(0, 0, 8, 0);
+        content.add(lblTitle, gbc);
 
+        // Fila 2: Mensaje secundario centrado (ancho máximo 320px)
+        JLabel lblMessage = new JLabel("<html><div style='text-align: center; width: 320px; line-height: 1.4;'>" + escaparHtml(message) + "</div></html>", SwingConstants.CENTER);
+        lblMessage.setFont(ThemeConstants.FONT_SMALL);
+        lblMessage.setForeground(ThemeConstants.TEXT_SECONDARY);
+        lblMessage.setHorizontalAlignment(SwingConstants.CENTER);
+
+        gbc.gridy = 2;
+        gbc.insets = new Insets(0, 0, 0, 0);
+        content.add(lblMessage, gbc);
+
+        // Fila 3: Botón CTA opcional centrado
         if (ctaText != null && ctaAction != null) {
             NeonButton btnCta = new NeonButton(ctaText);
             btnCta.setNeonColor(iconColor);
             btnCta.setIconTextGap(8);
+            btnCta.setPreferredSize(new Dimension(200, 40));
             btnCta.addActionListener(e -> ctaAction.run());
-            gbc.gridy = 2;
-            gbc.insets = new Insets(14, 0, 0, 0);
-            state.add(btnCta, gbc);
+
+            JPanel btnWrap = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+            btnWrap.setOpaque(false);
+            btnWrap.add(btnCta);
+
+            gbc.gridy = 3;
+            gbc.insets = new Insets(18, 0, 0, 0);
+            content.add(btnWrap, gbc);
         }
 
-        return state;
+        // Agregar el bloque content al wrapper con centrado absoluto (center anchor)
+        GridBagConstraints wGbc = new GridBagConstraints();
+        wGbc.gridx = 0;
+        wGbc.gridy = 0;
+        wGbc.anchor = GridBagConstraints.CENTER;
+        wGbc.weightx = 1.0;
+        wGbc.weighty = 1.0;
+        wGbc.insets = new Insets(20, 20, 20, 20);
+        wrapper.add(content, wGbc);
+
+        return wrapper;
+    }
+
+    /** Sobrecarga conveniente para crear estados vacíos directos con un FlatSVGIcon ya configurado. */
+    public static JPanel createEmptyState(String title, String message, FlatSVGIcon icon) {
+        ScrollablePanel wrapper = new ScrollablePanel();
+        wrapper.setLayout(new GridBagLayout());
+        wrapper.setOpaque(false);
+
+        JPanel content = new JPanel(new GridBagLayout());
+        content.setOpaque(false);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+
+        if (icon != null) {
+            JLabel iconLabel = new JLabel(icon, SwingConstants.CENTER);
+            iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            gbc.gridy = 0;
+            gbc.insets = new Insets(0, 0, 14, 0);
+            content.add(iconLabel, gbc);
+        }
+
+        JLabel lblTitle = new JLabel("<html><div style='text-align: center; width: 320px; line-height: 1.3;'>" + escaparHtml(title) + "</div></html>", SwingConstants.CENTER);
+        lblTitle.setFont(ThemeConstants.FONT_BODY.deriveFont(Font.BOLD, 15f));
+        lblTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
+        lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
+
+        gbc.gridy = 1;
+        gbc.insets = new Insets(0, 0, 8, 0);
+        content.add(lblTitle, gbc);
+
+        JLabel lblMessage = new JLabel("<html><div style='text-align: center; width: 320px; line-height: 1.4;'>" + escaparHtml(message) + "</div></html>", SwingConstants.CENTER);
+        lblMessage.setFont(ThemeConstants.FONT_SMALL);
+        lblMessage.setForeground(ThemeConstants.TEXT_SECONDARY);
+        lblMessage.setHorizontalAlignment(SwingConstants.CENTER);
+
+        gbc.gridy = 2;
+        gbc.insets = new Insets(0, 0, 0, 0);
+        content.add(lblMessage, gbc);
+
+        GridBagConstraints wGbc = new GridBagConstraints();
+        wGbc.gridx = 0;
+        wGbc.gridy = 0;
+        wGbc.anchor = GridBagConstraints.CENTER;
+        wGbc.weightx = 1.0;
+        wGbc.weighty = 1.0;
+        wGbc.insets = new Insets(20, 20, 20, 20);
+        wrapper.add(content, wGbc);
+
+        return wrapper;
     }
 
     public static void configureGlobalStyles() {
@@ -147,5 +459,32 @@ public class UIUtils {
         // Títulos de ventanas de diálogo
         UIManager.put("TitlePane.background", ThemeConstants.BACKGROUND);
         UIManager.put("TitlePane.foreground", ThemeConstants.TEXT_PRIMARY);
+    }
+
+    /** Muestra un diálogo de error consistente con el tema. */
+    public static void showError(Component parent, String message) {
+        JOptionPane.showMessageDialog(parent, message, UIMessages.TITULO_ERROR, JOptionPane.ERROR_MESSAGE);
+    }
+
+    /** Muestra un diálogo de éxito consistente con el tema. */
+    public static void showSuccess(Component parent, String message) {
+        JOptionPane.showMessageDialog(parent, message, UIMessages.TITULO_EXITO, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /** Muestra éxito o error según {@link com.mycompany.zl_solucion_integral.config.ResultadoOperacion}. */
+    public static void showResultado(Component parent, com.mycompany.zl_solucion_integral.config.ResultadoOperacion resultado) {
+        if (resultado == null) {
+            return;
+        }
+        if (resultado.esExito()) {
+            showSuccess(parent, resultado.getMensaje());
+        } else {
+            showError(parent, resultado.getMensaje());
+        }
+    }
+
+    /** Muestra un diálogo de información consistente con el tema. */
+    public static void showInfo(Component parent, String title, String message) {
+        JOptionPane.showMessageDialog(parent, message, title, JOptionPane.INFORMATION_MESSAGE);
     }
 }

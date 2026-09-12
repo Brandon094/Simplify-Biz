@@ -1,92 +1,254 @@
-# Documentación técnica - ERP+ Business
+# Documentación Técnica — ERP+ Business
 
-## Alcance
+> Referencia técnica completa del proyecto: arquitectura, patrones de diseño, flujos de datos, componentes y proceso de construcción.
 
-Aplicación Java Swing de escritorio con SQLite local, autenticación por roles y una ventana principal que reemplaza el contenido según el módulo seleccionado.
+---
 
-## Capas del proyecto
+## 1. Alcance
 
-- `config`: `ConexionDB`, `DatabaseInitializer`, `SelecionRuta`, `Seguridad`, correo y utilidades de archivos.
-- `controllers`: acceso a datos y operaciones de usuarios, productos y ventas.
-- `models`: `Producto`, `Venta`, `Usuario`, `Sesion` e `Informe`.
-- `views`: login, registro inicial, shell principal y páginas funcionales.
-- `views/components`: constantes visuales y componentes reutilizables.
+ERP+ Business es una aplicación de escritorio Java Swing con persistencia SQLite local, autenticación por roles y una ventana principal de contenido intercambiable. No requiere servidor web ni base de datos externa.
 
-## Patrón de presentación
+---
 
-La aplicación usa MVC y una organización inspirada en Atomic Design:
+## 2. Capas del Proyecto
 
-- Atoms: `NeonButton`, `RoundedPanel`, `NeonLineChart`, `NeonPieChart`, `ThemeToggleButton`.
-- Molecules: `SidebarItem`.
-- Organisms: `ModernSidebar`, `MetricCard`.
-- Shell: `MainTemplate`.
-- Páginas: dashboard, ventas, productos, clientes, empleados, reportes, configuración y proveedores.
+El proyecto sigue una arquitectura **MVC (Model-View-Controller)** organizada en cuatro paquetes principales:
 
-## Sistema de temas
-
-Todos los colores de la interfaz se centralizan en `ThemeConstants` (principio DRY). La clase define dos paletas completas —**oscura** (predeterminada) y **clara**— y las intercambia en caliente mediante `ThemeConstants.toggleTheme()` / `setDark(boolean)` sin reescribir ninguna vista.
-
-Además de los colores base (`BACKGROUND`, `SIDEBAR_BACKGROUND`, `CARD_BACKGROUND`, `TEXT_PRIMARY`, `TEXT_SECONDARY`), `ThemeConstants` expone constantes semánticas (`INPUT_BACKGROUND`, `INPUT_BORDER`, `TABLE_ZEBRA`, `CARD_BORDER`, `HOVER_BACKGROUND`, `ACTIVE_BACKGROUND`, `BRAND_BACKGROUND`, `GRID_LINE`) que reemplazan los colores hardcodeados en las vistas.
-
-El átomo `ThemeToggleButton` (en `atoms`) muestra el icono SVG de sol o luna según el tema y se integra en la parte inferior del `ModernSidebar`. Al alternarlo, `MainTemplate` cambia la paleta, guarda la preferencia en `config.properties` (`theme.dark`) mediante `SelecionRuta.guardarPreferenciaTema()`, re-aplica el Look and Feel con `Main.aplicarTema()` y reconstruye la ventana con el mismo rol. Al arrancar, `Main` lee la preferencia con `SelecionRuta.cargarPreferenciaTema()` (oscuro por defecto si no existe). Es un cambio puramente visual: no afecta a la lógica de negocio ni a los datos.
-
-## Arranque y navegación
-
-`Main.main()` configura el tema FlatLaf (oscuro por defecto vía `Main.aplicarTema()`), aplica estilos globales, inicializa la base de datos y decide entre registro de administrador o login. `MainTemplate` recibe el rol, crea el sidebar y muestra:
-
-- Administrador (`1`): Resumen, Ventas, Productos, Clientes, Empleados, Reportes y Configuración.
-- Vendedor (`0`): Ventas y Productos.
-
-Proveedores permanece implementado, pero no se registra actualmente en el sidebar.
-
-## Dependencias principales
-
-- Java/JDK 25.
-- Maven.
-- FlatLaf y FlatLaf Extras 3.5.1 (con `FlatMacDarkLaf` / `FlatMacLightLaf`).
-- SQLite JDBC 3.46.1.0.
-- Apache POI 5.2.3 para Excel.
-- JavaMail 1.6.2.
-- Lombok como dependencia provided.
-
-## Recursos visuales
-
-Los SVG se encuentran en `src/main/resources/icons` y se cargan con `FlatSVGIcon`. La aplicación aplica filtros de color para estados y acciones. Los componentes de gráficos usan `Graphics2D`, con guías, escalas, leyendas y estados vacíos.
-
-## Flujos importantes
-
-### Productos
-
-`ProductPage` valida campos, crea `Producto` y llama a `ProductoController.agregarOActualizarProductoSiExiste()`. Si el código existe, el controlador suma stock; si no, inserta el producto.
-
-### Ventas
-
-`SalesPage` busca por código o nombre, construye el carrito, valida cantidades y crea una `Venta`. `VentasController.guardarVenta()` ejecuta una transacción que inserta encabezado y detalles, y descuenta stock.
-
-Para venta mostrador se utilizan `CONSUMIDOR FINAL` y `N/A`. No se agrega un usuario genérico a `usuarios`.
-
-### Clientes y empleados
-
-Clientes se muestran mediante `mostrarUsuariosPorRol(..., "2")` y la vista es de consulta. Empleados se registran y actualizan mediante `UsuarioController` con rol `0`.
-
-### Reportes
-
-La tabla se carga con `VentasController.MostrarVentas()` o `mostrarFechasDefinidas()`. El feedback de lista vacía se muestra en la vista. La exportación a Excel y PDF debe considerarse pendiente de completar en la lógica.
-
-## Construcción y verificación
-
-```bash
-mvn compile
-mvn clean package
-java -jar target/Simplify-Biz-1.2.0.jar
+```text
+com.mycompany.zl_solucion_integral/
+├── config/          Infraestructura: conexión, seguridad, rutas, validaciones, utilidades
+├── controllers/     Lógica de negocio y acceso a datos (DAO embebido)
+├── models/          Modelos de dominio (POJOs con Lombok)
+└── views/           Interfaz gráfica Java Swing
+    └── components/  Sistema de diseño: constantes, utilidades, átomos, moléculas y organismos
 ```
 
-El proyecto no contiene actualmente fuentes de pruebas automatizadas. Toda modificación visual debe verificarse compilando y abriendo el JAR.
+### 2.1 Capa `config` — Infraestructura
 
-## Documentos relacionados
+| Clase | Responsabilidad |
+| :--- | :--- |
+| `GestorConexion` | Singleton de conexión SQLite. Gestiona apertura, PRAGMAs (WAL, busy_timeout, foreign_keys), resolución de archivo efectivo y cierre. |
+| `ConexionDB` | Creación de tablas (`CREATE TABLE IF NOT EXISTS`) e inserción de valores iniciales. |
+| `DatabaseInitializer` | Orquesta la inicialización delegando a `ConexionDB`. |
+| `ResultadoOperacion` | DTO inmutable `(exito, mensaje)` que desacopla controladores de Swing. Factory methods: `ok(msg)`, `error(msg)`. |
+| `SelecionRuta` | Lee/escribe `config.properties`, provee la ruta protegida por SO por defecto (`%APPDATA%`/`~/.config`), selección de carpeta de BD, preferencia de tema y persistencia de usuario recordado (`remember.user`). |
+| `Seguridad` | Encriptación y validación de contraseñas. |
+| `Validaciones` | Parsers seguros: `parseEntero`, `parseEnteroPositivo`, `parseDecimalNoNegativo`, `parseFecha`. Validaciones de email, teléfono, categoría, descuento, etc. |
+| `ExcelSQLiteManager` | Importación masiva de datos desde archivos Excel a SQLite. |
+| `EnvioCotizacion` | Envío de cotizaciones por correo electrónico vía JavaMail. |
+| `PantallaCarga` | Splash screen de carga durante la inicialización. |
+| `Listener` | Interfaz funcional para callbacks de eventos. |
+| `UtilVentanas` | Utilidades de posicionamiento de ventanas. |
 
-- [Manual de usuario](manual_usuario.md)
-- [Configuraciones](configuraciones.md)
-- [Esquema](esquema_bd.md)
-- [Diccionario](diccionario_datos.md)
-- [Roadmap](roadmap/roadmap.md)
+### 2.2 Capa `controllers` — Lógica de Negocio
+
+Los controladores **no invocan** `JOptionPane`, `UIUtils.showSuccess` ni ningún componente Swing. Cada operación retorna un `ResultadoOperacion` que la vista interpreta para mostrar feedback al usuario.
+
+| Controlador | Operaciones Principales |
+| :--- | :--- |
+| `ProductoController` | `agregarOActualizarProductoSiExiste`, `modificarProducto`, `eliminarProducto`, `eliminarCantidadProducto`, `mostrarProductos`, `buscarProductoPorCodigo/Nombre`, `obtenerDistribucionCategorias`, `obtenerCantidadStockCritico` |
+| `UsuarioController` | `agregarUsuario`, `modificarUsuario` (contraseña opcional), `eliminarUsuario`, `mostrarUsuarios/PorRol`, `validarCredencialesAdmin/Regular`, `validarDatosRecuperacion`, `restablecerContraseña`, `existeAdministrador` |
+| `VentasController` | `guardarVenta` (transacción atómica), `modificarVenta`, `MostrarVentas`, `mostrarFechasDefinidas`, `mostrarVentasPorDia`, `exportarDatosTablaAExcel`, `generarArchivoCotizacionConPlantilla`, `obtenerVentasUltimos7Dias`, `obtenerVentasTotales` |
+
+Todos los controladores obtienen la conexión vía `GestorConexion.getInstancia().obtenerConexion()` y nunca la cierran (la conexión es compartida).
+
+### 2.3 Capa `models` — Dominio
+
+| Modelo | Campos Principales | Notas |
+| :--- | :--- | :--- |
+| `Producto` | id, producto, precio, cantidad, codigo, total, categoria, cantidadSolicitada | Lombok `@Data/@AllArgsConstructor` |
+| `Usuario` | id, nombre, telefono, email, contraseña, rol, noCc, NIT, DIR | Multirol: admin(1), vendedor(0), cliente(2) |
+| `Venta` | producto, cantidad, codigo, total, fecha, metodoPago, vendedor, cliente, descuento | Modelo compuesto con referencia a Producto y Usuario |
+| `Sesion` | usuarioLogueado | Datos de sesión activa |
+| `Informe` | *(vacío)* | Placeholder para funcionalidad futura |
+
+### 2.4 Capa `views` — Interfaz Gráfica
+
+Organización inspirada en **Atomic Design**:
+
+| Nivel | Componentes | Descripción |
+| :--- | :--- | :--- |
+| **Atoms** | `NeonButton`, `RoundedPanel`, `NeonLineChart`, `NeonPieChart`, `ThemeToggleButton` | Elementos visuales primitivos reutilizables |
+| **Molecules** | `SidebarItem` | Combinaciones funcionales de átomos |
+| **Organisms** | `ModernSidebar`, `MetricCard`, `PasswordRecoveryDialog` | Secciones completas de interfaz y diálogos modales |
+| **Shell** | `MainTemplate` | Contenedor principal con sidebar + área de contenido |
+| **Páginas** | `DashboardPage`, `ProductPage`, `SalesPage`, `ClientsPage`, `SellersPage`, `ReportsPage`, `ConfigPage`, `ProvidersPage` | Pantallas funcionales completas (SalesPage incluye retícula simétrica de 3 columnas con cabeceras alineadas milimétricamente a 24px de padding superior; estados vacíos estandarizados con centrado absoluto horizontal y vertical a través de `UIUtils.createEmptyState`) |
+| **Acceso** | `ModernLoginPage`, `ModernAdminRegistrationPage` | Formularios de autenticación con iconos SVG en inputs (user/lock), recuerdo de usuario, recuperación de contraseña e hipervínculo interactivo a ChopCode Solutions |
+| **Utilidades** | `ThemeConstants`, `LayoutResponsive`, `UIUtils`, `UIMessages` | Sistema de temas, responsive, helpers de UI, mensajes y fábrica de estados vacíos centrados |
+
+---
+
+## 3. Sistema de Temas
+
+`ThemeConstants` centraliza todos los colores y dimensiones de la UI (principio DRY). Define dos paletas completas —**oscura** (predeterminada) y **clara**— intercambiables en caliente:
+
+- **Estado:** `ThemeConstants.isDark()` / `setDark(boolean)` / `toggleTheme()`
+- **Persistencia:** `SelecionRuta.guardarPreferenciaTema()` escribe `theme.dark` en `config.properties`
+- **Arranque:** `SelecionRuta.cargarPreferenciaTema()` lee la preferencia (oscuro si no existe)
+- **Aplicación:** `Main.aplicarTema()` instala `FlatMacDarkLaf` o `FlatMacLightLaf` y re-aplica estilos globales
+- **Reconstrucción:** `MainTemplate` reconstruye la ventana completa con la nueva paleta
+
+El cambio de tema es puramente visual: no afecta datos, conexiones ni lógica de negocio.
+
+Constantes semánticas disponibles: `BACKGROUND`, `SIDEBAR_BACKGROUND`, `CARD_BACKGROUND`, `INPUT_BACKGROUND`, `INPUT_BORDER`, `TABLE_ZEBRA`, `TEXT_PRIMARY`, `TEXT_SECONDARY`, `NEON_PURPLE`, `NEON_BLUE`, `NEON_GREEN`, `NEON_CYAN`, `CARD_BORDER`, `HOVER_BACKGROUND`, `ACTIVE_BACKGROUND`, `BRAND_BACKGROUND`, `GRID_LINE`.
+
+---
+
+## 4. Persistencia y Gestión de Conexiones
+
+### 4.1 Patrón Singleton (`GestorConexion`)
+
+```
+Main.inicializarBaseDatos()
+  └─► GestorConexion.getInstancia().inicializar(dbPath)
+        ├─► resolverArchivo(dbPath)     → File efectivo
+        ├─► DriverManager.getConnection(jdbcUrl)
+        └─► aplicarPragmas()
+              ├─ PRAGMA journal_mode=WAL
+              ├─ PRAGMA busy_timeout=5000
+              └─ PRAGMA foreign_keys=ON
+```
+
+- **Prevención de `database is locked`:** Una sola conexión compartida por toda la aplicación.
+- **Logs silenciados:** Solo emite `INFO` en el arranque inicial; reconexiones van a `FINE`.
+- **Pruebas:** `reiniciarParaPruebas(jdbcUrl)` permite inyectar `jdbc:sqlite::memory:`.
+
+### 4.2 Contrato de Rutas
+
+`GestorConexion.resolverArchivo(dbPath)` resuelve el archivo SQLite efectivo:
+
+| Escenario | `db.path` | Archivo Efectivo |
+| :--- | :--- | :--- |
+| Carpeta (predeterminado) | `/home/user/data` | `/home/user/data/db.db` |
+| Archivo `.db` explícito | `/home/user/mi_bd.db` | `/home/user/mi_bd.db` |
+| Archivo `.sqlite` explícito | `/home/user/datos.sqlite` | `/home/user/datos.sqlite` |
+| Carpeta inexistente | `/home/user/nueva` | `/home/user/nueva/db.db` (crea carpeta) |
+
+### 4.3 Desacoplamiento Swing
+
+Los controladores **nunca** invocan componentes de UI. Retornan `ResultadoOperacion`:
+
+```java
+// En el controlador:
+return ResultadoOperacion.ok(UIMessages.MSG_PRODUCTO_GUARDADO);
+
+// En la vista:
+ResultadoOperacion r = controller.agregarProducto(producto);
+if (r.esExito()) UIUtils.showSuccess(this, r.getMensaje());
+else UIUtils.showError(this, r.getMensaje());
+```
+
+---
+
+## 5. Arranque y Navegación
+
+### 5.1 Flujo de Arranque
+
+1. `Main.main()` carga la preferencia de tema y aplica FlatLaf.
+2. Lee `config.properties` para obtener `db.path`.
+3. Si no existe `db.path`, muestra selector de carpeta.
+4. `GestorConexion.inicializar(ruta)` abre la conexión SQLite.
+5. `DatabaseInitializer.inicializarTablas()` crea tablas si no existen.
+6. Shutdown hook registrado para cerrar la conexión al salir.
+7. `UsuarioController.existeAdministrador()`:
+   - **No** → `ModernAdminRegistrationPage`
+   - **Sí** → `ModernLoginPage`
+
+### 5.2 Navegación por Rol
+
+`MainTemplate` recibe el rol y configura el sidebar:
+
+| Rol | Módulos Visibles |
+| :--- | :--- |
+| **Administrador** (`1`) | Dashboard, Ventas, Productos, Clientes, Empleados, Reportes, Configuración |
+| **Vendedor** (`0`) | Ventas, Productos |
+
+---
+
+## 6. Flujos de Negocio
+
+### 6.1 Productos
+
+1. `ProductPage` valida campos con `Validaciones`.
+2. Crea un `Producto` y llama a `ProductoController.agregarOActualizarProductoSiExiste()`.
+3. Si el código existe → suma stock (`UPDATE cantidad`).
+4. Si no existe → inserta nuevo producto (`INSERT`).
+5. La vista muestra el `ResultadoOperacion` correspondiente.
+
+### 6.2 Ventas
+
+1. `SalesPage` busca productos por código o nombre.
+2. Construye un carrito con cantidades y descuento porcentual.
+3. Soporta `CONSUMIDOR FINAL` / `N/A` para venta mostrador.
+4. `VentasController.guardarVenta()` ejecuta una **transacción atómica**:
+   - Verifica stock suficiente para todos los productos.
+   - `INSERT INTO ventas` → obtiene ID generado.
+   - `INSERT INTO detalles_venta` por cada producto.
+   - `UPDATE productos SET cantidad = cantidad - ?` por cada producto.
+   - `commit()` si todo OK; `rollback()` si falla cualquier paso.
+
+### 6.3 Usuarios (Clientes y Empleados)
+
+- **Clientes** (`rol = 2`): Se listan con `mostrarUsuariosPorRol(..., "2")`. Vista de solo consulta.
+- **Empleados** (`rol = 0`): CRUD completo. `modificarUsuario` conserva la contraseña existente si el campo queda vacío.
+- **Administradores** (`rol = 1`): Se crean en el registro inicial o manualmente.
+- **Seguridad:** La constante `COLUMNAS_LISTADO` excluye `contraseña` de todas las consultas de listado.
+
+### 6.4 Reportes
+
+- `MostrarVentas()` carga el historial completo (JOIN ventas + detalles_venta).
+- `mostrarFechasDefinidas()` filtra por rango de fechas.
+- `exportarDatosTablaAExcel()` genera archivos `.xlsx` con Apache POI.
+- `generarArchivoCotizacionConPlantilla()` rellena una plantilla Excel con los datos de la cotización.
+
+---
+
+## 7. Recursos Visuales
+
+### 7.1 Iconografía SVG
+
+Los iconos están en `src/main/resources/icons/` y se cargan con `FlatSVGIcon`:
+
+```java
+new FlatSVGIcon("icons/sun.svg", 20, 20)
+```
+
+Se aplican `ColorFilter` dinámicos según el estado (hover, activo, tema).
+
+### 7.2 Gráficos
+
+- `NeonLineChart`: Gráfico de líneas con curva suave, grid, escala automática y leyenda.
+- `NeonPieChart`: Gráfico de torta/anillo con categorías y leyenda lateral.
+- Ambos usan `Graphics2D` con antialiasing y renderizado de alta calidad.
+
+---
+
+## 8. Construcción y Verificación
+
+```bash
+# Compilar fuentes
+mvn compile
+
+# Ejecutar pruebas automatizadas (JUnit 5 en memoria / headless)
+mvn test
+
+# Empaquetar JAR ejecutable
+mvn clean package
+
+# Ejecutar aplicación
+java -jar dist/Simplify-Biz-1.2.0.jar
+```
+
+Las modificaciones de lógica de negocio y persistencia se verifican automáticamente con `mvn test`. Las modificaciones visuales deben validarse abriendo el JAR empaquetado.
+
+---
+
+## 9. Documentos Relacionados
+
+- [Manual de Operación](manual_usuario.md)
+- [Arquitectura de UI/UX](arquitectura_ui.md)
+- [Configuraciones y Rutas](configuraciones.md)
+- [Esquema de Base de Datos](esquema_bd.md)
+- [Diccionario de Datos](diccionario_datos.md)
+- [API de Controladores](api_controladores.md)
+- [Roadmap de Desarrollo](roadmap/roadmap.md)

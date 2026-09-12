@@ -9,19 +9,19 @@ import java.awt.*;
 public class MetricCard extends RoundedPanel {
     public MetricCard(String title, String value, String trend, Color trendColor, String icon) {
         super(20, ThemeConstants.CARD_BACKGROUND);
-        setLayout(new BorderLayout(0, 8));
+        setLayout(new BorderLayout(0, 6));
         setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(ThemeConstants.CARD_BORDER, 1),
-                BorderFactory.createEmptyBorder(14, 16, 14, 16)
+                BorderFactory.createEmptyBorder(16, 18, 16, 18)
         ));
         
         // Header con Título e Icono
-        JPanel header = new JPanel(new BorderLayout());
+        JPanel header = new JPanel(new BorderLayout(6, 0));
         header.setOpaque(false);
         
         JLabel lblTitle = new JLabel(title);
         lblTitle.setForeground(ThemeConstants.TEXT_SECONDARY);
-        lblTitle.setFont(ThemeConstants.FONT_SMALL);
+        lblTitle.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD, 12f));
         header.add(lblTitle, BorderLayout.WEST);
 
         JPanel iconBadge = new JPanel(new GridBagLayout());
@@ -40,12 +40,12 @@ public class MetricCard extends RoundedPanel {
         
         JLabel lblValue = new JLabel(value);
         lblValue.setForeground(ThemeConstants.TEXT_PRIMARY);
-        lblValue.setFont(ThemeConstants.FONT_TITLE.deriveFont(Font.BOLD, 22));
+        lblValue.setFont(ThemeConstants.FONT_TITLE.deriveFont(Font.BOLD, 21f));
         add(lblValue, BorderLayout.CENTER);
         
         JLabel lblTrend = new JLabel(trend);
         lblTrend.setForeground(trendColor);
-        lblTrend.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
+        lblTrend.setFont(ThemeConstants.FONT_SMALL);
         add(lblTrend, BorderLayout.SOUTH);
     }
 }

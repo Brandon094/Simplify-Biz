@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="af9ff134-8101-4f4c-8ded-cd771a90be32" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/Desarrollo Desktop.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/target.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.artifacts/372eba62-b658-40f0-82e0-ca562a9fb656/implementation_plan.artifact.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Simplify_Biz_1_2_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/planningMode.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Desarrollo Desktop.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Desarrollo Desktop.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dependency-reduced-pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/dependency-reduced-pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/roadmap/roadmap.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/roadmap/roadmap.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/controllers/ProductoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/controllers/ProductoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/controllers/UsuarioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/controllers/UsuarioController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/controllers/VentasController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/controllers/VentasController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/ClientsPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/ClientsPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/ConfigPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/ConfigPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/DashboardPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/DashboardPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/MainTemplate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/MainTemplate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/ModernAdminRegistrationPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/ModernAdminRegistrationPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/ModernLoginPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/ModernLoginPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/ProductPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/ProductPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/ProvidersPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/ProvidersPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/ReportsPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/ReportsPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/SalesPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/SalesPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/SellersPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/SellersPage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/components/ThemeConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/components/ThemeConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/components/UIMessages.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/components/UIMessages.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/components/UIUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/components/UIUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/components/atoms/NeonButton.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/components/atoms/NeonButton.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/components/molecules/SidebarItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/zl_solucion_integral/views/components/molecules/SidebarItem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/moon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/icons/moon.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/icons/sun.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/icons/sun.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/Simplify-Biz-1.2.0.jar" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "Brandon094"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://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@github.com/Brandon094/Porfolio-ChopCode-Solutions-Brandon-Daza.git",
+    "accountId": "b9f6d6ad-8765-4b13-af4e-97dfe5b2dbfb"
+  }
+}]]></component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 0
+}]]></component>
+  <component name="ProjectId" id="3JERxWjTSAsIpTbHlbhQeupnusX" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;appmod/java-upgrade-20260912000701&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="af9ff134-8101-4f4c-8ded-cd771a90be32" name="Changes" comment="" />
+      <created>1789193565567</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1789193565567</updated>
+    </task>
+    <servers />
+  </component>
+</project>

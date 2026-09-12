@@ -53,6 +53,12 @@ public class ThemeConstants {
     /** Líneas de la cuadrícula de las gráficas. */
     public static Color GRID_LINE;
 
+    // ---- Tamaños táctiles (accesibilidad/uso en pantallas pequeñas) ----
+    /** Altura mínima recomendada para objetivos táctiles (botones, campos). */
+    public static final int TOUCH_TARGET_MIN = 44;
+    /** Altura mínima de las filas de tabla para lectura/uso cómodo. */
+    public static final int TABLE_ROW_HEIGHT = 36;
+
     // ---- Fuentes (compartidas por ambos temas) ----
     public static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 24);
     public static final Font FONT_SUBTITLE = new Font("Segoe UI", Font.BOLD, 18);

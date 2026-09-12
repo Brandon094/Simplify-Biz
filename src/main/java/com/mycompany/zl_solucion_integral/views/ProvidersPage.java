@@ -1,6 +1,8 @@
 package com.mycompany.zl_solucion_integral.views;
 
+import com.mycompany.zl_solucion_integral.views.components.LayoutResponsive;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
+import com.mycompany.zl_solucion_integral.views.components.UIUtils;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonButton;
 import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
 import com.formdev.flatlaf.FlatClientProperties;
@@ -15,6 +17,7 @@ public class ProvidersPage extends JPanel {
     private JTable tbProviders;
     private JTextField txtName, txtNIT, txtContact, txtPhone, txtEmail;
     private JComboBox<String> cbCategory;
+    private JPanel mainContent, formPanel, tablePanel;
 
     public ProvidersPage() {
         setOpaque(false);
@@ -31,9 +34,9 @@ public class ProvidersPage extends JPanel {
         title.setFont(ThemeConstants.FONT_TITLE);
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel subtitle = new JLabel("Vincula a tus proveedores y mantén a la mano sus datos de contacto");
-        subtitle.setForeground(ThemeConstants.TEXT_SECONDARY);
-        subtitle.setFont(ThemeConstants.FONT_SMALL);
+        JTextArea subtitle = UIUtils.createWrappingLabel(
+                "Vincula a tus proveedores y mantén a la mano sus datos de contacto",
+                ThemeConstants.FONT_SMALL, ThemeConstants.TEXT_SECONDARY);
         subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         headerPanel.add(title);
@@ -42,18 +45,39 @@ public class ProvidersPage extends JPanel {
         add(headerPanel, BorderLayout.NORTH);
 
         // Contenido Principal
-        JPanel mainContent = new JPanel(new BorderLayout(25, 0));
+        mainContent = new JPanel(new BorderLayout(25, 0));
         mainContent.setOpaque(false);
 
         // Formulario (Izquierda)
-        mainContent.add(createFormPanel(), BorderLayout.WEST);
-
-        // Tabla (Derecha)
-        mainContent.add(createTablePanel(), BorderLayout.CENTER);
+        formPanel = createFormPanel();
+        tablePanel = createTablePanel();
+        mainContent.add(formPanel, BorderLayout.WEST);
+        mainContent.add(tablePanel, BorderLayout.CENTER);
 
         add(mainContent, BorderLayout.CENTER);
-        
+
+        // Reflow adaptable: en móvil el formulario pasa arriba (una columna).
+        LayoutResponsive.listenWidth(this, (bp, ancho) -> aplicarBreakpoint(bp, ancho));
+
         refreshData();
+    }
+
+    /** Reorganiza formulario y tabla según el ancho (vertical en móvil). */
+    private void aplicarBreakpoint(LayoutResponsive.Breakpoint bp, int anchoDisponible) {
+        boolean movil = LayoutResponsive.esColumnaUnica(bp);
+        formPanel.setPreferredSize(movil ? null : new Dimension(380, 0));
+        mainContent.removeAll();
+        if (movil) {
+            mainContent.setLayout(new BorderLayout(0, 20));
+            mainContent.add(formPanel, BorderLayout.NORTH);
+            mainContent.add(tablePanel, BorderLayout.CENTER);
+        } else {
+            mainContent.setLayout(new BorderLayout(25, 0));
+            mainContent.add(formPanel, BorderLayout.WEST);
+            mainContent.add(tablePanel, BorderLayout.CENTER);
+        }
+        mainContent.revalidate();
+        mainContent.repaint();
     }
 
     private JPanel createFormPanel() {
@@ -116,7 +140,8 @@ public class ProvidersPage extends JPanel {
         btnSave.setNeonColor(ThemeConstants.NEON_CYAN);
         btnSave.setIcon(createIcon("icons/providers.svg", ThemeConstants.NEON_CYAN, 17, 17));
         btnSave.setIconTextGap(8);
-        btnSave.addActionListener(e -> JOptionPane.showMessageDialog(this, "UI Lista: Implementaremos la lógica de persistencia en la siguiente fase."));
+        btnSave.addActionListener(e -> UIUtils.showInfo(this, "Próximamente",
+                "La interfaz de proveedores está lista. La persistencia llegará en una próxima fase."));
         btnSave.setToolTipText("Vincula el proveedor al sistema (la persistencia llega en la Fase 3)");
         gbc.gridy = 13; gbc.insets = new Insets(0, 0, 10, 0);
         p.add(btnSave, gbc);
@@ -145,7 +170,7 @@ public class ProvidersPage extends JPanel {
         tbProviders = new JTable(model);
         tbProviders.setBackground(ThemeConstants.CARD_BACKGROUND);
         tbProviders.setForeground(ThemeConstants.TEXT_PRIMARY);
-        tbProviders.setRowHeight(35);
+        tbProviders.setRowHeight(ThemeConstants.TABLE_ROW_HEIGHT);
         tbProviders.setShowGrid(false);
         tbProviders.setFillsViewportHeight(true);
         tbProviders.setFont(ThemeConstants.FONT_SMALL);

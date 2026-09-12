@@ -63,9 +63,9 @@ public class NeonPieChart extends JPanel {
 
         int legendX = Math.max(width / 2 + 20, width - 135);
         int chartAreaWidth = Math.max(1, legendX - padding - 18);
-        int diameter = Math.min(chartAreaWidth, Math.max(1, height - 58));
+        int diameter = Math.min(chartAreaWidth, Math.max(1, height - 48));
         int x = padding + (chartAreaWidth - diameter) / 2;
-        int y = 38 + Math.max(0, (height - 58 - diameter) / 2);
+        int y = 30 + Math.max(0, (height - 48 - diameter) / 2);
         double curAngle = 0;
         int colorIdx = 0;
 

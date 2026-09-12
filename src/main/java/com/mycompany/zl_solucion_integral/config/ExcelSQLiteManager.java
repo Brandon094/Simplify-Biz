@@ -1,6 +1,5 @@
 package com.mycompany.zl_solucion_integral.config;
 
-import com.mycompany.zl_solucion_integral.config.ConexionDB;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -18,16 +17,11 @@ import java.sql.Statement;
  * archivo Excel a una base de datos SQLite.
  */
 public class ExcelSQLiteManager {
-    private static SelecionRuta rutaDB = new SelecionRuta();    
-
-    // Se declara 'conexion' como estático para acceder desde un método estático
-    private static ConexionDB conexion = new ConexionDB(rutaDB.cargarRutaBaseDatos());
 
     public static void importarExcel(String rutaExcel, String nombreTabla) {
-        Connection conn = null;
+        Connection conn = GestorConexion.getInstancia().obtenerConexion();
 
         try {
-            conn = conexion.obtenerConexion();
             if (conn != null) {
                 System.out.println("Conexión a SQLite establecida.");
 
@@ -100,24 +94,15 @@ public class ExcelSQLiteManager {
             }
         } catch (SQLException | IOException e) {
             System.err.println("Error general: " + e.getMessage());
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException e) {
-                    System.err.println("Error al cerrar la conexión: " + e.getMessage());
-                }
-            }
         }
     }
 
     // Método para exportar datos desde una tabla SQLite a un archivo Excel
     public static void exportarDatosAExcel(String nombreTabla, String rutaExcel) {
-        Connection conn = null;
+        Connection conn = GestorConexion.getInstancia().obtenerConexion();
         FileOutputStream fos = null;
 
         try {
-            conn = conexion.obtenerConexion();
             if (conn != null) {
                 System.out.println("Conexión a SQLite establecida.");
 
@@ -167,14 +152,11 @@ public class ExcelSQLiteManager {
             System.out.println("Error: " + e.getMessage());
         } finally {
             try {
-                if (conn != null) {
-                    conn.close();
-                }
                 if (fos != null) {
                     fos.close();
                 }
-            } catch (SQLException | IOException e) {
-                System.out.println("Error al cerrar la conexión o el archivo: " + e.getMessage());
+            } catch (IOException e) {
+                System.out.println("Error al cerrar el archivo: " + e.getMessage());
             }
         }
     }

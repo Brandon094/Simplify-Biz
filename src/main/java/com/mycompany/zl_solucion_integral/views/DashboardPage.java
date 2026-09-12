@@ -3,6 +3,7 @@ package com.mycompany.zl_solucion_integral.views;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.mycompany.zl_solucion_integral.controllers.ProductoController;
 import com.mycompany.zl_solucion_integral.controllers.VentasController;
+import com.mycompany.zl_solucion_integral.views.components.LayoutResponsive;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
 import com.mycompany.zl_solucion_integral.views.components.UIUtils;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonLineChart;
@@ -36,6 +37,12 @@ public class DashboardPage extends JPanel {
     private List<Double> ventas7Dias;
     private Map<String, Double> distribucionCategorias;
 
+    // Referencias para el reflow adaptable.
+    private JPanel metricsPanel;
+    private JPanel tablesRow;
+    private JPanel chartsRow;
+    private final java.util.List<MetricCard> metricCards = new java.util.ArrayList<>();
+
     public DashboardPage() {
         setOpaque(false);
         setLayout(new BorderLayout(18, 18));
@@ -51,71 +58,112 @@ public class DashboardPage extends JPanel {
         title.setFont(ThemeConstants.FONT_TITLE);
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel subtitle = new JLabel("Visión rápida del rendimiento y la actividad de tu negocio");
-        subtitle.setForeground(ThemeConstants.TEXT_SECONDARY);
-        subtitle.setFont(ThemeConstants.FONT_SMALL);
+        JTextArea subtitle = UIUtils.createWrappingLabel(
+                "Visión rápida del rendimiento y la actividad de tu negocio",
+                ThemeConstants.FONT_SMALL, ThemeConstants.TEXT_SECONDARY);
         subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         headerPanel.add(title);
         headerPanel.add(Box.createVerticalStrut(4));
         headerPanel.add(subtitle);
 
-        // Grid de Métricas con Datos Reales
-        JPanel metricsPanel = new JPanel(new GridLayout(1, 4, 14, 0));
-        metricsPanel.setOpaque(false);
-        
-        double totalVentas = ventasCtrl.obtenerVentasTotales();
+        // Cabecera fija; las métricas se añaden después de la carga asíncrona.
+        northWrap.setOpaque(false);
+        northWrap.add(headerPanel, BorderLayout.NORTH);
+        add(northWrap, BorderLayout.NORTH);
+
+        // Estado de carga: skeleton mientras los datos llegan de SQLite.
+        JPanel loadingWrap = new JPanel(new BorderLayout());
+        loadingWrap.setOpaque(false);
+        loadingWrap.add(new ShimmerSkeleton(), BorderLayout.CENTER);
+        add(loadingWrap, BorderLayout.CENTER);
+
+        // Carga asíncrona: las consultas a SQLite corren fuera del EDT (Tarea 6 Fase 1).
+        new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() {
+                totalVentas = ventasCtrl.obtenerVentasTotales();
+                totalOrdenes = ventasCtrl.contarRegistros("Todas");
+                productosUnicos = productoCtrl.contarRegistros("Todas");
+                stockCritico = productoCtrl.obtenerCantidadStockCritico(5);
+                ventasRecientes = ventasCtrl.obtenerUltimasVentas(5);
+                ventas7Dias = ventasCtrl.obtenerVentasUltimos7Dias();
+                distribucionCategorias = productoCtrl.obtenerDistribucionCategorias();
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                remove(loadingWrap);
+                construirVista();
+                revalidate();
+                repaint();
+            }
+        }.execute();
+    }
+
+    /** Construye métricas, tablas y gráficos con los datos ya cargados. */
+    private void construirVista() {
         NumberFormat cur = NumberFormat.getCurrencyInstance(new Locale("es", "CO"));
-        
-        metricsPanel.add(new MetricCard("Ventas Totales", cur.format(totalVentas), "Acumulado histórico", ThemeConstants.NEON_GREEN, "icons/sales.svg"));
-        metricsPanel.add(new MetricCard("Total Órdenes", String.valueOf(ventasCtrl.contarRegistros("Todas")), "Órdenes registradas", ThemeConstants.NEON_BLUE, "icons/dashboard.svg"));
-        metricsPanel.add(new MetricCard("Productos Únicos", String.valueOf(productoCtrl.contarRegistros("Todas")), "En catálogo", ThemeConstants.NEON_PURPLE, "icons/products.svg"));
-        metricsPanel.add(new MetricCard("Stock Crítico", productoCtrl.obtenerCantidadStockCritico(5) + " ítems", "Menos de 5 unidades", ThemeConstants.NEON_RED, "icons/reports.svg"));
 
-        JPanel overviewHeader = new JPanel(new BorderLayout(0, 18));
-        overviewHeader.setOpaque(false);
-        overviewHeader.add(headerPanel, BorderLayout.NORTH);
-        overviewHeader.add(metricsPanel, BorderLayout.CENTER);
-        add(overviewHeader, BorderLayout.NORTH);
+        // Grid de Métricas con hgap ampliado para evitar compresión lateral
+        metricsPanel = new JPanel(new GridLayout(1, 4, 18, 0));
+        metricsPanel.setOpaque(false);
+        MetricCard cardVentas = new MetricCard("Ventas Totales", cur.format(totalVentas), "Acumulado histórico", ThemeConstants.NEON_GREEN, "icons/sales.svg");
+        MetricCard cardOrdenes = new MetricCard("Total Órdenes", String.valueOf(totalOrdenes), "Órdenes registradas", ThemeConstants.NEON_BLUE, "icons/dashboard.svg");
+        MetricCard cardProductos = new MetricCard("Productos Únicos", String.valueOf(productosUnicos), "En catálogo", ThemeConstants.NEON_PURPLE, "icons/products.svg");
+        MetricCard cardStock = new MetricCard("Stock Crítico", stockCritico + " ítems", "Menos de 5 unidades", ThemeConstants.NEON_RED, "icons/reports.svg");
+        metricCards.clear();
+        metricCards.add(cardVentas);
+        metricCards.add(cardOrdenes);
+        metricCards.add(cardProductos);
+        metricCards.add(cardStock);
+        for (MetricCard card : metricCards) {
+            metricsPanel.add(card);
+        }
 
-        // Contenedor Central para Gráficos y Tablas
+        northWrap.add(metricsPanel, BorderLayout.CENTER);
+
+        // Contenedor Central
         JPanel mainContainer = new JPanel(new GridLayout(2, 1, 0, 14));
         mainContainer.setOpaque(false);
 
-        // Fila 1: Resumen operativo y actividad reciente
-        JPanel tablesRow = new JPanel(new GridLayout(1, 2, 18, 0));
-        tablesRow.setOpaque(false);
-
-        // Tabla 1: Últimas Transacciones (DATOS REALES)
-        Object[][] lastSales = ventasCtrl.obtenerUltimasVentas(5);
-        tablesRow.add(createActivityTable("Últimas Ventas Realizadas", lastSales, new String[]{"Fecha", "Cliente", "Producto", "Total"}));
-
-        // Tabla 2: Estado de Inventario (DATOS REALES)
+        // Fila 1: Tablas
+        JPanel tablaVentasCard = createActivityTable("Últimas Ventas Realizadas", ventasRecientes, new String[]{"Fecha", "Cliente", "Producto", "Total"});
         Object[][] lowStock = obtenerResumenInventario();
-        tablesRow.add(createActivityTable("Estado operativo del sistema", lowStock, new String[]{"Área", "Servicio", "Estado", "Resultado"}));
-
+        JPanel tablaEstadoCard = createActivityTable("Estado operativo del sistema", lowStock, new String[]{"Área", "Servicio", "Estado", "Resultado"});
+        tablesRow = new JPanel(new GridLayout(1, 2, 18, 0));
+        tablesRow.setOpaque(false);
+        tablesRow.add(tablaVentasCard);
+        tablesRow.add(tablaEstadoCard);
         mainContainer.add(tablesRow);
 
-        // Fila 2: Gráficos con Datos Reales
-        JPanel chartsRow = new JPanel(new GridLayout(1, 2, 18, 0));
-        chartsRow.setOpaque(false);
-
-        // Chart 1: Line Chart (Ventas 7 días reales)
+        // Fila 2: Gráficos
         RoundedPanel lineChartCard = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
         lineChartCard.setLayout(new BorderLayout());
-        List<Double> sales7Days = ventasCtrl.obtenerVentasUltimos7Dias();
-        lineChartCard.add(new NeonLineChart("Ventas Últimos 7 Días ($)", sales7Days), BorderLayout.CENTER);
-        chartsRow.add(lineChartCard);
+        lineChartCard.add(new NeonLineChart("Ventas Últimos 7 Días ($)", ventas7Dias), BorderLayout.CENTER);
 
-        // Chart 2: Pie Chart (Distribución Real)
         RoundedPanel pieChartCard = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
         pieChartCard.setLayout(new BorderLayout());
-        Map<String, Double> distribution = productoCtrl.obtenerDistribucionCategorias();
-        pieChartCard.add(new NeonPieChart("Distribución de Inventario", distribution), BorderLayout.CENTER);
+        pieChartCard.add(new NeonPieChart("Distribución de Inventario", distribucionCategorias), BorderLayout.CENTER);
+
+        chartsRow = new JPanel(new GridLayout(1, 2, 18, 0));
+        chartsRow.setOpaque(false);
+        chartsRow.add(lineChartCard);
         chartsRow.add(pieChartCard);
 
         mainContainer.add(chartsRow);
         add(mainContainer, BorderLayout.CENTER);
+
+        // Reflow adaptable: en móvil las métricas, tablas y gráficos se apilan.
+        LayoutResponsive.listen(this, bp -> {
+            LayoutResponsive.reflowColumnas(metricsPanel,
+                    new java.util.ArrayList<>(metricCards), 4, 14, bp);
+            LayoutResponsive.reflowColumnas(tablesRow,
+                    LayoutResponsive.list(tablaVentasCard, tablaEstadoCard), 2, 18, bp);
+            LayoutResponsive.reflowColumnas(chartsRow,
+                    LayoutResponsive.list(lineChartCard, pieChartCard), 2, 18, bp);
+        });
     }
 
     private Object[][] obtenerResumenInventario() {
@@ -142,7 +190,7 @@ public class DashboardPage extends JPanel {
         table.setForeground(ThemeConstants.TEXT_SECONDARY);
         table.setSelectionBackground(new Color(59, 130, 246, 70));
         table.setSelectionForeground(ThemeConstants.TEXT_PRIMARY);
-        table.setRowHeight(28);
+        table.setRowHeight(ThemeConstants.TABLE_ROW_HEIGHT);
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension(0, 1));
         table.setFont(ThemeConstants.FONT_SMALL);
@@ -179,7 +227,13 @@ public class DashboardPage extends JPanel {
         }
 
         if (data == null || data.length == 0) {
-            card.add(createEmptyState("Aquí verás la actividad de tu negocio cuando registres tus primeras ventas.", "icons/summary.svg"), BorderLayout.CENTER);
+            FlatSVGIcon icon = new FlatSVGIcon("icons/sales.svg", 36, 36);
+            icon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, ThemeConstants.NEON_BLUE));
+            JPanel emptyState = UIUtils.createEmptyState(
+                    "Sin ventas registradas aún",
+                    "Aquí verás la actividad reciente de tu negocio cuando registres tus primeras ventas.",
+                    icon);
+            card.add(emptyState, BorderLayout.CENTER);
             return card;
         }
         

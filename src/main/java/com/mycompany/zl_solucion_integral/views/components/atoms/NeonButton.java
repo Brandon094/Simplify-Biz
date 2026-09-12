@@ -19,6 +19,10 @@ public class NeonButton extends JButton {
         setFont(ThemeConstants.FONT_BODY);
         setCursor(new Cursor(Cursor.HAND_CURSOR));
 
+        // Objetivo táctil mínimo (uso cómodo en pantallas pequeñas).
+        setPreferredSize(new Dimension(0, ThemeConstants.TOUCH_TARGET_MIN));
+        setMinimumSize(new Dimension(0, ThemeConstants.TOUCH_TARGET_MIN));
+
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {

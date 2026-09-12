@@ -55,10 +55,10 @@ public class ThemeToggleButton extends JButton {
     /** Actualiza el icono, el texto y los colores según el tema vigente. */
     public void refresh() {
         if (ThemeConstants.isDark()) {
-            setIcon(createThemeIcon("/icons/sun.svg"));
+            setIcon(createThemeIcon("icons/sun.svg"));
             setText("Modo claro");
         } else {
-            setIcon(createThemeIcon("/icons/moon.svg"));
+            setIcon(createThemeIcon("icons/moon.svg"));
             setText("Modo oscuro");
         }
         setForeground(ThemeConstants.TEXT_SECONDARY);

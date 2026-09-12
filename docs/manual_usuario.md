@@ -1,76 +1,213 @@
-# Manual de operación - ERP+ Business
+# Manual de Operación — ERP+ Business
 
-## Inicio
+> Guía paso a paso para usuarios finales de la aplicación. Cubre todos los módulos, flujos de trabajo y preguntas frecuentes.
 
-Ejecuta la aplicación con:
+---
+
+## 1. Iniciar la Aplicación
 
 ```bash
-java -jar target/Simplify-Biz-1.2.0.jar
+java -jar dist/Simplify-Biz-1.2.0.jar
 ```
 
-En el primer uso configura la ubicación de la base de datos y crea el administrador principal. En usos posteriores inicia sesión con las credenciales registradas.
+### 1.1 Primer Uso
 
-## Roles
+En el primer inicio, la aplicación:
 
-- **Administrador:** acceso al dashboard, ventas, productos, clientes, empleados, reportes y configuración.
-- **Vendedor:** acceso a ventas y productos.
-- **Cliente:** se almacena como usuario de rol `2`, pero no tiene una sección de gestión manual en la interfaz administrativa.
+1. **Crea la carpeta de datos protegida automáticamente:** El sistema inicializa de forma transparente y resguardada la base de datos SQLite en tu carpeta de usuario de aplicación (`AppData` en Windows / `.config` en Linux) para prevenir borrados accidentales.
+2. **Crear el administrador principal:** Completa nombre, teléfono, correo electrónico y contraseña. Este será el usuario principal con acceso completo.
+3. El sistema confirma la creación y muestra la pantalla de login.
 
-## Dashboard
+### 1.2 Inicios Posteriores
 
-El dashboard muestra ventas acumuladas, órdenes, productos, stock crítico, últimas ventas, estado operativo y gráficos. Los mensajes como `Aún no hay ventas registradas` indican que todavía no existen datos, no un error de carga.
+La aplicación muestra directamente el formulario de **inicio de sesión**:
 
-## Registrar productos
+- **Recordarme:** Si activas la casilla *"Recordarme"*, tu nombre de usuario se guardará de forma segura para autocompletarse en próximos inicios de sesión.
+- **¿Olvidaste tu contraseña?:** Haz clic sobre este enlace si necesitas restablecer tu clave. Se abrirá un diálogo modal que te solicitará:
+  1. Tu nombre de usuario o correo electrónico registrado.
+  2. Tu número de teléfono registrado.
+  3. Si la verificación es exitosa, podrás definir una nueva contraseña al instante.
 
-1. Abre `Productos`.
-2. Escribe nombre y código/SKU.
-3. Selecciona categoría.
-4. Introduce precio y stock.
-5. Pulsa `Guardar producto`.
+---
 
-Si el código ya existe, el flujo actual actualiza el stock del producto existente.
+## 2. Roles de Usuario
 
-## Cambiar entre tema oscuro y claro
+| Rol | Código | Acceso |
+| :--- | :--- | :--- |
+| **Administrador** | `1` | Dashboard, Ventas, Productos, Clientes, Empleados, Reportes, Configuración |
+| **Vendedor/Empleado** | `0` | Ventas, Productos |
+| **Cliente** | `2` | Sin acceso directo. Se almacena como dato de referencia para las ventas. |
 
-En la parte inferior del menú lateral hay un botón que permite alternar el aspecto de la aplicación:
+---
 
-- En **tema oscuro** (predeterminado) muestra **Modo claro** (icono de sol); al pulsarlo la interfaz pasa a la paleta clara.
-- En **tema claro** muestra **Modo oscuro** (icono de luna); al pulsarlo vuelve a la paleta oscura.
+## 3. Módulos
 
-El cambio se aplica al instante a toda la aplicación (menú, tablas, formularios, gráficos y ventanas) y no modifica tus datos ni la configuración del negocio.
+### 3.1 Dashboard
 
-## Registrar una venta
+El panel principal muestra un resumen en tiempo real de la operación:
 
-1. Abre `Ventas`.
-2. Busca el producto por código o nombre.
-3. Define cantidad y descuento.
-4. Pulsa `Agregar al carrito`.
-5. Completa nombre y documento del cliente, o activa `Cliente no desea suministrar datos`.
-6. Selecciona el método de pago.
-7. Pulsa `Confirmar venta`.
+- **KPIs:** Ventas acumuladas, total de órdenes, productos en catálogo y stock crítico (≤5 unidades).
+- **Gráfico de ventas:** Línea neon con los totales de los últimos 7 días.
+- **Estado operativo:** Indicador visual del estado de la base de datos y la actividad.
+- **Últimas ventas:** Tabla con las transacciones más recientes.
 
-En venta mostrador se guardan `CONSUMIDOR FINAL` y `N/A`. El sistema no crea un usuario ficticio.
+> **Nota:** Los mensajes como *"Aún no hay ventas registradas"* indican que no existen datos aún, no un error del sistema.
 
-## Consultar clientes
+### 3.2 Productos
 
-La sección `Clientes` lista los usuarios con rol `2`. Los clientes se crean desde el flujo de venta cuando entregan sus datos. La pantalla no permite crear ni editar clientes manualmente.
+#### Registrar un producto
 
-## Gestionar empleados
+1. Abre la sección **Productos** desde el menú lateral.
+2. Completa los campos:
+   - **Nombre del producto** — Nombre descriptivo.
+   - **Código/SKU** — Código único de identificación (ej: `SKU-001`).
+   - **Categoría** — Selecciona del listado predefinido.
+   - **Precio** — Precio unitario de venta.
+   - **Stock** — Cantidad disponible.
+3. Pulsa **Guardar producto**.
 
-El administrador abre `Empleados`, completa nombre, teléfono, correo y contraseña, y utiliza `Registrar empleado`. Para editar, selecciona una fila y utiliza `Actualizar datos`.
+> **Comportamiento:** Si el código ya existe, el sistema **suma** la cantidad al stock existente en lugar de crear un duplicado.
 
-## Reportes
+#### Modificar un producto
 
-En `Reportes` puedes consultar las ventas y filtrar por fecha. Los botones de Excel y PDF forman parte de la interfaz; la implementación de exportación debe revisarse antes de considerarla final.
+1. Selecciona un producto en la tabla haciendo clic sobre la fila.
+2. Los datos se cargan automáticamente en el formulario.
+3. Modifica los campos deseados.
+4. Pulsa **Modificar producto**.
 
-## Configuración
+#### Eliminar un producto
 
-La sección permite revisar la ruta de datos, cambiarla y consultar versión, motor de base de datos, licencia y desarrollador. El texto `ChopCode Solutions` abre el portafolio web.
+1. Selecciona un producto en la tabla.
+2. Pulsa el botón **Eliminar** (icono de papelera).
+3. Confirma la acción en el diálogo de confirmación.
 
-## Proveedores
+#### Filtrar por categoría
 
-La opción está oculta temporalmente del sidebar. La pantalla existe como prototipo visual, pero todavía no guarda proveedores en SQLite.
+Utiliza el selector de categoría sobre la tabla para ver solo los productos de una categoría específica. Selecciona "Todas" para ver el catálogo completo.
 
-## Copias de seguridad
+### 3.3 Ventas
 
-Cierra la aplicación y respalda el archivo SQLite efectivo antes de moverlo o actualizar el proyecto. Consulta [configuraciones.md](configuraciones.md) para la particularidad actual de la ruta.
+El punto de venta (POS) cuenta con un diseño de tres tarjetas simétricas perfectamente alineadas en la parte superior:
+
+1. **Agregar productos (Izquierda):** Búsqueda ágil por código/SKU o nombre, especificación de cantidad y aplicación opcional de descuento porcentual.
+2. **Carrito de compras (Centro):** Listado dinámico con subtotal por ítem y cálculo en tiempo real del gran total.
+3. **Datos del cliente y pago (Derecha):** Selección de método de pago (Efectivo, Crédito, Transferencia, etc.) y captura de datos del cliente, o activación del checkbox *"Cliente no desea suministrar datos"* (`CONSUMIDOR FINAL`).
+
+#### Realizar una venta
+
+1. Abre la sección **Ventas**.
+2. **Buscar producto:** Ingresa el código o nombre en el campo de búsqueda.
+3. **Añadir al carrito:**
+   - Define la cantidad.
+   - (Opcional) Aplica un descuento porcentual (0–100%).
+   - Pulsa **Agregar al carrito**.
+4. Repite para añadir más productos.
+5. **Datos del cliente:**
+   - Ingresa nombre y documento (cédula/NIT).
+   - **O** activa la casilla *"Cliente no desea suministrar datos"* → se registra como `CONSUMIDOR FINAL` con `N/A`. No se crea un usuario ficticio.
+6. Selecciona el **método de pago** (Efectivo, Crédito, Transferencia, etc.).
+7. Pulsa **Confirmar venta**.
+
+> **Seguridad:** El stock se descuenta en una transacción atómica. Si falla alguna actualización, toda la operación se revierte automáticamente.
+
+### 3.4 Clientes
+
+La sección **Clientes** lista los usuarios registrados con rol `2` (cliente):
+
+- La tabla muestra: ID, Nombre, Email, Teléfono y Rol.
+- **No se muestran contraseñas** en la interfaz.
+- Los clientes se crean automáticamente desde el flujo de venta cuando proporcionan sus datos.
+- Esta pantalla es **de solo consulta**: no permite crear ni editar clientes manualmente.
+
+### 3.5 Empleados
+
+*(Solo para administradores)*
+
+#### Registrar un empleado
+
+1. Abre la sección **Empleados**.
+2. Completa: nombre, teléfono, correo electrónico y contraseña.
+3. Pulsa **Registrar empleado**.
+
+#### Actualizar datos
+
+1. Selecciona un empleado en la tabla.
+2. Modifica los campos deseados.
+3. Si dejas la contraseña en blanco, se conserva la contraseña existente.
+4. Pulsa **Actualizar datos**.
+
+#### Eliminar un empleado
+
+1. Selecciona un empleado en la tabla.
+2. Pulsa **Eliminar**.
+3. Confirma la acción en el diálogo de confirmación.
+
+### 3.6 Reportes
+
+1. Abre la sección **Reportes**.
+2. **Ver todas las ventas:** Se cargan automáticamente al entrar.
+3. **Filtrar por fecha:**
+   - Ingresa la fecha de inicio y fin en formato `dd/MM/yyyy`.
+   - Pulsa **Filtrar**.
+4. **Exportar a Excel:**
+   - Pulsa el botón de exportación.
+   - Selecciona la ubicación para guardar el archivo `.xlsx`.
+
+### 3.7 Configuración
+
+La sección de configuración permite:
+
+- **Ver la ruta de la base de datos** actual.
+- **Cambiar la ruta:** Selecciona una nueva carpeta. Requiere reiniciar la aplicación.
+- **Información del sistema:** Versión de la aplicación, motor de base de datos, licencia.
+- **Enlace al desarrollador:** El texto *"ChopCode Solutions"* abre el portafolio web.
+
+### 3.8 Proveedores *(próximamente)*
+
+La pantalla existe como prototipo visual, pero actualmente no guarda datos en la base de datos. Esta funcionalidad se implementará en la Fase 4.
+
+---
+
+## 4. Tema Oscuro y Claro
+
+En la parte inferior del menú lateral hay un botón toggle que permite cambiar el aspecto visual:
+
+| Tema Actual | Botón Muestra | Acción |
+| :--- | :--- | :--- |
+| Oscuro (predeterminado) | ☀️ Modo claro | Cambia a paleta clara |
+| Claro | 🌙 Modo oscuro | Cambia a paleta oscura |
+
+- El cambio se aplica **instantáneamente** a toda la aplicación (menú, tablas, formularios, gráficos).
+- La preferencia se **guarda automáticamente** y se recuerda entre reinicios.
+- **No modifica datos** ni la configuración del negocio.
+
+---
+
+## 5. Copias de Seguridad
+
+### 5.1 Proceso de Respaldo
+
+1. **Cierra la aplicación** completamente.
+2. Navega a la carpeta de datos configurada.
+3. Copia el archivo `db.db` (o el archivo SQLite configurado) a una carpeta de respaldo.
+4. Nombra las copias con la fecha (ej: `db_20260912.db`).
+
+### 5.2 Restaurar un Respaldo
+
+1. Cierra la aplicación.
+2. Reemplaza el archivo `db.db` con la copia de respaldo.
+3. Inicia la aplicación normalmente.
+
+> **Importante:** Prueba periódicamente la restauración en una carpeta separada para verificar la integridad. Consulta [configuraciones.md](configuraciones.md) para más información sobre el contrato de rutas.
+
+---
+
+## 6. Solución de Problemas
+
+| Problema | Causa Probable | Solución |
+| :--- | :--- | :--- |
+| "Error al inicializar la base de datos" | Ruta de BD inválida o permisos insuficientes | Verifica que la carpeta existe y tienes permisos de escritura |
+| "database is locked" | Múltiples instancias de la app o BD en carpeta sincronizada | Cierra otras instancias. Mueve la BD a una carpeta local |
+| Los iconos del tema se ven como cuadros rojos | SVGs no encontrados en el classpath | Verifica que `src/main/resources/icons/` contiene los archivos SVG |
+| La tabla no muestra datos | Base de datos vacía | Es normal en el primer uso. Registra productos y realiza ventas |
+| Campos de texto truncados | Ventana muy pequeña | Redimensiona la ventana. El diseño adaptativo se ajustará automáticamente |

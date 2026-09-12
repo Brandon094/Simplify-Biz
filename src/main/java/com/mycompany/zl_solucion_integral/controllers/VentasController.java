@@ -10,12 +10,14 @@ package com.mycompany.zl_solucion_integral.controllers;
  *
  * @author ChopCode Solutions
  */
-import com.mycompany.zl_solucion_integral.config.ConexionDB;
-import com.mycompany.zl_solucion_integral.config.SelecionRuta;
+import com.mycompany.zl_solucion_integral.config.GestorConexion;
+import com.mycompany.zl_solucion_integral.config.ResultadoOperacion;
+import com.mycompany.zl_solucion_integral.config.Validaciones;
 import com.mycompany.zl_solucion_integral.models.Producto;
 import com.mycompany.zl_solucion_integral.models.Sesion;
 import com.mycompany.zl_solucion_integral.models.Usuario;
 import com.mycompany.zl_solucion_integral.models.Venta;
+import com.mycompany.zl_solucion_integral.views.components.UIMessages;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,7 +29,6 @@ import java.util.Date;
 import java.util.logging.Level;
 import javax.swing.JTable;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import org.apache.poi.ss.usermodel.*;
 
@@ -41,29 +42,27 @@ import java.io.InputStream;
 import java.text.ParseException;
 import javax.swing.table.TableModel;
 
-/* Clase encargada de manejar las operaciones 
+/* Clase encargada de manejar las operaciones
 relacionadas con las ventas en la base de datos*/
 public class VentasController {
 
-    SelecionRuta rutaDB = new SelecionRuta();
     private Usuario cliente;
-    private ConexionDB conexion; // Variable global para la conexión
     private Logger logger = Logger.getLogger(VentasController.class.getName());
-    private Sesion sesion;    
+    private Sesion sesion;
 
-    // Constructor
+    private Connection conn() {
+        return GestorConexion.getInstancia().obtenerConexion();
+    }
+
     public VentasController(Usuario cliente, Sesion sesion) {
-        this.conexion = new ConexionDB(rutaDB.cargarRutaBaseDatos()); // Instancia de la clase de conexión        
         this.sesion = sesion;
         this.cliente = cliente;
     }
 
-    // Constructor adicional sin parámetros de Usuario y Sesion
     public VentasController() {
-        this.conexion = new ConexionDB(rutaDB.cargarRutaBaseDatos()); // Instancia de la clase de conexión
     }
 
-    public void guardarVenta(final Venta venta, List<Producto> productosVendidos, JTable tablaVentas) {
+    public ResultadoOperacion guardarVenta(final Venta venta, List<Producto> productosVendidos, JTable tablaVentas) {
         String sqlInsertVenta = "INSERT INTO ventas (cliente, cc_cliente, vendedor, fecha, total, metodo_pago, pago_confirmado) VALUES (?, ?, ?, ?, ?, ?, ?)";
         String sqlInsertDetalleVenta = "INSERT INTO detalles_venta (venta_id, producto, cantidad, codigo, precio, total) VALUES (?, ?, ?, ?, ?, ?)";
         String sqlUpdateStock = "UPDATE productos SET cantidad = cantidad - ? WHERE codigo = ? AND cantidad >= ?";
@@ -75,16 +74,14 @@ public class VentasController {
         ResultSet generatedKeys = null;
 
         try {
-            // Establecer conexión y preparar transacción
-            conn = conexion.obtenerConexion();
+            conn = conn();
             conn.setAutoCommit(false);
 
-            // Verificar stock de productos antes de comenzar
             for (Producto producto : productosVendidos) {
                 if (producto.getCantidad() < producto.getCantidadSolicitada()) {
-                    throw new SQLException("Stock insuficiente para el producto: " + producto.getProducto()
-                            + ". Disponible: " + producto.getCantidad()
-                            + ", solicitado: " + producto.getCantidadSolicitada());
+                    conn.rollback();
+                    conn.setAutoCommit(true);
+                    return ResultadoOperacion.error(UIMessages.MSG_STOCK_VENTA_INSUFICIENTE);
                 }
             }
 
@@ -96,7 +93,7 @@ public class VentasController {
             psVenta.setString(1, venta.getCliente().getNombre());
             psVenta.setString(2, venta.getCliente().getNoCc());
             psVenta.setString(3, venta.getVendedor());
-            psVenta.setDate(4, java.sql.Date.valueOf(venta.getFecha()));
+            psVenta.setString(4, venta.getFecha() != null ? venta.getFecha().toString() : java.time.LocalDate.now().toString());
             psVenta.setDouble(5, venta.getTotal());
             psVenta.setString(6, venta.getMetodoPago());
             psVenta.setString(7, pagoConfirmado);
@@ -131,13 +128,13 @@ public class VentasController {
                 }
             }
 
-            // Confirmar transacción
             conn.commit();
-            JOptionPane.showMessageDialog(null, "Venta guardada y stock actualizado exitosamente.");
-            MostrarVentas(tablaVentas);
+            if (tablaVentas != null) {
+                MostrarVentas(tablaVentas);
+            }
+            return ResultadoOperacion.ok(UIMessages.MSG_VENTA_GUARDADA);
 
         } catch (SQLException e) {
-            // Revertir transacción en caso de error
             if (conn != null) {
                 try {
                     conn.rollback();
@@ -146,9 +143,11 @@ public class VentasController {
                 }
             }
             logger.log(Level.SEVERE, "Error al procesar la venta", e);
-            JOptionPane.showMessageDialog(null, "Error al procesar venta: " + e.getMessage());
+            if (e.getMessage() != null && e.getMessage().toLowerCase().contains("stock")) {
+                return ResultadoOperacion.error(UIMessages.MSG_STOCK_VENTA_INSUFICIENTE);
+            }
+            return ResultadoOperacion.error(UIMessages.MSG_ERROR_BD);
         } finally {
-            // Cerrar recursos
             try {
                 if (generatedKeys != null) {
                     generatedKeys.close();
@@ -164,16 +163,15 @@ public class VentasController {
                 }
                 if (conn != null) {
                     conn.setAutoCommit(true);
-                    conexion.cerrarConexion(conn);
                 }
             } catch (SQLException ex) {
-                logger.log(Level.SEVERE, "Error al cerrar conexiones", ex);
+                logger.log(Level.SEVERE, "Error al restaurar auto-commit", ex);
             }
         }
     }
 
     // Metodo para modificar una venta
-    public void modificarVenta(final Venta venta, int idVenta, JTable tablaVentas) {
+    public ResultadoOperacion modificarVenta(final Venta venta, int idVenta, JTable tablaVentas) {
         String sqlUpdateVenta = "UPDATE ventas SET producto = ?, cantidad = ?, codigo = ?, precio = ?, cliente = ?, cc_cliente = ?, vendedor = ?, fecha = ?, total = ? WHERE id = ?";
         String sqlUpdateStockRestaurar = "UPDATE productos SET cantidad = cantidad + ? WHERE codigo = ?";  // Para restaurar el stock antiguo
         String sqlUpdateStockNuevo = "UPDATE productos SET cantidad = cantidad - ? WHERE codigo = ? AND cantidad >= ?";  // Para aplicar el nuevo stock
@@ -184,8 +182,8 @@ public class VentasController {
         PreparedStatement psStockNuevo = null;
 
         try {
-            conn = conexion.obtenerConexion();
-            conn.setAutoCommit(false);  // Iniciar una transacción
+            conn = conn();
+            conn.setAutoCommit(false);
 
             // Restaurar el stock del producto basado en la venta anterior
             psStockRestaurar = conn.prepareStatement(sqlUpdateStockRestaurar);
@@ -221,12 +219,11 @@ public class VentasController {
 
             // Confirmar la transacción
             conn.commit();
-            JOptionPane.showMessageDialog(null, "Venta modificada y stock actualizado exitosamente.");
-
-            // Actualizar la tabla de ventas
-            MostrarVentas(tablaVentas);
+            if (tablaVentas != null) {
+                MostrarVentas(tablaVentas);
+            }
+            return ResultadoOperacion.ok(UIMessages.MSG_VENTA_MODIFICADA);
         } catch (SQLException e) {
-            // Revertir la transacción en caso de error
             if (conn != null) {
                 try {
                     conn.rollback();
@@ -235,9 +232,8 @@ public class VentasController {
                 }
             }
             logger.log(Level.SEVERE, "Error al modificar la venta", e);
-            JOptionPane.showMessageDialog(null, "Error al modificar venta: " + e.getMessage());
+            return ResultadoOperacion.error(UIMessages.MSG_ERROR_BD);
         } finally {
-            // Cerrar las conexiones
             try {
                 if (psVenta != null) {
                     psVenta.close();
@@ -249,11 +245,10 @@ public class VentasController {
                     psStockNuevo.close();
                 }
                 if (conn != null) {
-                    conn.setAutoCommit(true);  // Restaurar el auto-commit
+                    conn.setAutoCommit(true);
                 }
-                conexion.cerrarConexion(conn);
             } catch (SQLException ex) {
-                logger.log(Level.SEVERE, "Error al cerrar conexiones", ex);
+                logger.log(Level.SEVERE, "Error al restaurar auto-commit", ex);
             }
         }
     }
@@ -261,7 +256,7 @@ public class VentasController {
 // Método para obtener la cantidad anterior de una venta
     private int obtenerCantidadAnterior(int idVenta) {
         String sql = "SELECT cantidad FROM ventas WHERE id = ?";
-        try (Connection conn = conexion.obtenerConexion(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn().prepareStatement(sql)) {
 
             ps.setInt(1, idVenta);
             ResultSet rs = ps.executeQuery();
@@ -283,8 +278,8 @@ public class VentasController {
 
         // Verificar si hay una fila seleccionada
         if (filaSeleccionada != -1) {
-            // Obtener el valor de la primera columna (ID del producto) y convertirlo a entero
-            return Integer.parseInt(tabla.getValueAt(filaSeleccionada, 0).toString());
+            Integer id = Validaciones.parseEntero(tabla.getValueAt(filaSeleccionada, 0).toString());
+            return id == null ? -1 : id;
         } else {
             // No se ha seleccionado ninguna fila, devolver -1
             return -1;
@@ -294,7 +289,7 @@ public class VentasController {
     public void guardarNumeroCotizacionEnBaseDeDatos(String numeroCotizacion) {
         String sqlActualizar = "UPDATE configuracion SET ultimoNumeroCotizacion = ? WHERE id = 1";
 
-        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pstmt = conn.prepareStatement(sqlActualizar)) {
+        try (PreparedStatement pstmt = conn().prepareStatement(sqlActualizar)) {
             pstmt.setString(1, numeroCotizacion);
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -311,7 +306,7 @@ public class VentasController {
         String sqlConsulta = "SELECT ultimoNumeroCotizacion FROM configuracion WHERE id = 1";
         String sqlActualizar = "UPDATE configuracion SET ultimoNumeroCotizacion = ? WHERE id = 1";
 
-        try (Connection conn = conexion.obtenerConexion(); PreparedStatement psConsulta = conn.prepareStatement(sqlConsulta); PreparedStatement psActualizar = conn.prepareStatement(sqlActualizar)) {
+        try (PreparedStatement psConsulta = conn().prepareStatement(sqlConsulta); PreparedStatement psActualizar = conn().prepareStatement(sqlActualizar)) {
 
             // Consultar el último número de cotización
             ResultSet rs = psConsulta.executeQuery();
@@ -319,7 +314,8 @@ public class VentasController {
                 String ultimoNumero = rs.getString("ultimoNumeroCotizacion");
                 if (ultimoNumero != null && ultimoNumero.startsWith(fecha)) {
                     // Extraer el número actual después del guión y sumarle 1
-                    siguienteNumero = Integer.parseInt(ultimoNumero.split("-")[1]) + 1;
+                    Integer extraido = Validaciones.parseEntero(ultimoNumero.split("-")[1]);
+                    siguienteNumero = extraido == null ? 1 : extraido + 1;
                 } else {
                     // Si la fecha cambió, reinicia el conteo para la nueva fecha
                     siguienteNumero = 1;
@@ -377,7 +373,7 @@ public class VentasController {
                 + "FROM ventas v "
                 + "JOIN detalles_venta d ON v.id = d.venta_id";
 
-        try (Connection conn = conexion.obtenerConexion(); Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+        try (Statement st = conn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
                 double precio = rs.getDouble("precio");
@@ -423,7 +419,6 @@ public class VentasController {
             //tablaVentas.setRowHeight(25);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error al mostrar ventas", e);
-            JOptionPane.showMessageDialog(null, "Error al mostrar ventas: " + e.getMessage());
         }
     }
 
@@ -439,32 +434,19 @@ public class VentasController {
      * @param fechaInicio Fecha de inicio del filtro en formato "dd/MM/yyyy".
      * @param fechaFin Fecha de fin del filtro en formato "dd/MM/yyyy".
      */
-    public void mostrarFechasDefinidas(JTable tablaVentas, String fechaInicio, String fechaFin) {
-        // Validar que las fechas tengan el formato correcto
-        if (!esFormatoFechaValido(fechaInicio)) {
-            JOptionPane.showMessageDialog(null, "La fecha de inicio ingresada no tiene un formato válido (dd/MM/yyyy).");
-            return;
-        }
-        if (!esFormatoFechaValido(fechaFin)) {
-            JOptionPane.showMessageDialog(null, "La fecha de finalización ingresada no tiene un formato válido (dd/MM/yyyy).");
-            return;
+    public ResultadoOperacion mostrarFechasDefinidas(JTable tablaVentas, String fechaInicio, String fechaFin) {
+        Date inicio = Validaciones.parseFecha(fechaInicio);
+        Date fin = Validaciones.parseFecha(fechaFin);
+        if (inicio == null || fin == null) {
+            return ResultadoOperacion.error(UIMessages.MSG_FECHA_FORMATO_INVALIDO);
         }
 
-        // Convertir las fechas a timestamp
-        long timestampInicio = 0;
-        long timestampFin = 0;
-        try {
-            SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
-            formatoFecha.setLenient(false); // Para validar fechas estrictamente
-            Date inicio = formatoFecha.parse(fechaInicio);
-            Date fin = formatoFecha.parse(fechaFin);
+        long timestampInicio = inicio.getTime();
+        long timestampFin = fin.getTime() + (24 * 60 * 60 * 1000) - 1; // Incluir todo el día final
 
-            timestampInicio = inicio.getTime();
-            timestampFin = fin.getTime();
-        } catch (ParseException e) {
-            JOptionPane.showMessageDialog(null, "Error al convertir las fechas: " + e.getMessage());
-            return;
-        }
+        SimpleDateFormat isoFmt = new SimpleDateFormat("yyyy-MM-dd");
+        String isoInicio = isoFmt.format(inicio);
+        String isoFin = isoFmt.format(fin);
 
         // Crear un nuevo modelo de tabla
         final DefaultTableModel modelo = new DefaultTableModel();
@@ -484,123 +466,17 @@ public class VentasController {
         modelo.addColumn("Precio Total");
         tablaVentas.setModel(modelo);
 
-        // Consulta SQL con filtro por rango de fechas (timestamps)
+        // Consulta SQL compatible con fechas String ISO (YYYY-MM-DD) y con timestamps antiguos
         final String sql = "SELECT v.id, d.producto, d.cantidad, d.codigo, d.precio, v.cliente, v.cc_cliente, v.vendedor, v.metodo_pago, v.fecha, v.pago_confirmado "
                 + "FROM ventas v "
                 + "JOIN detalles_venta d ON v.id = d.venta_id "
-                + "WHERE v.fecha BETWEEN ? AND ?";
+                + "WHERE (v.fecha BETWEEN ? AND ?) OR (v.fecha >= ? AND v.fecha <= ?)";
 
-        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pst = conn.prepareStatement(sql)) {
-            // Establecer los valores del rango de fechas (timestamps) en la consulta
-            pst.setLong(1, timestampInicio);
-            pst.setLong(2, timestampFin);
-
-            try (ResultSet rs = pst.executeQuery()) {
-                while (rs.next()) {
-                    double precio = rs.getDouble("precio");
-                    int cantidad = rs.getInt("cantidad");
-                    double precioTotal = precio * cantidad;
-
-                    // Convertir el timestamp de la base de datos a una fecha legible
-                    long fechaTimestamp = rs.getLong("fecha");
-                    String fechaLegible = new SimpleDateFormat("dd/MM/yyyy").format(new Date(fechaTimestamp));
-
-                    modelo.addRow(new Object[]{
-                        rs.getInt("id"),
-                        rs.getString("producto"),
-                        cantidad,
-                        rs.getString("codigo"),
-                        precio,
-                        rs.getString("cliente"),
-                        rs.getString("cc_cliente"),
-                        rs.getString("metodo_pago"),
-                        rs.getString("pago_confirmado"),
-                        rs.getString("vendedor"),
-                        fechaLegible,
-                        precioTotal
-                    });
-                }
-            }
-
-            tablaVentas.setModel(modelo);
-
-            // Ajustar tamaños de columnas
-            tablaVentas.getColumnModel().getColumn(0).setPreferredWidth(50);  // Id
-            tablaVentas.getColumnModel().getColumn(1).setPreferredWidth(250); // Producto
-            tablaVentas.getColumnModel().getColumn(2).setPreferredWidth(50);  // Cantidad
-            tablaVentas.getColumnModel().getColumn(3).setPreferredWidth(100); // Código
-            tablaVentas.getColumnModel().getColumn(4).setPreferredWidth(75);  // Precio
-            tablaVentas.getColumnModel().getColumn(5).setPreferredWidth(150); // Cliente
-            tablaVentas.getColumnModel().getColumn(6).setPreferredWidth(100); // CC Cliente
-            tablaVentas.getColumnModel().getColumn(7).setPreferredWidth(100); // Vendedor
-            tablaVentas.getColumnModel().getColumn(8).setPreferredWidth(100); // metodo pago
-            tablaVentas.getColumnModel().getColumn(9).setPreferredWidth(100); // pago confirmado            
-            tablaVentas.getColumnModel().getColumn(10).setPreferredWidth(100); // Fecha
-            tablaVentas.getColumnModel().getColumn(11).setPreferredWidth(100); // Precio Total
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error al mostrar ventas", e);
-            JOptionPane.showMessageDialog(null, "Error al mostrar ventas: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Método para mostrar los registros de ventas de una fecha específica en
-     * formato dd/MM/yyyy.
-     *
-     * @param tablaVentas La tabla (`JTable`) donde se mostrarán los registros
-     * de ventas.
-     * @param fecha La fecha específica para filtrar los registros (formato:
-     * "dd/MM/yyyy").
-     */
-    public void mostrarVentasPorDia(JTable tablaVentas, String fecha) {
-        // Validar que la fecha tenga el formato correcto
-        if (!esFormatoFechaValido(fecha)) {
-            JOptionPane.showMessageDialog(null, "La fecha ingresada no tiene un formato válido (dd/MM/yyyy).");
-            return;
-        }
-
-        // Convertir la fecha a un rango de timestamp
-        long inicioDia = 0;
-        long finDia = 0;
-        try {
-            SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
-            formatoFecha.setLenient(false); // Validación estricta
-            Date fechaInicio = formatoFecha.parse(fecha);
-
-            // Obtener el inicio y el fin del día
-            inicioDia = fechaInicio.getTime(); // 00:00:00
-            finDia = inicioDia + (24 * 60 * 60 * 1000) - 1; // 23:59:59
-        } catch (ParseException e) {
-            JOptionPane.showMessageDialog(null, "Error al convertir la fecha: " + e.getMessage());
-            return;
-        }
-
-        // Crear un modelo de tabla vacío
-        final DefaultTableModel modelo = new DefaultTableModel();
-        modelo.addColumn("Id");
-        modelo.addColumn("Producto");
-        modelo.addColumn("Cantidad");
-        modelo.addColumn("Código");
-        modelo.addColumn("Precio");
-        modelo.addColumn("Cliente");
-        modelo.addColumn("CC Cliente");
-        modelo.addColumn("Metodo pago");
-        modelo.addColumn("Pago confirmado");
-        modelo.addColumn("Vendedor");
-        modelo.addColumn("Fecha");
-        modelo.addColumn("Precio Total");
-        tablaVentas.setModel(modelo);
-
-        // Consulta SQL con filtro por rango de fechas (timestamps)
-        final String sql = "SELECT v.id, d.producto, d.cantidad, d.codigo, d.precio, v.cliente, v.cc_cliente, v.vendedor, v.metodo_pago, v.fecha, v.pago_confirmado  "
-                + "FROM ventas v "
-                + "JOIN detalles_venta d ON v.id = d.venta_id "
-                + "WHERE v.fecha BETWEEN ? AND ?";
-
-        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pst = conn.prepareStatement(sql)) {
-            // Establecer los valores del rango de fechas (timestamps) en la consulta
-            pst.setLong(1, inicioDia);
-            pst.setLong(2, finDia);
+        try (PreparedStatement pst = conn().prepareStatement(sql)) {
+            pst.setString(1, isoInicio);
+            pst.setString(2, isoFin);
+            pst.setLong(3, timestampInicio);
+            pst.setLong(4, timestampFin);
 
             try (ResultSet rs = pst.executeQuery()) {
                 while (rs.next()) {
@@ -608,9 +484,14 @@ public class VentasController {
                     int cantidad = rs.getInt("cantidad");
                     double precioTotal = precio * cantidad;
 
-                    // Convertir el timestamp de la base de datos a una fecha legible
-                    long fechaTimestamp = rs.getLong("fecha");
-                    String fechaLegible = new SimpleDateFormat("dd/MM/yyyy").format(new Date(fechaTimestamp));
+                    String fechaRaw = rs.getString("fecha");
+                    String fechaLegible = fechaRaw;
+                    if (fechaRaw != null && fechaRaw.matches("\\d+")) {
+                        try {
+                            long fechaTimestamp = Long.parseLong(fechaRaw);
+                            fechaLegible = new SimpleDateFormat("dd/MM/yyyy").format(new Date(fechaTimestamp));
+                        } catch (Exception ignored) {}
+                    }
 
                     modelo.addRow(new Object[]{
                         rs.getInt("id"),
@@ -644,10 +525,110 @@ public class VentasController {
             tablaVentas.getColumnModel().getColumn(9).setPreferredWidth(100); // pago confirmado
             tablaVentas.getColumnModel().getColumn(10).setPreferredWidth(100); // Fecha
             tablaVentas.getColumnModel().getColumn(11).setPreferredWidth(100); // Precio Total
+            return ResultadoOperacion.ok("");
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error al mostrar ventas", e);
+            return ResultadoOperacion.error(UIMessages.MSG_ERROR_BD);
+        }
+    }
 
+    /**
+     * Método para mostrar los registros de ventas de una fecha específica en
+     * formato dd/MM/yyyy.
+     *
+     * @param tablaVentas La tabla (`JTable`) donde se mostrarán los registros
+     * de ventas.
+     * @param fecha La fecha específica para filtrar los registros (formato:
+     * "dd/MM/yyyy").
+     */
+    public ResultadoOperacion mostrarVentasPorDia(JTable tablaVentas, String fecha) {
+        Date fechaInicio = Validaciones.parseFecha(fecha);
+        if (fechaInicio == null) {
+            return ResultadoOperacion.error(UIMessages.MSG_FECHA_FORMATO_INVALIDO);
+        }
+
+        long inicioDia = fechaInicio.getTime();
+        long finDia = inicioDia + (24 * 60 * 60 * 1000) - 1;
+        String isoDia = new SimpleDateFormat("yyyy-MM-dd").format(fechaInicio);
+
+        // Crear un modelo de tabla vacío
+        final DefaultTableModel modelo = new DefaultTableModel();
+        modelo.addColumn("Id");
+        modelo.addColumn("Producto");
+        modelo.addColumn("Cantidad");
+        modelo.addColumn("Código");
+        modelo.addColumn("Precio");
+        modelo.addColumn("Cliente");
+        modelo.addColumn("CC Cliente");
+        modelo.addColumn("Metodo pago");
+        modelo.addColumn("Pago confirmado");
+        modelo.addColumn("Vendedor");
+        modelo.addColumn("Fecha");
+        modelo.addColumn("Precio Total");
+        tablaVentas.setModel(modelo);
+
+        // Consulta SQL con filtro dual (cadena ISO YYYY-MM-DD y timestamp milisegundos)
+        final String sql = "SELECT v.id, d.producto, d.cantidad, d.codigo, d.precio, v.cliente, v.cc_cliente, v.vendedor, v.metodo_pago, v.fecha, v.pago_confirmado  "
+                + "FROM ventas v "
+                + "JOIN detalles_venta d ON v.id = d.venta_id "
+                + "WHERE v.fecha = ? OR (v.fecha >= ? AND v.fecha <= ?)";
+
+        try (PreparedStatement pst = conn().prepareStatement(sql)) {
+            pst.setString(1, isoDia);
+            pst.setLong(2, inicioDia);
+            pst.setLong(3, finDia);
+
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    double precio = rs.getDouble("precio");
+                    int cantidad = rs.getInt("cantidad");
+                    double precioTotal = precio * cantidad;
+
+                    String fechaRaw = rs.getString("fecha");
+                    String fechaLegible = fechaRaw;
+                    if (fechaRaw != null && fechaRaw.matches("\\d+")) {
+                        try {
+                            long fechaTimestamp = Long.parseLong(fechaRaw);
+                            fechaLegible = new SimpleDateFormat("dd/MM/yyyy").format(new Date(fechaTimestamp));
+                        } catch (Exception ignored) {}
+                    }
+
+                    modelo.addRow(new Object[]{
+                        rs.getInt("id"),
+                        rs.getString("producto"),
+                        cantidad,
+                        rs.getString("codigo"),
+                        precio,
+                        rs.getString("cliente"),
+                        rs.getString("cc_cliente"),
+                        rs.getString("metodo_pago"),
+                        rs.getString("pago_confirmado"),
+                        rs.getString("vendedor"),
+                        fechaLegible,
+                        precioTotal
+                    });
+                }
+            }
+
+            tablaVentas.setModel(modelo);
+
+            // Ajustar tamaños de columnas
+            tablaVentas.getColumnModel().getColumn(0).setPreferredWidth(50);  // Id
+            tablaVentas.getColumnModel().getColumn(1).setPreferredWidth(250); // Producto
+            tablaVentas.getColumnModel().getColumn(2).setPreferredWidth(50);  // Cantidad
+            tablaVentas.getColumnModel().getColumn(3).setPreferredWidth(100); // Código
+            tablaVentas.getColumnModel().getColumn(4).setPreferredWidth(75);  // Precio
+            tablaVentas.getColumnModel().getColumn(5).setPreferredWidth(150); // Cliente
+            tablaVentas.getColumnModel().getColumn(6).setPreferredWidth(100); // CC Cliente
+            tablaVentas.getColumnModel().getColumn(7).setPreferredWidth(100); // Vendedor
+            tablaVentas.getColumnModel().getColumn(8).setPreferredWidth(100); // metodo pago
+            tablaVentas.getColumnModel().getColumn(9).setPreferredWidth(100); // pago confirmado
+            tablaVentas.getColumnModel().getColumn(10).setPreferredWidth(100); // Fecha
+            tablaVentas.getColumnModel().getColumn(11).setPreferredWidth(100); // Precio Total
+            return ResultadoOperacion.ok("");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error al mostrar ventas por día", e);
-            JOptionPane.showMessageDialog(null, "Error al mostrar ventas por día: " + e.getMessage());
+            return ResultadoOperacion.error(UIMessages.MSG_ERROR_BD);
         }
     }
 
@@ -664,19 +645,7 @@ public class VentasController {
      * @return `true` si la fecha es válida, `false` en caso contrario.
      */
     public static boolean esFormatoFechaValido(String fecha) {
-        if (fecha == null || fecha.isEmpty()) {
-            return false; // Fecha vacía o nula no es válida
-        }
-
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        sdf.setLenient(false); // No permitir fechas como "31/02/2025"
-
-        try {
-            Date date = sdf.parse(fecha); // Intentar parsear la fecha
-            return true;
-        } catch (ParseException e) {
-            return false; // La fecha no es válida
-        }
+        return Validaciones.parseFecha(fecha) != null;
     }
 
     public void exportarDatosTablaAExcel(JTable tabla, String rutaExcel) throws IOException {
@@ -713,13 +682,10 @@ public class VentasController {
         workbook.close();
     }
 
-    public boolean generarArchivoCotizacionConPlantilla(String rutaPlantilla, String rutaArchivo, String numeroCotizacion, List<Venta> ventasCotizadas) {
-        // Verificar si la plantilla es un archivo Excel válido
+    public ResultadoOperacion generarArchivoCotizacionConPlantilla(String rutaPlantilla, String rutaArchivo, String numeroCotizacion, List<Venta> ventasCotizadas) {
         File archivoPlantilla = new File(rutaPlantilla);
         if (!archivoPlantilla.exists() || !archivoPlantilla.getName().endsWith(".xlsx")) {
-            JOptionPane.showMessageDialog(null, "La plantilla seleccionada no es un archivo Excel válido.",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            return false;  // Retorna false si el archivo no es válido
+            return ResultadoOperacion.error(UIMessages.MSG_PLANTILLA_INVALIDA);
         }
 
         try (InputStream inputStream = new FileInputStream(archivoPlantilla); Workbook workbook = new XSSFWorkbook(inputStream)) {
@@ -731,7 +697,7 @@ public class VentasController {
             String fecha = java.time.LocalDate.now().toString(); // Fecha actual
             sheet.getRow(6).getCell(0).setCellValue("FECHA: " + fecha);
 
-            // Llenar el número de cotización (columnas D y E)            
+            // Llenar el número de cotización (columnas D y E)
             sheet.getRow(6).getCell(3).setCellValue("COTIZACION N°: " + numeroCotizacion);
 
             // Llenar el método de pago (columna F) usando la primera venta
@@ -767,33 +733,29 @@ public class VentasController {
             // Guardar el archivo generado
             try (FileOutputStream fileOut = new FileOutputStream(rutaArchivo)) {
                 workbook.write(fileOut);
-                JOptionPane.showMessageDialog(null, "Archivo Excel generado con éxito: " + rutaArchivo,
-                        "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                return true;  // Retorna true si la generación del archivo fue exitosa
+                return ResultadoOperacion.ok(UIMessages.MSG_EXCEL_GENERADO + rutaArchivo);
             }
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Error al generar el archivo Excel: " + e.getMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            return false;  // Retorna false si ocurre un error durante la operación
+            logger.log(Level.SEVERE, "Error al generar el archivo Excel", e);
+            return ResultadoOperacion.error(UIMessages.MSG_ERROR_BD);
         }
     }
 
-    public void actualizarPagoConfirmado(int ventaId, String pagoConfirmado) {
+    public ResultadoOperacion actualizarPagoConfirmado(int ventaId, String pagoConfirmado) {
         String sql = "UPDATE ventas SET pago_confirmado = ? WHERE id = ?";
-        try (Connection conn = conexion.obtenerConexion(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn().prepareStatement(sql)) {
 
             ps.setString(1, pagoConfirmado);
             ps.setInt(2, ventaId);
 
             int filasActualizadas = ps.executeUpdate();
             if (filasActualizadas > 0) {
-                JOptionPane.showMessageDialog(null, "El estado de pago fue actualizado correctamente.");
-            } else {
-                JOptionPane.showMessageDialog(null, "No se encontró una venta con el ID especificado.");
+                return ResultadoOperacion.ok(UIMessages.MSG_PAGO_ACTUALIZADO);
             }
+            return ResultadoOperacion.error(UIMessages.MSG_VENTA_NO_ENCONTRADA);
         } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error al actualizar el estado de pago: " + e.getMessage());
+            logger.log(Level.SEVERE, "Error al actualizar el estado de pago", e);
+            return ResultadoOperacion.error(UIMessages.MSG_ERROR_BD);
         }
     }
 
@@ -801,28 +763,58 @@ public class VentasController {
      * Obtiene el total de ventas diarias de los últimos 7 días.
      * @return Lista de totales de ventas.
      */
+    /**
+     * Obtiene el total de ventas diarias de los últimos 7 días.
+     * @return Lista de totales de ventas.
+     */
     public List<Double> obtenerVentasUltimos7Dias() {
         List<Double> ventas = new java.util.ArrayList<>();
-        String sql = "SELECT fecha, SUM(total) as total_dia FROM ventas WHERE fecha >= date('now', '-7 days') GROUP BY fecha ORDER BY fecha ASC";
-        
-        try (Connection conn = conexion.obtenerConexion(); Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+        java.util.Map<String, Double> mapaVentas = new java.util.HashMap<>();
+
+        // 1. Consultar ventas agregadas por fecha
+        String sql = "SELECT fecha, SUM(total) as total_dia FROM ventas GROUP BY fecha";
+        try (Statement st = conn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {
-                ventas.add(rs.getDouble("total_dia"));
+                String f = rs.getString("fecha");
+                double tot = rs.getDouble("total_dia");
+                if (f != null && !f.trim().isEmpty()) {
+                    String fLimpia = f.trim().substring(0, Math.min(10, f.trim().length()));
+                    mapaVentas.put(fLimpia, mapaVentas.getOrDefault(fLimpia, 0.0) + tot);
+                }
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al obtener ventas de los últimos 7 días", e);
+            logger.log(Level.SEVERE, "Error al obtener ventas diarias", e);
         }
-        
-        // Rellenar con ceros si hay menos de 7 días de datos para el gráfico
-        while (ventas.size() < 7) {
-            ventas.add(0, 0.0);
+
+        // 2. Intentar armar la serie temporal para los 7 días continuos hasta el día de hoy
+        java.time.LocalDate hoy = java.time.LocalDate.now();
+        for (int i = 6; i >= 0; i--) {
+            String claveFecha = hoy.minusDays(i).toString(); // YYYY-MM-DD
+            ventas.add(mapaVentas.getOrDefault(claveFecha, 0.0));
         }
+
+        // 3. Si las ventas registradas corresponden a fechas de prueba diferentes (ej. fechas pasadas o importadas),
+        // y la lista resultante está vacía en valores positivos pero mapaVentas no lo está,
+        // devolvemos directamente las últimas 7 ventas acumuladas para asegurar que la gráfica se pinte.
+        boolean tieneValores = ventas.stream().anyMatch(v -> v != null && v > 0);
+        if (!tieneValores && !mapaVentas.isEmpty()) {
+            ventas.clear();
+            java.util.List<Double> valoresEncontrados = new java.util.ArrayList<>(mapaVentas.values());
+            int inicio = Math.max(0, valoresEncontrados.size() - 7);
+            for (int i = inicio; i < valoresEncontrados.size(); i++) {
+                ventas.add(valoresEncontrados.get(i));
+            }
+            while (ventas.size() < 7) {
+                ventas.add(0, 0.0);
+            }
+        }
+
         return ventas;
     }
     
     public double obtenerVentasTotales() {
         String sql = "SELECT SUM(total) FROM ventas";
-        try (Connection conn = conexion.obtenerConexion(); Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+        try (Statement st = conn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
             if (rs.next()) return rs.getDouble(1);
         } catch (SQLException e) { e.printStackTrace(); }
         return 0;
@@ -830,7 +822,7 @@ public class VentasController {
 
     public int contarRegistros(String filtro) {
         String sql = "SELECT COUNT(*) FROM ventas";
-        try (Connection conn = conexion.obtenerConexion(); Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+        try (Statement st = conn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
             if (rs.next()) return rs.getInt(1);
         } catch (SQLException e) { e.printStackTrace(); }
         return 0;
@@ -846,7 +838,7 @@ public class VentasController {
                 + "ORDER BY v.id DESC LIMIT ?";
         
         List<Object[]> data = new java.util.ArrayList<>();
-        try (Connection conn = conexion.obtenerConexion(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = conn().prepareStatement(sql)) {
             pstmt.setInt(1, limite);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {

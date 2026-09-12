@@ -1,12 +1,7 @@
 package com.mycompany.zl_solucion_integral.models;
 
-import com.mycompany.zl_solucion_integral.config.ConexionDB;
-import com.mycompany.zl_solucion_integral.config.SelecionRuta;
-
 public class Producto {
 
-    private final ConexionDB conexion; // Variable global para la conexión
-    // Atributos 
     private int id;
     private String producto;
     private double precio;
@@ -15,17 +10,11 @@ public class Producto {
     private String codigo;
     private double total;
     private String categoria;
-    
-    SelecionRuta rutaDB = new SelecionRuta();
 
-    // Constructor vacío (útil para instanciar sin datos iniciales)
     public Producto() {
-        this.conexion = new ConexionDB(rutaDB.cargarRutaBaseDatos()); // Asegúrate de que ConexionDB esté bien definida.
     }
 
-    // Constructor con parámetros (para inicializar con datos, incluyendo el total)
     public Producto(int id, String producto, double precio, int cantidad, String codigo, double total, String categoria) {
-        this();
         this.id = id;
         this.producto = producto;
         this.precio = precio;
@@ -35,9 +24,7 @@ public class Producto {
         this.categoria = categoria;
     }
 
-    // Constructor sin el parametro id 
     public Producto(String producto, double precio, int cantidad, String codigo, double total) {
-        this();
         this.producto = producto;
         this.precio = precio;
         this.cantidad = cantidad;
@@ -45,18 +32,14 @@ public class Producto {
         this.total = total;
     }
 
-    // Constructor sin el parametro de total 
     public Producto(String producto, Double precio, int cantidad, String codigo) {
-        this();
         this.producto = producto;
         this.precio = precio;
         this.cantidad = cantidad;
         this.codigo = codigo;
     }
 
-    // Constructor con el parametro de categoria 
     public Producto(String producto, Double precio, int cantidad, String codigo, String categoria) {
-        this();
         this.producto = producto;
         this.precio = precio;
         this.cantidad = cantidad;
@@ -64,7 +47,6 @@ public class Producto {
         this.categoria = categoria;
     }
 
-    // Getters y Setters para cada atributo
     public int getId() {
         return id;
     }
