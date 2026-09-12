@@ -2,6 +2,7 @@ package com.mycompany.zl_solucion_integral.config;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 import javax.swing.JFileChooser;
@@ -71,6 +72,49 @@ public class SelecionRuta {
         } catch (IOException e) {
             e.printStackTrace();
             return null; // En caso de error, retorna null
+        }
+    }
+
+    /**
+     * Carga la preferencia de tema (oscuro/claro) desde config.properties.
+     *
+     * @return true si se prefiere tema oscuro, false para tema claro, o null si
+     *         no hay preferencia guardada.
+     */
+    public static Boolean cargarPreferenciaTema() {
+        Properties props = new Properties();
+        try (FileInputStream input = new FileInputStream("config.properties")) {
+            props.load(input);
+            String valor = props.getProperty("theme.dark");
+            if (valor == null) {
+                return null;
+            }
+            return Boolean.parseBoolean(valor);
+        } catch (IOException e) {
+            return null; // Archivo no disponible aún; se usa el valor por defecto
+        }
+    }
+
+    /**
+     * Guarda la preferencia de tema en config.properties conservando las demás
+     * propiedades existentes.
+     *
+     * @param dark true para tema oscuro, false para tema claro.
+     */
+    public static void guardarPreferenciaTema(boolean dark) {
+        Properties props = new Properties();
+        // Conservar las propiedades existentes (por ejemplo db.path).
+        try (FileInputStream input = new FileInputStream("config.properties")) {
+            props.load(input);
+        } catch (IOException e) {
+            // Si no existe, se crea desde cero en el bloque de escritura.
+        }
+
+        try (FileOutputStream output = new FileOutputStream("config.properties")) {
+            props.setProperty("theme.dark", String.valueOf(dark));
+            props.store(output, "Configuración de la aplicación");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

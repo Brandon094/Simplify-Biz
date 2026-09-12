@@ -28,7 +28,7 @@ Todos los colores de la interfaz se centralizan en `ThemeConstants` (principio D
 
 Además de los colores base (`BACKGROUND`, `SIDEBAR_BACKGROUND`, `CARD_BACKGROUND`, `TEXT_PRIMARY`, `TEXT_SECONDARY`), `ThemeConstants` expone constantes semánticas (`INPUT_BACKGROUND`, `INPUT_BORDER`, `TABLE_ZEBRA`, `CARD_BORDER`, `HOVER_BACKGROUND`, `ACTIVE_BACKGROUND`, `BRAND_BACKGROUND`, `GRID_LINE`) que reemplazan los colores hardcodeados en las vistas.
 
-El átomo `ThemeToggleButton` (en `atoms`) muestra ☀️/🌙 según el tema y se integra en la parte inferior del `ModernSidebar`. Al alternarlo, `MainTemplate` cambia la paleta, re-aplica el Look and Feel con `Main.aplicarTema()` y reconstruye la ventana con el mismo rol. Es un cambio puramente visual: no afecta a la lógica de negocio ni a los datos.
+El átomo `ThemeToggleButton` (en `atoms`) muestra el icono SVG de sol o luna según el tema y se integra en la parte inferior del `ModernSidebar`. Al alternarlo, `MainTemplate` cambia la paleta, guarda la preferencia en `config.properties` (`theme.dark`) mediante `SelecionRuta.guardarPreferenciaTema()`, re-aplica el Look and Feel con `Main.aplicarTema()` y reconstruye la ventana con el mismo rol. Al arrancar, `Main` lee la preferencia con `SelecionRuta.cargarPreferenciaTema()` (oscuro por defecto si no existe). Es un cambio puramente visual: no afecta a la lógica de negocio ni a los datos.
 
 ## Arranque y navegación
 

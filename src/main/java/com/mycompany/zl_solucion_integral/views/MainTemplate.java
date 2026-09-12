@@ -83,9 +83,11 @@ public class MainTemplate extends JFrame {
             BorderFactory.createEmptyBorder(8, 12, 8, 12)
         ));
 
-        JLabel lblUser = new JLabel("👤 " + com.mycompany.zl_solucion_integral.models.Sesion.getUsuarioLogueado());
+        JLabel lblUser = new JLabel(com.mycompany.zl_solucion_integral.models.Sesion.getUsuarioLogueado(),
+                createIcon("icons/user.svg"), SwingConstants.LEFT);
         lblUser.setForeground(ThemeConstants.TEXT_PRIMARY);
         lblUser.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
+        lblUser.setIconTextGap(8);
         lblUser.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
 
         rightContent.add(lblDate);
@@ -134,6 +136,8 @@ public class MainTemplate extends JFrame {
      */
     private void toggleTheme() {
         ThemeConstants.toggleTheme();
+        // Persistir la preferencia para que sobreviva entre reinicios.
+        com.mycompany.zl_solucion_integral.config.SelecionRuta.guardarPreferenciaTema(ThemeConstants.isDark());
         Main.aplicarTema();
         SwingUtilities.invokeLater(() -> {
             MainTemplate fresh = new MainTemplate(userRole);
@@ -147,5 +151,13 @@ public class MainTemplate extends JFrame {
         container.add(page, BorderLayout.CENTER);
         container.revalidate();
         container.repaint();
+    }
+
+    private com.formdev.flatlaf.extras.FlatSVGIcon createIcon(String path) {
+        com.formdev.flatlaf.extras.FlatSVGIcon icon =
+                new com.formdev.flatlaf.extras.FlatSVGIcon(path, 18, 18);
+        icon.setColorFilter(new com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter()
+                .add(java.awt.Color.BLACK, ThemeConstants.TEXT_SECONDARY));
+        return icon;
     }
 }

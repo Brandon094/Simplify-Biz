@@ -32,6 +32,10 @@ public class Main {
      * caso).
      */
     public static void main(String[] args) {
+        // Cargar la preferencia de tema guardada (oscuro por defecto si no existe).
+        Boolean temaGuardado = SelecionRuta.cargarPreferenciaTema();
+        ThemeConstants.setDark(temaGuardado == null || temaGuardado);
+
         // Inicializar Look and Feel Moderno según el tema por defecto (oscuro).
         aplicarTema();
         UIUtils.configureGlobalStyles();

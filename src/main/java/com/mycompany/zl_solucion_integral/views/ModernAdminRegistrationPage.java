@@ -4,6 +4,7 @@ import com.mycompany.zl_solucion_integral.config.Validaciones;
 import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
 import com.mycompany.zl_solucion_integral.models.Usuario;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
+import com.mycompany.zl_solucion_integral.views.components.UIMessages;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonButton;
 import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
 import com.formdev.flatlaf.FlatClientProperties;
@@ -15,6 +16,7 @@ public class ModernAdminRegistrationPage extends JFrame {
     private JTextField txtTel;
     private JTextField txtEmail;
     private JPasswordField txtContraseña;
+    private NeonButton btnReg;
     
     private Validaciones valid = new Validaciones();
     private UsuarioController usuarioCtrl = new UsuarioController();
@@ -23,6 +25,7 @@ public class ModernAdminRegistrationPage extends JFrame {
         setTitle("ERP+ Business - Registro Inicial");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setMinimumSize(new Dimension(900, 700));
         
         JPanel mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBackground(ThemeConstants.BACKGROUND);
@@ -94,11 +97,21 @@ public class ModernAdminRegistrationPage extends JFrame {
         btnReg.setNeonColor(ThemeConstants.NEON_BLUE);
         btnReg.setPreferredSize(new Dimension(0, 50));
         btnReg.addActionListener(e -> registerAdmin());
+        this.btnReg = btnReg;
         gbc.gridy = 12;
         regCard.add(btnReg, gbc);
         
         mainPanel.add(regCard);
         add(mainPanel);
+
+        // Accesibilidad: Enter avanza al siguiente campo, Enter en contraseña
+        // registra, botón por defecto y foco inicial en el nombre.
+        txtNombre.addActionListener(e -> txtTel.requestFocusInWindow());
+        txtTel.addActionListener(e -> txtEmail.requestFocusInWindow());
+        txtEmail.addActionListener(e -> txtContraseña.requestFocusInWindow());
+        txtContraseña.addActionListener(e -> registerAdmin());
+        getRootPane().setDefaultButton(btnReg);
+        SwingUtilities.invokeLater(() -> txtNombre.requestFocusInWindow());
     }
     
     private JLabel createLabel(String text) {
@@ -147,23 +160,31 @@ public class ModernAdminRegistrationPage extends JFrame {
     }
     
     private void registerAdmin() {
+        // Evitar envíos duplicados mientras se procesa el registro.
+        if (btnReg != null && !btnReg.isEnabled()) {
+            return;
+        }
+
         String nombre = txtNombre.getText().trim();
         String numTel = txtTel.getText().trim();
         String email = txtEmail.getText().trim();
         String pass = new String(txtContraseña.getPassword()).trim();
         
-        if (nombre.isEmpty() || numTel.isEmpty() || email.isEmpty() || pass.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
+        if (!Validaciones.validarNoVacio(nombre, numTel, email, pass)) {
+            JOptionPane.showMessageDialog(this, UIMessages.MSG_CAMPOS_OBLIGATORIOS,
+                    UIMessages.TITULO_ERROR, JOptionPane.ERROR_MESSAGE);
             return;
         }
         
         if (!Validaciones.validarEmail(email)) {
-            JOptionPane.showMessageDialog(this, "Email no válido", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, UIMessages.MSG_EMAIL_INVALIDO,
+                    UIMessages.TITULO_ERROR, JOptionPane.ERROR_MESSAGE);
             return;
         }
         
         if (!valid.validarTelefono(numTel)) {
-            JOptionPane.showMessageDialog(this, "El teléfono debe tener 10 dígitos", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, UIMessages.MSG_TELEFONO_INVALIDO,
+                    UIMessages.TITULO_ERROR, JOptionPane.ERROR_MESSAGE);
             return;
         }
         
@@ -174,14 +195,36 @@ public class ModernAdminRegistrationPage extends JFrame {
         admin.setContraseña(pass);
         admin.setRol("1");
         
-        usuarioCtrl.agregarUsuario(admin);
+        habilitarFormulario(false);
+        try {
+            usuarioCtrl.agregarUsuario(admin);
+        } finally {
+            habilitarFormulario(true);
+        }
         
         if (usuarioCtrl.existeAdministrador()) {
-            JOptionPane.showMessageDialog(this, "Administrador registrado con éxito", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Administrador registrado con éxito",
+                    UIMessages.TITULO_EXITO, JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             new ModernLoginPage().setVisible(true);
         } else {
-            JOptionPane.showMessageDialog(this, "Error al registrar", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error al registrar",
+                    UIMessages.TITULO_ERROR, JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    /**
+     * Feedback de carga: bloquea el formulario y muestra estado "Registrando…"
+     * mientras se guarda la cuenta. Es un cambio puramente visual.
+     */
+    private void habilitarFormulario(boolean habilitar) {
+        if (btnReg != null) {
+            btnReg.setEnabled(habilitar);
+            btnReg.setText(habilitar ? "REGISTRAR ADMINISTRADOR" : UIMessages.TEXTO_PROCESANDO_REGISTRO);
+        }
+        if (txtNombre != null) txtNombre.setEnabled(habilitar);
+        if (txtTel != null) txtTel.setEnabled(habilitar);
+        if (txtEmail != null) txtEmail.setEnabled(habilitar);
+        if (txtContraseña != null) txtContraseña.setEnabled(habilitar);
     }
 }

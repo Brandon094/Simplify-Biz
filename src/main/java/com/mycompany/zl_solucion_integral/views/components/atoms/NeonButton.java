@@ -47,7 +47,7 @@ public class NeonButton extends JButton {
         int width = getWidth();
         int height = getHeight();
 
-        // Background
+        // Fondo: al estar enfocado por teclado se resalta ligeramente.
         if (isHovered) {
             g2.setColor(neonColor.darker().darker());
         } else {
@@ -59,6 +59,14 @@ public class NeonButton extends JButton {
         g2.setColor(isHovered ? neonColor : neonColor.darker());
         g2.setStroke(new BasicStroke(isHovered ? 2f : 1f));
         g2.drawRoundRect(1, 1, width - 2, height - 2, 15, 15);
+
+        // Anillo de foco para navegación por teclado (accesibilidad).
+        if (hasFocus()) {
+            g2.setColor(neonColor.brighter());
+            g2.setStroke(new BasicStroke(1.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
+                    0, new float[]{4f, 3f}, 0));
+            g2.drawRoundRect(3, 3, width - 7, height - 7, 13, 13);
+        }
 
         g2.dispose();
         super.paintComponent(g);

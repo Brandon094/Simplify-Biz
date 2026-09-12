@@ -5,6 +5,7 @@ import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
 import com.mycompany.zl_solucion_integral.models.Sesion;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
+import com.mycompany.zl_solucion_integral.views.components.UIMessages;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonButton;
 import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
 import javax.swing.*;
@@ -13,12 +14,14 @@ import java.awt.*;
 public class ModernLoginPage extends JFrame {
     private JTextField txtUsuario;
     private JPasswordField txtPassword;
+    private NeonButton btnLogin;
     private Sesion sesion = new Sesion();
 
     public ModernLoginPage() {
         setTitle("ERP+ Business - Inicio de sesión");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setMinimumSize(new Dimension(1024, 640));
         setUndecorated(false);
 
         JPanel mainPanel = new JPanel(new BorderLayout());
@@ -37,6 +40,13 @@ public class ModernLoginPage extends JFrame {
 
         mainPanel.add(splitPane, BorderLayout.CENTER);
         add(mainPanel);
+
+        // Accesibilidad: Enter avanza al siguiente campo, Enter en contraseña
+        // ingresa, el botón por defecto responde a Enter y el foco inicia en usuario.
+        txtUsuario.addActionListener(e -> txtPassword.requestFocusInWindow());
+        txtPassword.addActionListener(e -> performLogin());
+        getRootPane().setDefaultButton(btnLogin);
+        SwingUtilities.invokeLater(() -> txtUsuario.requestFocusInWindow());
     }
 
     private RoundedPanel createBrandPanel() {
@@ -157,6 +167,7 @@ public class ModernLoginPage extends JFrame {
         btnLogin.setNeonColor(ThemeConstants.NEON_PURPLE);
         btnLogin.setPreferredSize(new Dimension(0, 52));
         btnLogin.addActionListener(e -> performLogin());
+        this.btnLogin = btnLogin;
         gbc.gridy = 7;
         card.add(btnLogin, gbc);
 
@@ -237,10 +248,16 @@ public class ModernLoginPage extends JFrame {
     }
     
     private void performLogin() {
+        // Evitar envíos duplicados mientras se procesa la validación.
+        if (btnLogin != null && !btnLogin.isEnabled()) {
+            return;
+        }
+
         UsuarioController controller = new UsuarioController();
         String user = txtUsuario.getText().trim();
         String pass = new String(txtPassword.getPassword()).trim();
         
+        habilitarFormulario(false);
         try {
             // Intentar login como Administrador (Rol 1)
             if (controller.validarCredencialesAdmin(user, pass)) {
@@ -255,10 +272,30 @@ public class ModernLoginPage extends JFrame {
                 new MainTemplate("0").setVisible(true);
             }
             else {
-                JOptionPane.showMessageDialog(this, "Credenciales incorrectas", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, UIMessages.MSG_CREDENCIALES_INVALIDAS,
+                        UIMessages.TITULO_ERROR, JOptionPane.ERROR_MESSAGE);
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            habilitarFormulario(true);
+        }
+    }
+
+    /**
+     * Feedback de carga: bloquea el formulario y muestra estado "Ingresando…"
+     * mientras se validan las credenciales. Es un cambio puramente visual.
+     */
+    private void habilitarFormulario(boolean habilitar) {
+        if (btnLogin != null) {
+            btnLogin.setEnabled(habilitar);
+            btnLogin.setText(habilitar ? "INGRESAR" : UIMessages.TEXTO_PROCESANDO_INGRESO);
+        }
+        if (txtUsuario != null) {
+            txtUsuario.setEnabled(habilitar);
+        }
+        if (txtPassword != null) {
+            txtPassword.setEnabled(habilitar);
         }
     }
 }

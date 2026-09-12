@@ -1,5 +1,6 @@
 package com.mycompany.zl_solucion_integral.views.components.atoms;
 
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
 import javax.swing.*;
 import java.awt.*;
@@ -9,17 +10,17 @@ import java.awt.event.MouseEvent;
 /**
  * Átomo: botón reutilizable para alternar entre tema oscuro y claro.
  *
- * Muestra un icono de luna (🌙) en tema oscuro y de sol (☀️) en tema claro,
- * con el texto "Modo claro"/"Modo oscuro" que indica la acción a realizar.
- * El texto y el color se recalculan cada vez que cambia el tema mediante
- * {@link #refresh()}.
+ * Muestra el icono SVG de sol (indica pasar a tema claro) cuando el tema
+ * vigente es oscuro, y el de luna (indica volver a tema oscuro) cuando el
+ * tema vigente es claro. El texto "Modo claro"/"Modo oscuro" indica la acción
+ * a realizar. El icono, el texto y los colores se recalculan cada vez que
+ * cambia el tema mediante {@link #refresh()}.
  */
 public class ThemeToggleButton extends JButton {
     private boolean hovered = false;
 
     public ThemeToggleButton() {
         setContentAreaFilled(false);
-        setFocusPainted(false);
         setBorderPainted(false);
         setFont(ThemeConstants.FONT_BODY);
         setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -43,14 +44,25 @@ public class ThemeToggleButton extends JButton {
         refresh();
     }
 
-    /** Actualiza el texto y colores según el tema vigente. */
+    /** Crea el icono SVG de tema tiñéndolo con el color secundario vigente. */
+    private Icon createThemeIcon(String resourcePath) {
+        FlatSVGIcon icon = new FlatSVGIcon(resourcePath, 16, 16);
+        icon.setColorFilter(new FlatSVGIcon.ColorFilter()
+                .add(Color.BLACK, ThemeConstants.TEXT_SECONDARY));
+        return icon;
+    }
+
+    /** Actualiza el icono, el texto y los colores según el tema vigente. */
     public void refresh() {
         if (ThemeConstants.isDark()) {
-            setText("☀️  Modo claro");
+            setIcon(createThemeIcon("/icons/sun.svg"));
+            setText("Modo claro");
         } else {
-            setText("🌙  Modo oscuro");
+            setIcon(createThemeIcon("/icons/moon.svg"));
+            setText("Modo oscuro");
         }
         setForeground(ThemeConstants.TEXT_SECONDARY);
+        setIconTextGap(10);
         repaint();
     }
 
@@ -64,6 +76,13 @@ public class ThemeToggleButton extends JButton {
         if (hovered) {
             g2.setColor(ThemeConstants.HOVER_BACKGROUND);
             g2.fillRoundRect(0, 0, width, height, 12, 12);
+        }
+
+        // Anillo de foco para navegación por teclado (accesibilidad).
+        if (hasFocus()) {
+            g2.setColor(ThemeConstants.NEON_PURPLE);
+            g2.setStroke(new BasicStroke(1.6f));
+            g2.drawRoundRect(1, 1, width - 3, height - 3, 12, 12);
         }
 
         g2.dispose();

@@ -7,7 +7,7 @@ Este documento define el orden recomendado para continuar el desarrollo. La regl
 ### Completado en la iteración UI/UX
 
 - [x] Identidad visual oscura y branding ERP+ Business.
-- [x] **Tema claro alternable** mediante toggle ☀️/🌙 en el sidebar, con paletas centralizadas en `ThemeConstants` (principio DRY).
+- [x] **Tema claro alternable** mediante toggle en el sidebar (iconos SVG de sol/luna), con paletas centralizadas en `ThemeConstants` (principio DRY).
 - [x] Login con panel moderno, SVG y flujo de acceso.
 - [x] Ventana única con navegación lateral por rol.
 - [x] Dashboard con KPIs, actividad operativa, gráficos, leyendas y estados vacíos.
@@ -20,15 +20,15 @@ Este documento define el orden recomendado para continuar el desarrollo. La regl
 - [x] Proveedores con UI preparada, pero ocultos temporalmente del sidebar.
 - [x] Documentación técnica, funcional y de base de datos actualizada.
 
-## Fase 1: Cierre de UI/UX
+## Fase 1: Cierre de UI/UX ✅ (Completada)
 
 - [x] Soporte de tema oscuro y claro con paletas centralizadas.
-- [ ] Unificar validaciones y mensajes de error.
-- [ ] Revisar tamaños mínimos y comportamiento en distintas resoluciones.
-- [ ] Eliminar emojis restantes de las vistas.
-- [ ] Añadir feedback de carga, éxito y error donde falte.
-- [ ] Probar accesibilidad básica: foco, contraste y navegación por teclado.
-- [ ] Persistir la preferencia de tema del usuario (recordar oscuro/claro entre reinicios).
+- [x] Unificar validaciones y mensajes de error en formularios de acceso (`UIMessages`); la separación de mensajes de controladores se aborda en Fase 2.
+- [x] Revisar tamaños mínimos y comportamiento en distintas resoluciones (mínimos explícitos en login, registro y ventana principal).
+- [x] Eliminar emojis restantes de las vistas (toggle de tema ahora usa `sun.svg`/`moon.svg`).
+- [x] Añadir feedback de carga, éxito y error donde falte (botones con estado "Ingresando…"/"Registrando…", sin envíos duplicados).
+- [x] Accesibilidad básica: foco visible (anillo en botones), contraste y navegación por teclado (Enter avanza campos, botón por defecto, foco inicial).
+- [x] Persistir la preferencia de tema del usuario (`theme.dark` en `config.properties`, conservando `db.path`).
 
 ## Fase 2: Correcciones técnicas prioritarias
 

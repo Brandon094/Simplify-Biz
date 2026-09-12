@@ -53,8 +53,8 @@ mvn compile
 
 La aplicación soporta **tema oscuro** (predeterminado) y **tema claro**. Puedes alternar en cualquier momento desde el botón del **sidebar**:
 
-- En oscuro aparece **☀️ Modo claro**; al pulsarlo la interfaz cambia a la paleta clara.
-- En claro aparece **🌙 Modo oscuro**; al pulsarlo vuelves a la paleta oscura.
+- En oscuro aparece **Modo claro** (icono de sol); al pulsarlo la interfaz cambia a la paleta clara.
+- En claro aparece **Modo oscuro** (icono de luna); al pulsarlo vuelves a la paleta oscura.
 
 Todas los colores están centralizados en `ThemeConstants` (principio DRY), por lo que el cambio se aplica a toda la aplicación de forma consistente:
 
