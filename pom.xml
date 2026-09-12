@@ -8,8 +8,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>17</maven.compiler.source> <!-- Cambiar a 17 si es necesario -->
-        <maven.compiler.target>17</maven.compiler.target> <!-- Cambiar a 17 si es necesario -->
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
         <exec.mainClass>com.mycompany.zl_solucion_integral.Main</exec.mainClass>
     </properties>
 
