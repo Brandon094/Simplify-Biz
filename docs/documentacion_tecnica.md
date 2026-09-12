@@ -16,15 +16,23 @@ Aplicación Java Swing de escritorio con SQLite local, autenticación por roles 
 
 La aplicación usa MVC y una organización inspirada en Atomic Design:
 
-- Atoms: `NeonButton`, `RoundedPanel`, `NeonLineChart`, `NeonPieChart`.
+- Atoms: `NeonButton`, `RoundedPanel`, `NeonLineChart`, `NeonPieChart`, `ThemeToggleButton`.
 - Molecules: `SidebarItem`.
 - Organisms: `ModernSidebar`, `MetricCard`.
 - Shell: `MainTemplate`.
 - Páginas: dashboard, ventas, productos, clientes, empleados, reportes, configuración y proveedores.
 
+## Sistema de temas
+
+Todos los colores de la interfaz se centralizan en `ThemeConstants` (principio DRY). La clase define dos paletas completas —**oscura** (predeterminada) y **clara**— y las intercambia en caliente mediante `ThemeConstants.toggleTheme()` / `setDark(boolean)` sin reescribir ninguna vista.
+
+Además de los colores base (`BACKGROUND`, `SIDEBAR_BACKGROUND`, `CARD_BACKGROUND`, `TEXT_PRIMARY`, `TEXT_SECONDARY`), `ThemeConstants` expone constantes semánticas (`INPUT_BACKGROUND`, `INPUT_BORDER`, `TABLE_ZEBRA`, `CARD_BORDER`, `HOVER_BACKGROUND`, `ACTIVE_BACKGROUND`, `BRAND_BACKGROUND`, `GRID_LINE`) que reemplazan los colores hardcodeados en las vistas.
+
+El átomo `ThemeToggleButton` (en `atoms`) muestra ☀️/🌙 según el tema y se integra en la parte inferior del `ModernSidebar`. Al alternarlo, `MainTemplate` cambia la paleta, re-aplica el Look and Feel con `Main.aplicarTema()` y reconstruye la ventana con el mismo rol. Es un cambio puramente visual: no afecta a la lógica de negocio ni a los datos.
+
 ## Arranque y navegación
 
-`Main.main()` configura `FlatDarkLaf`, aplica estilos globales, inicializa la base de datos y decide entre registro de administrador o login. `MainTemplate` recibe el rol, crea el sidebar y muestra:
+`Main.main()` configura el tema FlatLaf (oscuro por defecto vía `Main.aplicarTema()`), aplica estilos globales, inicializa la base de datos y decide entre registro de administrador o login. `MainTemplate` recibe el rol, crea el sidebar y muestra:
 
 - Administrador (`1`): Resumen, Ventas, Productos, Clientes, Empleados, Reportes y Configuración.
 - Vendedor (`0`): Ventas y Productos.
@@ -33,9 +41,9 @@ Proveedores permanece implementado, pero no se registra actualmente en el sideba
 
 ## Dependencias principales
 
-- Java/JDK 17.
+- Java/JDK 25.
 - Maven.
-- FlatLaf y FlatLaf Extras 3.5.1.
+- FlatLaf y FlatLaf Extras 3.5.1 (con `FlatMacDarkLaf` / `FlatMacLightLaf`).
 - SQLite JDBC 3.46.1.0.
 - Apache POI 5.2.3 para Excel.
 - JavaMail 1.6.2.
@@ -81,4 +89,4 @@ El proyecto no contiene actualmente fuentes de pruebas automatizadas. Toda modif
 - [Configuraciones](configuraciones.md)
 - [Esquema](esquema_bd.md)
 - [Diccionario](diccionario_datos.md)
-- [Roadmap](roadmap/roadmap_erpsimplify.md)
+- [Roadmap](roadmap/roadmap.md)

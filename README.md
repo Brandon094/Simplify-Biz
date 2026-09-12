@@ -2,13 +2,13 @@
 
 ERP+ Business es una aplicación de escritorio para pequeñas y medianas empresas. Centraliza inventario, ventas, clientes, empleados, reportes y configuración en una ventana operativa con navegación lateral.
 
-El proyecto está desarrollado con Java 17, Swing, FlatLaf y SQLite. La versión actual prioriza la modernización UI/UX sin cambiar las reglas de negocio existentes.
+El proyecto está desarrollado con Java 25, Swing, FlatLaf y SQLite. La versión actual prioriza la modernización UI/UX sin cambiar las reglas de negocio existentes. Incluye soporte de **tema oscuro y claro** con un toggle en el sidebar.
 
 ## Inicio rápido
 
 ### Requisitos
 
-- JDK 17 o superior.
+- JDK 25 o superior.
 - Maven 3.8 o superior.
 - Permisos de lectura y escritura para la raíz del proyecto, `config.properties` y la ubicación de SQLite.
 
@@ -31,7 +31,7 @@ mvn compile
 
 ## Primer inicio
 
-1. `Main` configura FlatLaf Dark y los estilos globales.
+1. `Main` configura el tema FlatLaf (oscuro por defecto) y los estilos globales.
 2. Se lee `config.properties`.
 3. Si falta la ruta, se solicita una carpeta mediante un selector.
 4. Se crean o verifican las tablas SQLite.
@@ -49,6 +49,24 @@ mvn compile
 - **Configuración:** cambio de ruta, información técnica y enlace al portafolio del desarrollador.
 - **Proveedores:** vista preparada visualmente, actualmente oculta del sidebar y sin persistencia propia.
 
+## Temas visuales
+
+La aplicación soporta **tema oscuro** (predeterminado) y **tema claro**. Puedes alternar en cualquier momento desde el botón del **sidebar**:
+
+- En oscuro aparece **☀️ Modo claro**; al pulsarlo la interfaz cambia a la paleta clara.
+- En claro aparece **🌙 Modo oscuro**; al pulsarlo vuelves a la paleta oscura.
+
+Todas los colores están centralizados en `ThemeConstants` (principio DRY), por lo que el cambio se aplica a toda la aplicación de forma consistente:
+
+| Recurso | Oscuro | Claro |
+| :--- | :--- | :--- |
+| Fondo general | `#0B0E14` | `#EEF2F7` |
+| Fondo del sidebar | `#121620` | `#FFFFFF` |
+| Fondo de tarjetas | `#1E293B` | `#FFFFFF` |
+| Texto principal | `#FFFFFF` | `#0F172A` |
+| Texto secundario | `#94A3B8` | `#475569` |
+| Acento (morado) | `#A855F7` | `#7C3AED` |
+
 ## Decisiones de UI/UX
 
 - Ventana única con contenido dinámico y sidebar por rol.
@@ -56,6 +74,7 @@ mvn compile
 - Iconos SVG locales en `src/main/resources/icons` mediante `FlatSVGIcon`.
 - Estados vacíos explícitos para listas, ventas e inventario.
 - Tablas con encabezados, filas alternadas, selección y columnas técnicas ocultas donde corresponde.
+- Paletas de color únicas en `ThemeConstants` con alternancia oscura/clara.
 
 ## Estructura principal
 
@@ -65,8 +84,12 @@ src/main/java/com/mycompany/zl_solucion_integral/
   controllers/  Operaciones de negocio y acceso a datos
   models/       Entidades del dominio
   views/        Pantallas y componentes Swing
+    components/
+      atoms/         Botones, paneles redondeados, gráficos y toggle de tema
+      molecules/     Ítems del sidebar
+      organisms/     Sidebar completo y tarjetas de métricas
 src/main/resources/icons/  Recursos SVG de la interfaz
-docs/                         Documentación técnica, datos y roadmap
+docs/                         Documentación técnica, manual, datos y roadmap
 ```
 
 ## Documentación
@@ -76,8 +99,8 @@ docs/                         Documentación técnica, datos y roadmap
 - [Configuración](docs/configuraciones.md)
 - [Esquema de base de datos](docs/esquema_bd.md)
 - [Diccionario de datos](docs/diccionario_datos.md)
-- [Roadmap](docs/roadmap/roadmap_erpsimplify.md)
+- [Roadmap](docs/roadmap/roadmap.md)
 
 ## Estado y continuidad
 
-La prioridad vigente es cerrar la consistencia UI/UX y después abordar validaciones, persistencia de proveedores, exportación PDF/Excel completa, historial de clientes e inteligencia de negocio. El punto de continuidad está en el [roadmap](docs/roadmap/roadmap_erpsimplify.md).
+La prioridad vigente es cerrar la consistencia UI/UX (incluida la alternancia de tema ya implementada) y después abordar validaciones, persistencia de proveedores, exportación PDF/Excel completa, historial de clientes e inteligencia de negocio. El punto de continuidad está en el [roadmap](docs/roadmap/roadmap.md).

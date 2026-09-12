@@ -6,26 +6,29 @@ Este documento define el orden recomendado para continuar el desarrollo. La regl
 
 ### Completado en la iteración UI/UX
 
-- Identidad visual oscura y branding ERP+ Business.
-- Login con panel moderno, SVG y flujo de acceso.
-- Ventana única con navegación lateral por rol.
-- Dashboard con KPIs, actividad operativa, gráficos, leyendas y estados vacíos.
-- Productos con formulario, iconos SVG, tabla y feedback sin registros.
-- Ventas con carrito, descuento, checkout, cliente genérico e iconos SVG.
-- Clientes convertidos en consulta de usuarios con rol `2`.
-- Empleados con registro y actualización para el administrador.
-- Reportes con filtros, acciones visuales, iconos SVG y feedback sin resultados.
-- Configuración con información técnica, SVG y enlace a `https://portafolio-brandon-daza.web.app/`.
-- Proveedores con UI preparada, pero ocultos temporalmente del sidebar.
-- Documentación técnica, funcional y de base de datos actualizada.
+- [x] Identidad visual oscura y branding ERP+ Business.
+- [x] **Tema claro alternable** mediante toggle ☀️/🌙 en el sidebar, con paletas centralizadas en `ThemeConstants` (principio DRY).
+- [x] Login con panel moderno, SVG y flujo de acceso.
+- [x] Ventana única con navegación lateral por rol.
+- [x] Dashboard con KPIs, actividad operativa, gráficos, leyendas y estados vacíos.
+- [x] Productos con formulario, iconos SVG, tabla y feedback sin registros.
+- [x] Ventas con carrito, descuento, checkout, cliente genérico e iconos SVG.
+- [x] Clientes convertidos en consulta de usuarios con rol `2`.
+- [x] Empleados con registro y actualización para el administrador.
+- [x] Reportes con filtros, acciones visuales, iconos SVG y feedback sin resultados.
+- [x] Configuración con información técnica, SVG y enlace a `https://portafolio-brandon-daza.web.app/`.
+- [x] Proveedores con UI preparada, pero ocultos temporalmente del sidebar.
+- [x] Documentación técnica, funcional y de base de datos actualizada.
 
 ## Fase 1: Cierre de UI/UX
 
+- [x] Soporte de tema oscuro y claro con paletas centralizadas.
 - [ ] Unificar validaciones y mensajes de error.
 - [ ] Revisar tamaños mínimos y comportamiento en distintas resoluciones.
 - [ ] Eliminar emojis restantes de las vistas.
 - [ ] Añadir feedback de carga, éxito y error donde falte.
 - [ ] Probar accesibilidad básica: foco, contraste y navegación por teclado.
+- [ ] Persistir la preferencia de tema del usuario (recordar oscuro/claro entre reinicios).
 
 ## Fase 2: Correcciones técnicas prioritarias
 

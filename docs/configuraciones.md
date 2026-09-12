@@ -33,7 +33,7 @@ La pantalla Configuración permite seleccionar una nueva ubicación. El cambio s
 
 ## Requisitos y permisos
 
-- JRE/JDK 17 o superior.
+- JRE/JDK 25 o superior.
 - Permiso de escritura en la carpeta de datos.
 - Permiso de escritura en `config.properties`.
 - Evitar rutas dentro de carpetas sincronizadas mientras se prueba SQLite.

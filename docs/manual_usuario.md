@@ -30,6 +30,15 @@ El dashboard muestra ventas acumuladas, órdenes, productos, stock crítico, úl
 
 Si el código ya existe, el flujo actual actualiza el stock del producto existente.
 
+## Cambiar entre tema oscuro y claro
+
+En la parte inferior del menú lateral hay un botón que permite alternar el aspecto de la aplicación:
+
+- En **tema oscuro** (predeterminado) muestra **☀️ Modo claro**; al pulsarlo la interfaz pasa a la paleta clara.
+- En **tema claro** muestra **🌙 Modo oscuro**; al pulsarlo vuelve a la paleta oscura.
+
+El cambio se aplica al instante a toda la aplicación (menú, tablas, formularios, gráficos y ventanas) y no modifica tus datos ni la configuración del negocio.
+
 ## Registrar una venta
 
 1. Abre `Ventas`.
