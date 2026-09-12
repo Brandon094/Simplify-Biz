@@ -23,11 +23,25 @@ public class ConfigPage extends JPanel {
         setLayout(new BorderLayout(20, 20));
         setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        // Header
+        // Header (microcopy de contexto)
+        JPanel headerPanel = new JPanel();
+        headerPanel.setOpaque(false);
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+
         JLabel title = new JLabel("Configuración del sistema", createIcon("icons/settings.svg", ThemeConstants.NEON_PURPLE, 24, 24), SwingConstants.LEFT);
         title.setForeground(ThemeConstants.TEXT_PRIMARY);
         title.setFont(ThemeConstants.FONT_TITLE);
-        add(title, BorderLayout.NORTH);
+        title.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel subtitle = new JLabel("Ajusta el almacenamiento y conoce los detalles técnicos de tu instalación");
+        subtitle.setForeground(ThemeConstants.TEXT_SECONDARY);
+        subtitle.setFont(ThemeConstants.FONT_SMALL);
+        subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        headerPanel.add(title);
+        headerPanel.add(Box.createVerticalStrut(4));
+        headerPanel.add(subtitle);
+        add(headerPanel, BorderLayout.NORTH);
 
         // Contenido Principal
         JPanel mainContent = new JPanel(new GridBagLayout());
@@ -90,6 +104,7 @@ public class ConfigPage extends JPanel {
         btnChange.setIconTextGap(8);
         btnChange.setPreferredSize(new Dimension(150, 40));
         btnChange.addActionListener(e -> changeDbPath());
+        btnChange.setToolTipText("Selecciona una nueva carpeta donde se guardará la base de datos. Requiere reiniciar la aplicación.");
         content.add(btnChange, BorderLayout.EAST);
 
         p.add(content, BorderLayout.CENTER);

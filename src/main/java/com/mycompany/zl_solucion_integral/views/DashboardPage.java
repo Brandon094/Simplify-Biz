@@ -4,9 +4,11 @@ import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.mycompany.zl_solucion_integral.controllers.ProductoController;
 import com.mycompany.zl_solucion_integral.controllers.VentasController;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
+import com.mycompany.zl_solucion_integral.views.components.UIUtils;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonLineChart;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonPieChart;
 import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
+import com.mycompany.zl_solucion_integral.views.components.atoms.ShimmerSkeleton;
 import com.mycompany.zl_solucion_integral.views.components.organisms.MetricCard;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -21,24 +23,42 @@ public class DashboardPage extends JPanel {
     private final VentasController ventasCtrl = new VentasController();
     private final ProductoController productoCtrl = new ProductoController();
 
+    // Panel norte fijo: título arriba y métricas después de la carga asíncrona.
+    private final JPanel northWrap = new JPanel(new BorderLayout(0, 18));
+    private final JPanel headerPanel = new JPanel();
+
+    // Datos cargados en segundo plano por el SwingWorker.
+    private double totalVentas;
+    private int totalOrdenes;
+    private int productosUnicos;
+    private int stockCritico;
+    private Object[][] ventasRecientes;
+    private List<Double> ventas7Dias;
+    private Map<String, Double> distribucionCategorias;
+
     public DashboardPage() {
         setOpaque(false);
         setLayout(new BorderLayout(18, 18));
         setBorder(BorderFactory.createEmptyBorder(24, 28, 24, 28));
 
-        // Header
-        JPanel headerPanel = new JPanel(new BorderLayout(10, 0));
+        // Header (microcopy de contexto)
+        JPanel headerPanel = new JPanel();
         headerPanel.setOpaque(false);
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
 
         JLabel title = new JLabel("Resumen general del negocio");
         title.setForeground(ThemeConstants.TEXT_PRIMARY);
         title.setFont(ThemeConstants.FONT_TITLE);
-        headerPanel.add(title, BorderLayout.WEST);
+        title.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel subtitle = new JLabel("Visión rápida del rendimiento actual");
+        JLabel subtitle = new JLabel("Visión rápida del rendimiento y la actividad de tu negocio");
         subtitle.setForeground(ThemeConstants.TEXT_SECONDARY);
         subtitle.setFont(ThemeConstants.FONT_SMALL);
-        headerPanel.add(subtitle, BorderLayout.EAST);
+        subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        headerPanel.add(title);
+        headerPanel.add(Box.createVerticalStrut(4));
+        headerPanel.add(subtitle);
 
         // Grid de Métricas con Datos Reales
         JPanel metricsPanel = new JPanel(new GridLayout(1, 4, 14, 0));
@@ -159,7 +179,7 @@ public class DashboardPage extends JPanel {
         }
 
         if (data == null || data.length == 0) {
-            card.add(createEmptyState("Aún no hay registros para mostrar", "icons/summary.svg"), BorderLayout.CENTER);
+            card.add(createEmptyState("Aquí verás la actividad de tu negocio cuando registres tus primeras ventas.", "icons/summary.svg"), BorderLayout.CENTER);
             return card;
         }
         
@@ -174,15 +194,7 @@ public class DashboardPage extends JPanel {
     }
 
     private JPanel createEmptyState(String message, String iconPath) {
-        JPanel state = new JPanel(new GridBagLayout());
-        state.setOpaque(false);
-        FlatSVGIcon icon = new FlatSVGIcon(iconPath, 20, 20);
-        icon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, ThemeConstants.TEXT_SECONDARY));
-        JLabel content = new JLabel(message, icon, SwingConstants.CENTER);
-        content.setForeground(ThemeConstants.TEXT_SECONDARY);
-        content.setFont(ThemeConstants.FONT_BODY);
-        content.setIconTextGap(10);
-        state.add(content);
-        return state;
+        return UIUtils.createEmptyState(iconPath, ThemeConstants.NEON_BLUE,
+                "Sin actividad por ahora", message, null, null);
     }
 }

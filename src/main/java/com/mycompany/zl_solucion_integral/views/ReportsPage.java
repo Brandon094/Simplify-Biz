@@ -2,6 +2,7 @@ package com.mycompany.zl_solucion_integral.views;
 
 import com.mycompany.zl_solucion_integral.controllers.VentasController;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
+import com.mycompany.zl_solucion_integral.views.components.UIUtils;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonButton;
 import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
 import com.formdev.flatlaf.FlatClientProperties;
@@ -22,11 +23,25 @@ public class ReportsPage extends JPanel {
         setLayout(new BorderLayout(20, 20));
         setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        // Header
+        // Header (microcopy de contexto)
+        JPanel headerPanel = new JPanel();
+        headerPanel.setOpaque(false);
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+
         JLabel title = new JLabel("Centro de reportes", createIcon("icons/reports.svg", ThemeConstants.NEON_PURPLE, 24, 24), SwingConstants.LEFT);
         title.setForeground(ThemeConstants.TEXT_PRIMARY);
         title.setFont(ThemeConstants.FONT_TITLE);
-        add(title, BorderLayout.NORTH);
+        title.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel subtitle = new JLabel("Filtra tus ventas por rango de fechas y exporta la información que necesitas");
+        subtitle.setForeground(ThemeConstants.TEXT_SECONDARY);
+        subtitle.setFont(ThemeConstants.FONT_SMALL);
+        subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        headerPanel.add(title);
+        headerPanel.add(Box.createVerticalStrut(4));
+        headerPanel.add(subtitle);
+        add(headerPanel, BorderLayout.NORTH);
 
         // Contenido Principal
         JPanel mainContent = new JPanel(new BorderLayout(25, 25));
@@ -67,6 +82,7 @@ public class ReportsPage extends JPanel {
         btnFilter.setIcon(createIcon("icons/search.svg", ThemeConstants.NEON_BLUE, 17, 17));
         btnFilter.setIconTextGap(8);
         btnFilter.setPreferredSize(new Dimension(180, 35));
+        btnFilter.setToolTipText("Filtra las ventas entre la fecha de inicio y fin (formato DD/MM/YYYY)");
         btnFilter.addActionListener(e -> applyFilter());
         p.add(btnFilter);
 
@@ -113,12 +129,14 @@ public class ReportsPage extends JPanel {
         btnExcel.setIconTextGap(8);
         btnExcel.setPreferredSize(new Dimension(200, 45));
         btnExcel.addActionListener(e -> exportToExcel());
+        btnExcel.setToolTipText("Exporta el reporte actual a un archivo de Excel");
         
         NeonButton btnPDF = new NeonButton("Generar PDF");
         btnPDF.setNeonColor(ThemeConstants.NEON_PURPLE);
         btnPDF.setIcon(createIcon("icons/pdf.svg", ThemeConstants.NEON_PURPLE, 17, 17));
         btnPDF.setIconTextGap(8);
         btnPDF.setPreferredSize(new Dimension(200, 45));
+        btnPDF.setToolTipText("Genera un PDF con las ventas del periodo filtrado");
         
         p.add(btnPDF);
         p.add(btnExcel);
@@ -182,8 +200,7 @@ public class ReportsPage extends JPanel {
         if (tbReports.getRowCount() == 0) {
             boolean hasFilter = !txtStartDate.getText().trim().isEmpty()
                     || !txtEndDate.getText().trim().isEmpty();
-            reportsScroll.setViewportView(createEmptyState(
-                    hasFilter ? "No hay ventas en el periodo seleccionado" : "Aún no hay ventas registradas"));
+            reportsScroll.setViewportView(createEmptyState(hasFilter));
         } else {
             reportsScroll.setViewportView(tbReports);
         }
@@ -191,16 +208,24 @@ public class ReportsPage extends JPanel {
         reportsScroll.repaint();
     }
 
-    private JPanel createEmptyState(String message) {
-        JPanel state = new JPanel(new GridBagLayout());
-        state.setOpaque(false);
-        FlatSVGIcon icon = createIcon("icons/reports.svg", ThemeConstants.NEON_PURPLE, 24, 24);
-        JLabel label = new JLabel(message, icon, SwingConstants.CENTER);
-        label.setForeground(ThemeConstants.TEXT_SECONDARY);
-        label.setFont(ThemeConstants.FONT_BODY);
-        label.setIconTextGap(10);
-        state.add(label);
-        return state;
+    private JPanel createEmptyState(boolean hasFilter) {
+        if (hasFilter) {
+            return UIUtils.createEmptyState(
+                    "icons/reports.svg", ThemeConstants.NEON_PURPLE,
+                    "No encontramos ventas en ese periodo",
+                    "Prueba con otro rango de fechas o consulta el histórico completo.",
+                    "Ver todo el histórico",
+                    () -> {
+                        txtStartDate.setText("");
+                        txtEndDate.setText("");
+                        refreshData();
+                    });
+        }
+        return UIUtils.createEmptyState(
+                "icons/reports.svg", ThemeConstants.NEON_PURPLE,
+                "Aún no tienes ventas registradas",
+                "Las ventas que registres en el punto de venta aparecerán aquí.",
+                null, null);
     }
 
     private JLabel createLabel(String t) {

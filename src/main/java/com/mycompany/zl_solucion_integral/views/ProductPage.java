@@ -6,6 +6,7 @@ import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonButton;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonPieChart;
 import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
+import com.mycompany.zl_solucion_integral.views.components.UIUtils;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import javax.swing.*;
@@ -27,11 +28,11 @@ public class ProductPage extends JPanel {
         setLayout(new BorderLayout(20, 20));
         setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        // Header
-        JLabel title = new JLabel("Gestión de inventario", createIcon("icons/products.svg", ThemeConstants.NEON_PURPLE, 24, 24), SwingConstants.LEFT);
-        title.setForeground(ThemeConstants.TEXT_PRIMARY);
-        title.setFont(ThemeConstants.FONT_TITLE);
-        add(title, BorderLayout.NORTH);
+        // Header (microcopy de contexto usando UIUtils)
+        add(UIUtils.createHeader("icons/products.svg", ThemeConstants.NEON_PURPLE,
+                "Gestión de inventario",
+                "Administra tu catálogo y mantén el control de tu stock en tiempo real"),
+                BorderLayout.NORTH);
 
         // Contenido Principal (Formulario + Tabla)
         JPanel centerPanel = new JPanel(new BorderLayout(25, 25));
@@ -92,7 +93,7 @@ public class ProductPage extends JPanel {
         setupFieldIcon(txtCodigo, "icons/reports.svg");
         gbc.gridy = 4;
         gbc.insets = new Insets(0, 0, 5, 0);
-        p.add(txtCodigo, gbc);
+        p.add(UIUtils.createFieldWithHelper(txtCodigo, "Ej: SKU-001 — código único de tu producto"), gbc);
 
         gbc.gridy = 5;
         gbc.insets = new Insets(15, 0, 5, 0);
@@ -113,12 +114,14 @@ public class ProductPage extends JPanel {
         txtPrecio = createTextField(); 
         setupFieldIcon(txtPrecio, "icons/sales.svg");
         p1.add(txtPrecio, BorderLayout.CENTER);
+        p1.add(UIUtils.createHelperLabel("Ej: 2500.00"), BorderLayout.SOUTH);
         
         JPanel p2 = new JPanel(new BorderLayout(0, 5)); p2.setOpaque(false);
         p2.add(createLabel("STOCK"), BorderLayout.NORTH);
         txtCantidad = createTextField(); 
         setupFieldIcon(txtCantidad, "icons/dashboard.svg");
         p2.add(txtCantidad, BorderLayout.CENTER);
+        p2.add(UIUtils.createHelperLabel("Ej: 50 unidades"), BorderLayout.SOUTH);
         
         row.add(p1); row.add(p2);
         gbc.gridy = 7;
@@ -131,6 +134,7 @@ public class ProductPage extends JPanel {
         btnSave.setIcon(createIcon("icons/products.svg", ThemeConstants.NEON_GREEN, 17, 17));
         btnSave.setIconTextGap(8);
         btnSave.addActionListener(e -> saveProduct());
+        btnSave.setToolTipText("Guarda el producto en el inventario. Si el SKU ya existe, suma el stock al existente.");
         gbc.gridy = 8;
         gbc.insets = new Insets(0, 0, 10, 0);
         p.add(btnSave, gbc);
@@ -140,6 +144,7 @@ public class ProductPage extends JPanel {
         btnClear.setIcon(createIcon("icons/settings.svg", ThemeConstants.NEON_BLUE, 17, 17));
         btnClear.setIconTextGap(8);
         btnClear.addActionListener(e -> clearFields());
+        btnClear.setToolTipText("Limpia el formulario para registrar un producto nuevo");
         gbc.gridy = 9;
         p.add(btnClear, gbc);
 
@@ -279,15 +284,12 @@ public class ProductPage extends JPanel {
     }
 
     private JPanel createEmptyState() {
-        JPanel state = new JPanel(new GridBagLayout());
-        state.setOpaque(false);
-        FlatSVGIcon icon = createIcon("icons/products.svg", ThemeConstants.NEON_CYAN, 24, 24);
-        JLabel message = new JLabel("Aún no hay productos registrados", icon, SwingConstants.CENTER);
-        message.setForeground(ThemeConstants.TEXT_SECONDARY);
-        message.setFont(ThemeConstants.FONT_BODY);
-        message.setIconTextGap(10);
-        state.add(message);
-        return state;
+        return UIUtils.createEmptyState(
+                "icons/products.svg", ThemeConstants.NEON_CYAN,
+                "Todavía no tienes productos en tu catálogo",
+                "Registra tu primer producto con el formulario de la izquierda para empezar a vender.",
+                "Registrar primer producto",
+                () -> txtNombre.requestFocusInWindow());
     }
 
     private JLabel createLabel(String t) {

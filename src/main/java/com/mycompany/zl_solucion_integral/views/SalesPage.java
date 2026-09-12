@@ -7,6 +7,7 @@ import com.mycompany.zl_solucion_integral.models.Producto;
 import com.mycompany.zl_solucion_integral.models.Usuario;
 import com.mycompany.zl_solucion_integral.models.Venta;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
+import com.mycompany.zl_solucion_integral.views.components.UIUtils;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonButton;
 import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
 import com.formdev.flatlaf.FlatClientProperties;
@@ -42,11 +43,25 @@ public class SalesPage extends JPanel {
         setLayout(new BorderLayout(20, 20));
         setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        // Header
+        // Header (microcopy de contexto)
+        JPanel headerPanel = new JPanel();
+        headerPanel.setOpaque(false);
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+
         JLabel title = new JLabel("Punto de venta", createIcon("icons/sales.svg", ThemeConstants.NEON_GREEN, 24, 24), SwingConstants.LEFT);
         title.setForeground(ThemeConstants.TEXT_PRIMARY);
         title.setFont(ThemeConstants.FONT_TITLE);
-        add(title, BorderLayout.NORTH);
+        title.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel subtitle = new JLabel("Registra ventas ágiles: busca productos, arma el carrito y cobra en segundos");
+        subtitle.setForeground(ThemeConstants.TEXT_SECONDARY);
+        subtitle.setFont(ThemeConstants.FONT_SMALL);
+        subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        headerPanel.add(title);
+        headerPanel.add(Box.createVerticalStrut(4));
+        headerPanel.add(subtitle);
+        add(headerPanel, BorderLayout.NORTH);
 
         JPanel mainGrid = new JPanel(new GridLayout(1, 3, 20, 0));
         mainGrid.setOpaque(false);
@@ -88,14 +103,15 @@ public class SalesPage extends JPanel {
         p.add(createLabel("DESCUENTO %"), gbc);
         txtDiscount = createTextField("0");
         setupFieldIcon(txtDiscount, "icons/reports.svg");
-        gbc.gridy = 5; gbc.insets = new Insets(0,0,30,0);
-        p.add(txtDiscount, gbc);
+        gbc.gridy = 5; gbc.insets = new Insets(0,0,25,0);
+        p.add(UIUtils.createFieldWithHelper(txtDiscount, "Deja 0 si no aplicas descuento"), gbc);
 
         NeonButton btnAdd = new NeonButton("Agregar al carrito");
         btnAdd.setNeonColor(ThemeConstants.NEON_PURPLE);
         btnAdd.setIcon(createIcon("icons/sales.svg", ThemeConstants.NEON_PURPLE, 17, 17));
         btnAdd.setIconTextGap(8);
         btnAdd.addActionListener(e -> addToCart());
+        btnAdd.setToolTipText("Agrega el producto buscado al carrito con la cantidad y el descuento indicados");
         gbc.gridy = 6; p.add(btnAdd, gbc);
 
         return p;
@@ -181,7 +197,7 @@ public class SalesPage extends JPanel {
         gbc.gridy = 4; p.add(createLabel("TELÉFONO"), gbc);
         txtClientTel = createTextField("Contacto");
         setupFieldIcon(txtClientTel, "icons/user.svg");
-        gbc.gridy = 5; p.add(txtClientTel, gbc);
+        gbc.gridy = 5; p.add(UIUtils.createFieldWithHelper(txtClientTel, "Ej: 3001234567 (opcional)"), gbc);
 
         gbc.gridy = 6; p.add(createLabel("CORREO ELECTRÓNICO"), gbc);
         txtClientEmail = createTextField("cliente@correo.com");
@@ -209,6 +225,7 @@ public class SalesPage extends JPanel {
         btnConfirm.setIcon(createIcon("icons/sales.svg", ThemeConstants.NEON_GREEN, 17, 17));
         btnConfirm.setIconTextGap(8);
         btnConfirm.addActionListener(e -> finishSale());
+        btnConfirm.setToolTipText("Procesa el cobro, guarda la venta y descuenta el stock");
         p.add(btnConfirm, gbc);
 
         return p;

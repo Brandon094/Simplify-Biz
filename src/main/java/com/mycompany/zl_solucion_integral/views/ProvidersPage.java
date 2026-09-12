@@ -21,11 +21,25 @@ public class ProvidersPage extends JPanel {
         setLayout(new BorderLayout(20, 20));
         setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        // Header
+        // Header (microcopy de contexto)
+        JPanel headerPanel = new JPanel();
+        headerPanel.setOpaque(false);
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+
         JLabel title = new JLabel("Gestión de proveedores", createIcon("icons/providers.svg", ThemeConstants.NEON_CYAN, 24, 24), SwingConstants.LEFT);
         title.setForeground(ThemeConstants.TEXT_PRIMARY);
         title.setFont(ThemeConstants.FONT_TITLE);
-        add(title, BorderLayout.NORTH);
+        title.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel subtitle = new JLabel("Vincula a tus proveedores y mantén a la mano sus datos de contacto");
+        subtitle.setForeground(ThemeConstants.TEXT_SECONDARY);
+        subtitle.setFont(ThemeConstants.FONT_SMALL);
+        subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        headerPanel.add(title);
+        headerPanel.add(Box.createVerticalStrut(4));
+        headerPanel.add(subtitle);
+        add(headerPanel, BorderLayout.NORTH);
 
         // Contenido Principal
         JPanel mainContent = new JPanel(new BorderLayout(25, 0));
@@ -103,6 +117,7 @@ public class ProvidersPage extends JPanel {
         btnSave.setIcon(createIcon("icons/providers.svg", ThemeConstants.NEON_CYAN, 17, 17));
         btnSave.setIconTextGap(8);
         btnSave.addActionListener(e -> JOptionPane.showMessageDialog(this, "UI Lista: Implementaremos la lógica de persistencia en la siguiente fase."));
+        btnSave.setToolTipText("Vincula el proveedor al sistema (la persistencia llega en la Fase 3)");
         gbc.gridy = 13; gbc.insets = new Insets(0, 0, 10, 0);
         p.add(btnSave, gbc);
 

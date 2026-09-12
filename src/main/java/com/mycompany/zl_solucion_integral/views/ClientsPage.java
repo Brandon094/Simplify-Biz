@@ -3,6 +3,7 @@ package com.mycompany.zl_solucion_integral.views;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
+import com.mycompany.zl_solucion_integral.views.components.UIUtils;
 import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -20,12 +21,27 @@ public class ClientsPage extends JPanel {
         setLayout(new BorderLayout(20, 20));
         setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
+        // Header (microcopy de contexto)
+        JPanel headerPanel = new JPanel();
+        headerPanel.setOpaque(false);
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+
         JLabel title = new JLabel("Consulta de clientes",
                 createIcon("icons/clients.svg", ThemeConstants.NEON_PURPLE, 24, 24),
                 SwingConstants.LEFT);
         title.setForeground(ThemeConstants.TEXT_PRIMARY);
         title.setFont(ThemeConstants.FONT_TITLE);
-        add(title, BorderLayout.NORTH);
+        title.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel subtitle = new JLabel("Consulta la información de contacto de todos tus clientes registrados");
+        subtitle.setForeground(ThemeConstants.TEXT_SECONDARY);
+        subtitle.setFont(ThemeConstants.FONT_SMALL);
+        subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        headerPanel.add(title);
+        headerPanel.add(Box.createVerticalStrut(4));
+        headerPanel.add(subtitle);
+        add(headerPanel, BorderLayout.NORTH);
 
         add(createTablePanel(), BorderLayout.CENTER);
         refreshData();
@@ -114,8 +130,7 @@ public class ClientsPage extends JPanel {
 
     private void actualizarEstadoVacio() {
         if (tbClientes.getRowCount() == 0) {
-            clientsScroll.setViewportView(createEmptyState(
-                    "Aún no hay clientes registrados", "icons/clients.svg"));
+            clientsScroll.setViewportView(createEmptyState("icons/clients.svg"));
         } else {
             clientsScroll.setViewportView(tbClientes);
         }
@@ -123,16 +138,12 @@ public class ClientsPage extends JPanel {
         clientsScroll.repaint();
     }
 
-    private JPanel createEmptyState(String message, String iconPath) {
-        JPanel state = new JPanel(new GridBagLayout());
-        state.setOpaque(false);
-        FlatSVGIcon icon = createIcon(iconPath, ThemeConstants.NEON_PURPLE, 24, 24);
-        JLabel label = new JLabel(message, icon, SwingConstants.CENTER);
-        label.setForeground(ThemeConstants.TEXT_SECONDARY);
-        label.setFont(ThemeConstants.FONT_BODY);
-        label.setIconTextGap(10);
-        state.add(label);
-        return state;
+    private JPanel createEmptyState(String iconPath) {
+        return UIUtils.createEmptyState(
+                iconPath, ThemeConstants.NEON_PURPLE,
+                "Todavía no tienes clientes registrados",
+                "Los clientes se crean automáticamente al registrar una venta con sus datos.",
+                null, null);
     }
 
     private FlatSVGIcon createIcon(String path, Color color, int width, int height) {

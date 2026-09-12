@@ -3,6 +3,7 @@ package com.mycompany.zl_solucion_integral.views;
 import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
 import com.mycompany.zl_solucion_integral.models.Usuario;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
+import com.mycompany.zl_solucion_integral.views.components.UIUtils;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonButton;
 import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
 import com.formdev.flatlaf.FlatClientProperties;
@@ -25,11 +26,25 @@ public class SellersPage extends JPanel {
         setLayout(new BorderLayout(20, 20));
         setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        // Header
+        // Header (microcopy de contexto)
+        JPanel headerPanel = new JPanel();
+        headerPanel.setOpaque(false);
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+
         JLabel title = new JLabel("Gestión de empleados", createIcon("icons/staff.svg", ThemeConstants.NEON_PURPLE, 24, 24), SwingConstants.LEFT);
         title.setForeground(ThemeConstants.TEXT_PRIMARY);
         title.setFont(ThemeConstants.FONT_TITLE);
-        add(title, BorderLayout.NORTH);
+        title.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel subtitle = new JLabel("Registra y administra el personal con acceso al sistema");
+        subtitle.setForeground(ThemeConstants.TEXT_SECONDARY);
+        subtitle.setFont(ThemeConstants.FONT_SMALL);
+        subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        headerPanel.add(title);
+        headerPanel.add(Box.createVerticalStrut(4));
+        headerPanel.add(subtitle);
+        add(headerPanel, BorderLayout.NORTH);
 
         // Contenido Principal
         JPanel mainContent = new JPanel(new BorderLayout(25, 0));
@@ -73,7 +88,7 @@ public class SellersPage extends JPanel {
         txtTel = createTextField("Ej: 3001234567");
         setupFieldIcon(txtTel, "icons/user.svg");
         gbc.gridy = 4; gbc.insets = new Insets(0, 0, 5, 0);
-        p.add(txtTel, gbc);
+        p.add(UIUtils.createFieldWithHelper(txtTel, "Debe tener 10 dígitos numéricos"), gbc);
 
         gbc.gridy = 5; gbc.insets = new Insets(15, 0, 5, 0);
         p.add(createLabel("CORREO ELECTRÓNICO"), gbc);
@@ -86,8 +101,8 @@ public class SellersPage extends JPanel {
         p.add(createLabel("CONTRASEÑA DE ACCESO"), gbc);
         txtPassword = createTextField("Defina una clave segura");
         setupFieldIcon(txtPassword, "icons/lock.svg");
-        gbc.gridy = 8; gbc.insets = new Insets(0, 0, 25, 0);
-        p.add(txtPassword, gbc);
+        gbc.gridy = 8; gbc.insets = new Insets(0, 0, 20, 0);
+        p.add(UIUtils.createFieldWithHelper(txtPassword, "La usará el empleado para iniciar sesión"), gbc);
 
         // Botones
         NeonButton btnSave = new NeonButton("Registrar empleado");
@@ -95,6 +110,7 @@ public class SellersPage extends JPanel {
         btnSave.setIcon(createIcon("icons/staff.svg", ThemeConstants.NEON_GREEN, 17, 17));
         btnSave.setIconTextGap(8);
         btnSave.addActionListener(e -> saveSeller());
+        btnSave.setToolTipText("Registra un nuevo empleado con acceso al sistema");
         gbc.gridy = 9; gbc.insets = new Insets(0, 0, 10, 0);
         p.add(btnSave, gbc);
 
@@ -103,6 +119,7 @@ public class SellersPage extends JPanel {
         btnUpdate.setIcon(createIcon("icons/settings.svg", ThemeConstants.NEON_BLUE, 17, 17));
         btnUpdate.setIconTextGap(8);
         btnUpdate.addActionListener(e -> updateSeller());
+        btnUpdate.setToolTipText("Actualiza los datos del empleado seleccionado en la tabla");
         gbc.gridy = 10;
         p.add(btnUpdate, gbc);
 
@@ -256,15 +273,12 @@ public class SellersPage extends JPanel {
     }
 
     private JPanel createEmptyState() {
-        JPanel state = new JPanel(new GridBagLayout());
-        state.setOpaque(false);
-        FlatSVGIcon icon = createIcon("icons/staff.svg", ThemeConstants.NEON_GREEN, 24, 24);
-        JLabel label = new JLabel("Aún no hay empleados registrados", icon, SwingConstants.CENTER);
-        label.setForeground(ThemeConstants.TEXT_SECONDARY);
-        label.setFont(ThemeConstants.FONT_BODY);
-        label.setIconTextGap(10);
-        state.add(label);
-        return state;
+        return UIUtils.createEmptyState(
+                "icons/staff.svg", ThemeConstants.NEON_GREEN,
+                "Aún no tienes empleados registrados",
+                "Completa el formulario de la izquierda para dar acceso al sistema a tu personal.",
+                "Registrar primer empleado",
+                () -> txtName.requestFocusInWindow());
     }
 
     private JTextField createTextField(String placeholder) {
