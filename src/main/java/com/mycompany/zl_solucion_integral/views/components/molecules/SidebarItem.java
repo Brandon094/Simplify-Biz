@@ -39,21 +39,14 @@ public class SidebarItem extends JPanel {
             @Override
             public void mouseEntered(MouseEvent e) {
                 if (!active) {
-                    label.setForeground(ThemeConstants.TEXT_PRIMARY);
-                    iconLabel.setForeground(ThemeConstants.NEON_BLUE);
-                    setBackground(new Color(255, 255, 255, 10));
-                    setOpaque(true);
-                    repaint();
+                    setHover(true);
                 }
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
                 if (!active) {
-                    label.setForeground(ThemeConstants.TEXT_SECONDARY);
-                    iconLabel.setForeground(ThemeConstants.TEXT_PRIMARY);
-                    setOpaque(false);
-                    repaint();
+                    setHover(false);
                 }
             }
 
@@ -66,16 +59,38 @@ public class SidebarItem extends JPanel {
 
     public void setActive(boolean active) {
         this.active = active;
+        refresh();
+    }
+
+    /**
+     * Re-aplica los colores del ítem según el tema vigente. Se usa tanto al
+     * cambiar el estado activo como al cambiar el tema (vía ThemeConstants).
+     */
+    public void refresh() {
         if (active) {
             label.setForeground(ThemeConstants.TEXT_PRIMARY);
             iconLabel.setForeground(ThemeConstants.NEON_PURPLE);
             label.setFont(ThemeConstants.FONT_BODY.deriveFont(Font.BOLD));
             setOpaque(true);
-            setBackground(new Color(168, 85, 247, 30));
+            setBackground(ThemeConstants.ACTIVE_BACKGROUND);
         } else {
             label.setForeground(ThemeConstants.TEXT_SECONDARY);
             iconLabel.setForeground(ThemeConstants.TEXT_PRIMARY);
             label.setFont(ThemeConstants.FONT_BODY);
+            setOpaque(false);
+        }
+        repaint();
+    }
+
+    private void setHover(boolean hover) {
+        if (hover) {
+            label.setForeground(ThemeConstants.TEXT_PRIMARY);
+            iconLabel.setForeground(ThemeConstants.NEON_BLUE);
+            setBackground(ThemeConstants.HOVER_BACKGROUND);
+            setOpaque(true);
+        } else {
+            label.setForeground(ThemeConstants.TEXT_SECONDARY);
+            iconLabel.setForeground(ThemeConstants.TEXT_PRIMARY);
             setOpaque(false);
         }
         repaint();

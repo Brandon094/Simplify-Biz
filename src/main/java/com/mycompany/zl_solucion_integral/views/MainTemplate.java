@@ -1,5 +1,6 @@
 package com.mycompany.zl_solucion_integral.views;
 
+import com.mycompany.zl_solucion_integral.Main;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
 import com.mycompany.zl_solucion_integral.views.components.organisms.ModernSidebar;
 import javax.swing.*;
@@ -78,7 +79,7 @@ public class MainTemplate extends JFrame {
         lblDate.setForeground(ThemeConstants.TEXT_SECONDARY);
         lblDate.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
         lblDate.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(51, 65, 85), 1),
+            BorderFactory.createLineBorder(ThemeConstants.INPUT_BORDER, 1),
             BorderFactory.createEmptyBorder(8, 12, 8, 12)
         ));
 
@@ -120,6 +121,24 @@ public class MainTemplate extends JFrame {
                 this.dispose();
                 new ModernLoginPage().setVisible(true);
             }
+        });
+
+        // Toggle de tema oscuro / claro (solo UI, no afecta lógica de negocio).
+        sidebar.setThemeToggleAction(this::toggleTheme);
+    }
+
+    /**
+     * Alterna entre tema oscuro y claro re-asignando las constantes de color.
+     * Para que el cambio sea consistente en todas las vistas, se reconstruye
+     * la ventana con el mismo rol. Es un cambio puramente visual.
+     */
+    private void toggleTheme() {
+        ThemeConstants.toggleTheme();
+        Main.aplicarTema();
+        SwingUtilities.invokeLater(() -> {
+            MainTemplate fresh = new MainTemplate(userRole);
+            fresh.setVisible(true);
+            this.dispose();
         });
     }
 

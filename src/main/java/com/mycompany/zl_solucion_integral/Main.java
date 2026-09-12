@@ -7,7 +7,7 @@ import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
 import com.mycompany.zl_solucion_integral.views.ModernLoginPage;
 import com.mycompany.zl_solucion_integral.views.ModernAdminRegistrationPage;
 import com.mycompany.zl_solucion_integral.views.components.UIUtils;
-import com.formdev.flatlaf.FlatDarkLaf;
+import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -32,8 +32,8 @@ public class Main {
      * caso).
      */
     public static void main(String[] args) {
-        // Inicializar Look and Feel Moderno
-        FlatDarkLaf.setup();
+        // Inicializar Look and Feel Moderno según el tema por defecto (oscuro).
+        aplicarTema();
         UIUtils.configureGlobalStyles();
         
         // Primero, se intenta inicializar la base de datos.
@@ -41,6 +41,26 @@ public class Main {
             // Si la base de datos se inicializa correctamente, se inicia la aplicación.
             iniciarAplicacion();
         }
+    }
+
+    /**
+     * Aplica el tema gráfico (oscuro o claro) según {@link ThemeConstants}.
+     * Usa FlatLaf para que el render de nativos (tablas, scrollbars, etc.)
+     * se ajuste al tema y luego re-aplica los estilos globales de la UI.
+     *
+     * Al cambiar el tema, las vistas se construyen de nuevo leyendo las
+     * constantes de color, por lo que no es necesario actualizar componentes
+     * ya creados aquí.
+     */
+    public static void aplicarTema() {
+        if (ThemeConstants.isDark()) {
+            com.formdev.flatlaf.themes.FlatMacDarkLaf darkLaf = new com.formdev.flatlaf.themes.FlatMacDarkLaf();
+            darkLaf.install();
+        } else {
+            com.formdev.flatlaf.themes.FlatMacLightLaf lightLaf = new com.formdev.flatlaf.themes.FlatMacLightLaf();
+            lightLaf.install();
+        }
+        UIUtils.configureGlobalStyles();
     }
 
     /**

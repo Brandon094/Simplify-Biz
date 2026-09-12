@@ -1,6 +1,7 @@
 package com.mycompany.zl_solucion_integral.views.components.organisms;
 
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
+import com.mycompany.zl_solucion_integral.views.components.atoms.ThemeToggleButton;
 import com.mycompany.zl_solucion_integral.views.components.molecules.SidebarItem;
 import javax.swing.*;
 import java.awt.*;
@@ -11,6 +12,7 @@ public class ModernSidebar extends JPanel {
     private final List<SidebarItem> items = new ArrayList<>();
     private final JPanel itemsContainer;
     private final JPanel footerContainer;
+    private final ThemeToggleButton themeToggle = new ThemeToggleButton();
 
     public ModernSidebar() {
         setLayout(new BorderLayout(0, 18));
@@ -45,10 +47,22 @@ public class ModernSidebar extends JPanel {
         wrapper.add(itemsContainer, BorderLayout.NORTH);
         add(wrapper, BorderLayout.CENTER);
 
+        // Toggle de tema en el borde inferior (justo encima del cierre de sesión)
+        JPanel toggleContainer = new JPanel(new BorderLayout());
+        toggleContainer.setOpaque(false);
+        toggleContainer.setBorder(BorderFactory.createEmptyBorder(0, 8, 4, 8));
+        toggleContainer.add(themeToggle, BorderLayout.NORTH);
+
         footerContainer = new JPanel(new BorderLayout());
         footerContainer.setOpaque(false);
         footerContainer.setBorder(BorderFactory.createEmptyBorder(8, 8, 18, 8));
-        add(footerContainer, BorderLayout.SOUTH);
+
+        JPanel bottomStack = new JPanel();
+        bottomStack.setOpaque(false);
+        bottomStack.setLayout(new BorderLayout());
+        bottomStack.add(toggleContainer, BorderLayout.NORTH);
+        bottomStack.add(footerContainer, BorderLayout.CENTER);
+        add(bottomStack, BorderLayout.SOUTH);
     }
 
     public void addItem(String text, String icon, Runnable onClick) {
@@ -71,6 +85,27 @@ public class ModernSidebar extends JPanel {
         footerContainer.add(logoutItem, BorderLayout.CENTER);
         footerContainer.revalidate();
         footerContainer.repaint();
+    }
+
+    /** Asocia el manejador del toggle de tema. */
+    public void setThemeToggleAction(Runnable action) {
+        themeToggle.addActionListener(e -> {
+            if (action != null) action.run();
+            themeToggle.refresh();
+        });
+    }
+
+    /** Refresca los colores del sidebar tras un cambio de tema. */
+    public void applyTheme() {
+        setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
+        for (Component c : itemsContainer.getComponents()) {
+            if (c instanceof SidebarItem) {
+                ((SidebarItem) c).refresh();
+            }
+        }
+        themeToggle.refresh();
+        revalidate();
+        repaint();
     }
 
     private void clearSelection() {

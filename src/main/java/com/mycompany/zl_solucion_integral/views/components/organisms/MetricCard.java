@@ -11,7 +11,7 @@ public class MetricCard extends RoundedPanel {
         super(20, ThemeConstants.CARD_BACKGROUND);
         setLayout(new BorderLayout(0, 8));
         setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(148, 163, 184, 45), 1),
+                BorderFactory.createLineBorder(ThemeConstants.CARD_BORDER, 1),
                 BorderFactory.createEmptyBorder(14, 16, 14, 16)
         ));
         

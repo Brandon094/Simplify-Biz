@@ -40,7 +40,7 @@ public class ModernLoginPage extends JFrame {
     }
 
     private RoundedPanel createBrandPanel() {
-        RoundedPanel panel = new RoundedPanel(32, new Color(17, 24, 39));
+        RoundedPanel panel = new RoundedPanel(32, ThemeConstants.BRAND_BACKGROUND);
         panel.setLayout(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(42, 42, 42, 42));
 
@@ -220,7 +220,7 @@ public class ModernLoginPage extends JFrame {
     }
     
     private void styleInput(JTextField f) {
-        f.setBackground(new Color(15, 23, 42));
+        f.setBackground(ThemeConstants.INPUT_BACKGROUND);
         f.setForeground(ThemeConstants.TEXT_PRIMARY);
         f.setCaretColor(ThemeConstants.NEON_PURPLE);
         f.setFont(ThemeConstants.FONT_BODY);
@@ -231,7 +231,7 @@ public class ModernLoginPage extends JFrame {
         }
         
         f.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(51, 65, 85), 1),
+            BorderFactory.createLineBorder(ThemeConstants.INPUT_BORDER, 1),
             BorderFactory.createEmptyBorder(12, 15, 12, 15)
         ));
     }

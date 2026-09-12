@@ -157,7 +157,7 @@ public class ReportsPage extends JPanel {
                 } else {
                     c.setBackground(row % 2 == 0
                             ? ThemeConstants.CARD_BACKGROUND
-                            : new Color(30, 41, 59, 150));
+                            : ThemeConstants.TABLE_ZEBRA);
                     c.setForeground(ThemeConstants.TEXT_SECONDARY);
                 }
                 setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
@@ -226,11 +226,11 @@ public class ReportsPage extends JPanel {
     private JTextField createTextField(String placeholder) {
         JTextField f = new JTextField();
         f.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, placeholder);
-        f.setBackground(new Color(15, 23, 42));
+        f.setBackground(ThemeConstants.INPUT_BACKGROUND);
         f.setForeground(ThemeConstants.TEXT_PRIMARY);
         f.setCaretColor(ThemeConstants.NEON_PURPLE);
         f.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(51, 65, 85), 1),
+            BorderFactory.createLineBorder(ThemeConstants.INPUT_BORDER, 1),
             BorderFactory.createEmptyBorder(8, 12, 8, 12)
         ));
         return f;

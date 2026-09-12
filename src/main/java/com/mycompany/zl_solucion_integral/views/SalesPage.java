@@ -131,7 +131,7 @@ public class SalesPage extends JPanel {
                 if (!isSelected) {
                     component.setBackground(row % 2 == 0
                             ? ThemeConstants.CARD_BACKGROUND
-                            : new Color(30, 41, 59, 150));
+                            : ThemeConstants.TABLE_ZEBRA);
                     component.setForeground(ThemeConstants.TEXT_SECONDARY);
                 }
                 setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
@@ -190,7 +190,7 @@ public class SalesPage extends JPanel {
 
         gbc.gridy = 8; p.add(createLabel("MÉTODO DE PAGO"), gbc);
         cbPaymentMethod = new JComboBox<>(new String[]{"Efectivo", "Crédito", "Transferencia", "Otro"});
-        cbPaymentMethod.setBackground(new Color(15, 23, 42));
+        cbPaymentMethod.setBackground(ThemeConstants.INPUT_BACKGROUND);
         cbPaymentMethod.setForeground(ThemeConstants.TEXT_PRIMARY);
         gbc.gridy = 9; gbc.insets = new Insets(0, 0, 10, 0);
         p.add(cbPaymentMethod, gbc);
@@ -385,11 +385,11 @@ public class SalesPage extends JPanel {
     private JTextField createTextField(String placeholder) {
         JTextField f = new JTextField();
         f.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, placeholder);
-        f.setBackground(new Color(15, 23, 42));
+        f.setBackground(ThemeConstants.INPUT_BACKGROUND);
         f.setForeground(ThemeConstants.TEXT_PRIMARY);
         f.setCaretColor(ThemeConstants.NEON_PURPLE);
         f.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(51, 65, 85), 1),
+            BorderFactory.createLineBorder(ThemeConstants.INPUT_BORDER, 1),
             BorderFactory.createEmptyBorder(10, 15, 10, 15)
         ));
         return f;

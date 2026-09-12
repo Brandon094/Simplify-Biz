@@ -70,7 +70,7 @@ public class ConfigPage extends JPanel {
 
         txtDbPath = new JTextField(SelecionRuta.cargarRutaBaseDatos());
         txtDbPath.setEditable(false);
-        txtDbPath.setBackground(new Color(15, 23, 42));
+        txtDbPath.setBackground(ThemeConstants.INPUT_BACKGROUND);
         txtDbPath.setForeground(ThemeConstants.TEXT_SECONDARY);
         
         JLabel icon = new JLabel(createIcon("icons/database.svg", ThemeConstants.TEXT_SECONDARY, 17, 17));
@@ -79,7 +79,7 @@ public class ConfigPage extends JPanel {
         txtDbPath.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_COMPONENT, icon);
 
         txtDbPath.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(51, 65, 85), 1),
+            BorderFactory.createLineBorder(ThemeConstants.INPUT_BORDER, 1),
             BorderFactory.createEmptyBorder(10, 15, 10, 15)
         ));
         content.add(txtDbPath, BorderLayout.CENTER);

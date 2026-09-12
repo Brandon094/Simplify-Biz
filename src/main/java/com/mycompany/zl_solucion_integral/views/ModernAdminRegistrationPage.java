@@ -130,7 +130,7 @@ public class ModernAdminRegistrationPage extends JFrame {
     }
     
     private void styleInput(JTextField f) {
-        f.setBackground(new Color(15, 23, 42));
+        f.setBackground(ThemeConstants.INPUT_BACKGROUND);
         f.setForeground(ThemeConstants.TEXT_PRIMARY);
         f.setCaretColor(ThemeConstants.NEON_BLUE);
         f.setFont(ThemeConstants.FONT_BODY);
@@ -141,7 +141,7 @@ public class ModernAdminRegistrationPage extends JFrame {
         }
         
         f.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(51, 65, 85), 1),
+            BorderFactory.createLineBorder(ThemeConstants.INPUT_BORDER, 1),
             BorderFactory.createEmptyBorder(10, 15, 10, 15)
         ));
     }

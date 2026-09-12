@@ -60,7 +60,7 @@ public class NeonLineChart extends JPanel {
         g2.setFont(ThemeConstants.FONT_SMALL);
         for (int step = 0; step <= 3; step++) {
             int y = top + (chartHeight * step / 3);
-            g2.setColor(new Color(148, 163, 184, 35));
+            g2.setColor(ThemeConstants.GRID_LINE);
             g2.drawLine(left, y, left + chartWidth, y);
             g2.setColor(ThemeConstants.TEXT_SECONDARY);
             g2.drawString(numberFormat.format(max - (max * step / 3)), 4, y + 4);

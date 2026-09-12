@@ -138,7 +138,7 @@ public class DashboardPage extends JPanel {
                 if (!isSelected) {
                     component.setBackground(row % 2 == 0
                             ? ThemeConstants.CARD_BACKGROUND
-                            : new Color(30, 41, 59, 150));
+                            : ThemeConstants.TABLE_ZEBRA);
                     component.setForeground(ThemeConstants.TEXT_SECONDARY);
                 }
                 setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
