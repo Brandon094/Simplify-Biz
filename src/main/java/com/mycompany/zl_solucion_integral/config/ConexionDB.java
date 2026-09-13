@@ -63,8 +63,32 @@ public class ConexionDB {
                 + "id INTEGER PRIMARY KEY,"
                 + "ultimoNumeroCotizacion TEXT);", "configuracion");
 
+        crearTabla(conn, "CREATE TABLE IF NOT EXISTS categorias ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "nombre TEXT UNIQUE NOT NULL);", "categorias");
+
         insertarValorInicialConfiguracion(conn);
+        sincronizarCategoriasIniciales(conn);
         LOGGER.log(Level.INFO, "Tablas verificadas o creadas correctamente.");
+    }
+
+    private void sincronizarCategoriasIniciales(Connection conn) {
+        String sqlDefault = "INSERT OR IGNORE INTO categorias (nombre) VALUES "
+                + "('DOTACION HOMBRE'), ('DOTACION DAMA'), ('CALZADO'), ('EPP'), ('BOTIQUINES'), ('SEÑALIZACION'), "
+                + "('HERRAMIENTAS'), ('MATERIALES'), ('ELECTRÓNICA'), ('BEBIDAS'), ('LIMPIEZA'), ('OTROS');";
+        try (PreparedStatement pstmt = conn.prepareStatement(sqlDefault)) {
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al insertar categorías iniciales por defecto", e);
+        }
+
+        String sqlSync = "INSERT OR IGNORE INTO categorias (nombre) "
+                + "SELECT DISTINCT UPPER(TRIM(categoria)) FROM productos WHERE categoria IS NOT NULL AND TRIM(categoria) != '';";
+        try (PreparedStatement pstmt = conn.prepareStatement(sqlSync)) {
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error al sincronizar categorías desde productos", e);
+        }
     }
 
     private void crearTabla(Connection conn, String sql, String nombreTabla) {

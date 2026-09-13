@@ -24,6 +24,9 @@ public class ProductoController {
     }
 
     public ResultadoOperacion agregarOActualizarProductoSiExiste(Producto producto) {
+        if (producto != null && producto.getCategoria() != null) {
+            guardarCategoriaSiNoExiste(producto.getCategoria());
+        }
         String sqlSelect = "SELECT cantidad FROM productos WHERE codigo = ?";
         String sqlUpdate = "UPDATE productos SET cantidad = ? WHERE codigo = ?";
         String sqlInsert = "INSERT INTO productos (producto, precio, cantidad, codigo, categoria) VALUES (?, ?, ?, ?, ?)";
@@ -360,5 +363,38 @@ public class ProductoController {
             logger.log(Level.SEVERE, "Error al obtener stock crítico", e);
         }
         return 0;
+    }
+
+    public java.util.List<String> obtenerCategorias() {
+        java.util.List<String> categorias = new java.util.ArrayList<>();
+        String sql = "SELECT nombre FROM categorias ORDER BY nombre ASC";
+        try (Statement st = conn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                String nom = rs.getString("nombre");
+                if (nom != null && !nom.trim().isEmpty()) {
+                    categorias.add(nom.trim().toUpperCase());
+                }
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al obtener categorías", e);
+        }
+        if (categorias.isEmpty()) {
+            categorias.add("GENERAL");
+        }
+        return categorias;
+    }
+
+    public void guardarCategoriaSiNoExiste(String categoria) {
+        if (categoria == null || categoria.trim().isEmpty()) {
+            return;
+        }
+        String catFormateada = categoria.trim().toUpperCase();
+        String sql = "INSERT OR IGNORE INTO categorias (nombre) VALUES (?)";
+        try (PreparedStatement pstmt = conn().prepareStatement(sql)) {
+            pstmt.setString(1, catFormateada);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al guardar categoría en base de datos", e);
+        }
     }
 }

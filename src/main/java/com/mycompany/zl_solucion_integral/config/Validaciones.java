@@ -77,19 +77,13 @@ public class Validaciones {
     }
 
     /**
-     * Método para validar que una categoría sea válida.
+     * Método para validar que una categoría no esté vacía.
      *
      * @param categoria La categoría a validar.
-     * @return true si la categoría es válida, false en caso contrario.
+     * @return true si la categoría no está vacía, false en caso contrario.
      */
     public static boolean validarCategoria(String categoria) {
-        String[] categoriasValidas = {"DOTACION HOMBRE", "DOTACION DAMA", "CALZADO", "EPP", "BOTIQUINES", "SEÑALIZACION"};
-        for (String valida : categoriasValidas) {
-            if (valida.equalsIgnoreCase(categoria)) {
-                return true;
-            }
-        }
-        return false;
+        return validarNoVacio(categoria);
     }
 
     /**
