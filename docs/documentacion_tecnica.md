@@ -236,7 +236,7 @@ mvn test
 mvn clean package
 
 # Ejecutar aplicación
-java -jar dist/Simplify-Biz-1.2.0.jar
+java -jar dist/Simplify-Biz-1.3.0.jar
 ```
 
 Las modificaciones de lógica de negocio y persistencia se verifican automáticamente con `mvn test`. Las modificaciones visuales deben validarse abriendo el JAR empaquetado.

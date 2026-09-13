@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mycompany</groupId>
     <artifactId>Simplify-Biz</artifactId>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -25,7 +25,7 @@
 
         <!--
           Carpeta visible dentro del proyecto donde se copia el JAR final tras
-          el `package`, para ejecutarlo como `java -jar dist/Simplify-Biz-1.2.0.jar`.
+          el `package`, para ejecutarlo como `java -jar dist/Simplify-Biz-1.3.0.jar`.
         -->
         <dist.dir>${project.basedir}/dist</dist.dir>
     </properties>
@@ -155,7 +155,7 @@
             <!--
               Copia el JAR final a ./dist/ tras el package, para que quede a mano
               dentro del proyecto (el target real vive fuera, en disco nativo).
-              Ejecutar con:  java -jar dist/Simplify-Biz-1.2.0.jar
+              Ejecutar con:  java -jar dist/Simplify-Biz-1.3.0.jar
             -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

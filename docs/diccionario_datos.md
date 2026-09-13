@@ -38,7 +38,7 @@ Catálogo de productos disponibles para la venta con control de inventario.
 | `precio` | `REAL` | No | Precio unitario de venta al público. |
 | `cantidad` | `INTEGER` | No | Stock disponible actualmente. Se descuenta al confirmar ventas y se suma al registrar productos con código existente. |
 | `codigo` | `TEXT` | No | Código SKU o identificador único del producto. Se usa para búsquedas y control de duplicados. |
-| `categoria` | `TEXT` | Sí | Categoría del producto. Valores comunes: `DOTACION HOMBRE`, `DOTACION DAMA`, `CALZADO`, `EPP`, `BOTIQUINES`, `SEÑALIZACION`. Si es `NULL` o vacío, se muestra como "Sin Categoría" en los gráficos. |
+| `categoria` | `TEXT` | Sí | Categoría del producto. Se vincula dinámicamente con la tabla `categorias`. Si es `NULL` o vacío, se muestra como "Sin Categoría" en los gráficos. |
 
 ---
 
@@ -113,7 +113,13 @@ Las tablas `ventas` y `detalles_venta` almacenan datos como **texto plano** (sna
 - La condición `WHERE cantidad >= ?` en el `UPDATE` previene que el stock sea negativo.
 - Si falla cualquier actualización, toda la transacción se revierte con `rollback`.
 
-### 6.5 Cotizaciones
+### 6.5 Categorías Dinámicas
+
+- Tabla `categorias` (`id INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT UNIQUE NOT NULL`).
+- El sistema aprende y registra automáticamente en SQLite cualquier nueva categoría ingresada en el inventario.
+- Semilla inicial: `DOTACION HOMBRE`, `DOTACION DAMA`, `CALZADO`, `EPP`, `BOTIQUINES`, `SEÑALIZACION`, `HERRAMIENTAS`, `MATERIALES`, `ELECTRÓNICA`, `BEBIDAS`, `LIMPIEZA`, `OTROS`.
+
+### 6.6 Cotizaciones
 
 - El número de cotización sigue el formato `YYYYMMDD-XXX`.
 - Se incrementa automáticamente con cada cotización generada.

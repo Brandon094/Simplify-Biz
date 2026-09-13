@@ -18,7 +18,10 @@ Este documento define el orden recomendado para continuar el desarrollo. La regl
 * [x] Reportes con filtros, acciones visuales, iconos SVG y feedback sin resultados.
 * [x] Configuración con información técnica, SVG y enlace a `[https://portafolio-brandon-daza.web.app/](https://portafolio-brandon-daza.web.app/)`.
 * [x] Proveedores con UI preparada, pero ocultos temporalmente del sidebar.
-* [x] Documentación técnica, funcional y de base de datos actualizada.
+* [x] **Categorías Dinámicas en SQLite (v1.3.0):** Gestión de categorías en tabla dedicada `categorias` con combo editable que aprende nuevas categorías automáticamente sin código duro.
+* [x] **Estándar DRY en Tablas (v1.3.0):** Implementación de `UIUtils.applyTableStyling` y `formatDate` en todas las tablas del sistema (Id oculto, alineación a derecha de moneda `$ 15.000,00`, fechas y códigos centrados).
+* [x] **Autocompletado de Clientes y Venta Ágil (v1.3.0):** Rediseño del POS con venta rápida en Efectivo por defecto (2 clics a `CONSUMIDOR FINAL`) y autocompletado inteligente por Cédula / NIT en Transferencias y Crédito.
+* [x] Documentación técnica, funcional y de base de datos totalmente actualizada para la **versión 1.3.0**.
 
 ## Fase 1: Cierre de UI/UX (Pulido y Microcopy)
 

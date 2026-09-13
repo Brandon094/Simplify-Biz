@@ -7,7 +7,7 @@
 ## 1. Iniciar la Aplicación
 
 ```bash
-java -jar dist/Simplify-Biz-1.2.0.jar
+java -jar dist/Simplify-Biz-1.3.0.jar
 ```
 
 ### 1.1 Primer Uso
@@ -61,7 +61,7 @@ El panel principal muestra un resumen en tiempo real de la operación:
 2. Completa los campos:
    - **Nombre del producto** — Nombre descriptivo.
    - **Código/SKU** — Código único de identificación (ej: `SKU-001`).
-   - **Categoría** — Selecciona del listado predefinido.
+   - **Categoría** — Selecciona una categoría existente de la lista desplegable **o escribe una categoría nueva** directamente en la casilla. El sistema la aprenderá y guardará automáticamente para tu negocio.
    - **Precio** — Precio unitario de venta.
    - **Stock** — Cantidad disponible.
 3. Pulsa **Guardar producto**.
@@ -85,30 +85,33 @@ El panel principal muestra un resumen en tiempo real de la operación:
 
 Utiliza el selector de categoría sobre la tabla para ver solo los productos de una categoría específica. Selecciona "Todas" para ver el catálogo completo.
 
-### 3.3 Ventas
+### 3.3 Ventas (Punto de Venta - POS)
 
-El punto de venta (POS) cuenta con un diseño de tres tarjetas simétricas perfectamente alineadas en la parte superior:
+El punto de venta (POS) cuenta con un diseño de tres tarjetas simétricas diseñadas para máxima eficiencia operativa:
 
-1. **Agregar productos (Izquierda):** Búsqueda ágil por código/SKU o nombre, especificación de cantidad y aplicación opcional de descuento porcentual.
-2. **Carrito de compras (Centro):** Listado dinámico con subtotal por ítem y cálculo en tiempo real del gran total.
-3. **Datos del cliente y pago (Derecha):** Selección de método de pago (Efectivo, Crédito, Transferencia, etc.) y captura de datos del cliente, o activación del checkbox *"Cliente no desea suministrar datos"* (`CONSUMIDOR FINAL`).
+1. **Agregar productos (Izquierda):** Búsqueda ágil por código/SKU o nombre, cantidad y descuento porcentual opcional.
+2. **Carrito de compras (Centro):** Listado dinámico con subtotal por ítem y cálculo del gran total en tiempo real.
+3. **Método de pago y cliente (Derecha):** Selector de método de pago prominente y gestión inteligente de cliente adaptada al flujo de caja.
 
-#### Realizar una venta
+#### Flujo de Venta Rápida (Cero Fricción)
 
-1. Abre la sección **Ventas**.
-2. **Buscar producto:** Ingresa el código o nombre en el campo de búsqueda.
-3. **Añadir al carrito:**
-   - Define la cantidad.
-   - (Opcional) Aplica un descuento porcentual (0–100%).
-   - Pulsa **Agregar al carrito**.
-4. Repite para añadir más productos.
-5. **Datos del cliente:**
-   - Ingresa nombre y documento (cédula/NIT).
-   - **O** activa la casilla *"Cliente no desea suministrar datos"* → se registra como `CONSUMIDOR FINAL` con `N/A`. No se crea un usuario ficticio.
-6. Selecciona el **método de pago** (Efectivo, Crédito, Transferencia, etc.).
-7. Pulsa **Confirmar venta**.
+- **Venta en Efectivo (Por Defecto):**
+  1. Busca el producto y agrégalo al carrito.
+  2. El método de pago está predeterminado en **Efectivo** y el cliente en **Venta a Consumidor Final (Sin datos)**.
+  3. Pulsa **Confirmar venta**. ¡Procesado en 2 clics sin digitar datos de cliente!
 
-> **Seguridad:** El stock se descuenta en una transacción atómica. Si falla alguna actualización, toda la operación se revierte automáticamente.
+- **Venta por Transferencia (Nequi / Bancolombia / Daviplata):**
+  1. Selecciona el método **Transferencia**.
+  2. Si deseas asociar el comprobante a un cliente recurrente, desmarca la casilla de Consumidor Final e ingresa su **Cédula / NIT** (presiona `Enter` para autocompletar su Nombre, Teléfono y Correo).
+  3. Pulsa **Confirmar venta**.
+
+- **Venta a Crédito (Fiado / Cuentas por Cobrar):**
+  1. Selecciona el método **Crédito**.
+  2. El sistema desactiva automáticamente la opción de Consumidor Final y exige los datos del cliente (**Cédula/NIT** y **Nombre/Razón Social**).
+  3. Si la cédula ya existe en el sistema, la información se autocompleta al instante.
+  4. Pulsa **Confirmar venta**.
+
+> **Seguridad:** El descuento de existencias en el inventario se ejecuta de forma atómica. Si ocurre una interrupción o fallo de base de datos, la transacción completa se revierte automáticamente.
 
 ### 3.4 Clientes
 

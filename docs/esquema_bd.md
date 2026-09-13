@@ -48,7 +48,14 @@
 │       configuracion          │
 │─────────────────────────────│
 │ id (PK, siempre = 1)        │
-│ ultimoNumeroCotizacion       │
+│ ultimoNumeroCotizacion      │
+└─────────────────────────────┘
+
+┌─────────────────────────────┐
+│         categorias          │
+│─────────────────────────────│
+│ id (PK)                     │
+│ nombre (UNIQUE, NOT NULL)   │
 └─────────────────────────────┘
 ```
 

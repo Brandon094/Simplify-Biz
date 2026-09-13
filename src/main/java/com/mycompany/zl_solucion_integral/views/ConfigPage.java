@@ -170,7 +170,7 @@ public class ConfigPage extends JPanel {
         p.setLayout(new GridLayout(4, 1, 10, 10));
         p.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
 
-        p.add(createDataRow("Versión del software", "1.2.0", "icons/version-code.svg", ThemeConstants.NEON_PURPLE));
+        p.add(createDataRow("Versión del software", "1.3.0", "icons/version-code.svg", ThemeConstants.NEON_PURPLE));
         p.add(createDataRow("Motor de base de datos", "SQLite 3.46", "icons/database.svg", ThemeConstants.NEON_BLUE));
         p.add(createDataRow("Licencia", "Pago único (ERP+ Business)", "icons/license.svg", ThemeConstants.NEON_GREEN));
         p.add(createDeveloperRow());

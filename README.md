@@ -19,8 +19,8 @@ Actualmente el sistema cuenta con las **Fases 1 (UI/UX), 2 (Responsive) y 3 (Cor
 
 ## ✨ Características Principales
 
-| Característica | Descripción |
-| :--- | :--- |
+| **Categorías Dinámicas** | Almacenamiento dinámico de categorías en SQLite (`categorias`). El desplegable de inventario es editable y aprende automáticamente nuevas categorías ingresadas sin código duro. |
+| **Tablas DRY & Formato** | `UIUtils.applyTableStyling` estandariza todas las tablas del sistema con `Id` oculto, precios contables (`$ 15.000,00`) a la derecha, fechas (`dd/MM/yyyy`) y estados centrados. |
 | **Conexión Singleton a SQLite** | Patrón Singleton (`GestorConexion`) que mantiene una única conexión compartida con modo WAL, `busy_timeout` y `foreign_keys`, previniendo `database is locked`. |
 | **Almacenamiento Seguro** | Ubicación protegida automática por el SO (`%APPDATA%\ERPPlusBusiness` en Windows, `~/.config/ERPPlusBusiness` en Linux) para resguardar la base de datos de borrados accidentales. |
 | **Tema Oscuro y Claro** | Alternancia en caliente mediante toggle (☀️/🌙) en el sidebar sin reiniciar la app. Paleta centralizada en `ThemeConstants`. La preferencia se persiste en `config.properties`. |
@@ -58,7 +58,7 @@ mvn clean test
 mvn clean package
 
 # Ejecutar aplicación
-java -jar dist/Simplify-Biz-1.2.0.jar
+java -jar dist/Simplify-Biz-1.3.0.jar
 ```
 
 > **Nota sobre NTFS:** El `target` de compilación está redirigido a `~/.m2-tmp/` para evitar fallos de `mvn clean` en particiones NTFS montadas vía FUSE. El JAR final se copia automáticamente a `dist/`.

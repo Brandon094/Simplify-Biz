@@ -53,7 +53,7 @@ views/
   │   │   ├── NeonButton.java           Botón neumórfico con bordes redondeados, brillo y filtro SVG
   │   │   ├── RoundedPanel.java         Contenedor con esquinas redondeadas ajustables (radius)
   │   │   ├── NeonLineChart.java        Gráfico de líneas en Graphics2D con curva suave y grid
-  │   │   ├── NeonPieChart.java         Gráfico de torta/anillo por categorías
+  │   │   ├── NeonPieChart.java         Gráfico de torta/anillo responsivo con paleta neón de 10 colores, métricas centrales y leyenda dinámica.
   │   │   └── ThemeToggleButton.java    Botón toggle (☀️/🌙) que conmuta la paleta en caliente
   │   ├── molecules/
   │   │   └── SidebarItem.java          Fila de navegación con icono SVG, etiqueta y estado activo
@@ -85,5 +85,11 @@ Todos los iconos son archivos SVG alojados en `src/main/resources/icons/`. Se ca
 ### Guiado de Usuario y Microcopy
 - **Subtítulos de Contexto:** Cada módulo incluye un encabezado descriptivo creado con `UIUtils.createHeader`.
 - **Textos de Ayuda (Helper Texts):** Campos clave incluyen descripciones de formato (ej: `"Ej: SKU-001 — código único"`).
-- **Tooltips:** Los botones de acción cuentan con globos informativos con descripciones claras.
-- **Estados Vacíos Activos:** Cuando una tabla no tiene registros, despliega `UIUtils.createEmptyState` con un icono descriptivo y un botón CTA ("Llamado a la Acción").
+- **Placeholders Visuales:** Cajas de texto con ejemplos tenues mediante `FlatClientProperties.PLACEHOLDER_TEXT` que desaparecen al enfocar.
+- **Sistema de Tablas y Formatos DRY (`UIUtils`):** Métodos centralizados que estandarizan el diseño y datos de todas las tablas de la aplicación (**Productos**, **Clientes**, **Empleados**, **Reportes** y **Dashboard**):
+  - **`UIUtils.formatDate(Object)`**: Convierte cualquier formato de fecha (`Date`, `LocalDate`, `Timestamp` o cadenas ISO `yyyy-MM-dd`) al estándar unificado **`dd/MM/yyyy`** (ej: `12/09/2026`).
+  - **`UIUtils.formatCurrency(double)`**: Formato de moneda contable (`$ 15.000,00`) alineado a la derecha para precios y totales.
+  - Ocultamiento automático de la columna `Id` técnica.
+  - Centrado automático para cantidades, stock, códigos, números de documento, fechas y estados.
+  - Alineación a la izquierda para nombres, categorías, correos y direcciones.
+  - Filas de zebra alternadas y selección neumórfica en tono `NEON_PURPLE`.
