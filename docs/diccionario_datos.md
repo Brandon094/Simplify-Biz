@@ -36,6 +36,7 @@ Catálogo de productos disponibles para la venta con control de inventario.
 | `id` | `INTEGER` | No | Identificador único autoincremental. Clave primaria. |
 | `producto` | `TEXT` | No | Nombre descriptivo del producto. |
 | `precio` | `REAL` | No | Precio unitario de venta al público. |
+| `precio_costo` | `REAL` | Sí | Precio unitario de costo o adquisición. Se usa para calcular la Inversión en Inventario y la Utilidad Neta Ganada en el Dashboard. Default: `0.0`. |
 | `cantidad` | `INTEGER` | No | Stock disponible actualmente. Se descuenta al confirmar ventas y se suma al registrar productos con código existente. |
 | `codigo` | `TEXT` | No | Código SKU o identificador único del producto. Se usa para búsquedas y control de duplicados. |
 | `categoria` | `TEXT` | Sí | Categoría del producto. Se vincula dinámicamente con la tabla `categorias`. Si es `NULL` o vacío, se muestra como "Sin Categoría" en los gráficos. |
@@ -54,8 +55,8 @@ Encabezado de cada transacción de venta registrada.
 | `vendedor` | `TEXT` | No | Nombre del usuario que realizó la venta (tomado de la sesión activa). |
 | `fecha` | `DATE` | No | Fecha de la transacción. Almacenada como `java.sql.Date`. |
 | `total` | `REAL` | No | Monto total de la venta (suma de todos los detalles con descuentos aplicados). |
-| `metodo_pago` | `TEXT` | No | Método de pago seleccionado: `Efectivo`, `Crédito`, `Transferencia` u otro. |
-| `pago_confirmado` | `TEXT` | Sí | Estado del pago. Para ventas a crédito se marca como `deudor`. Cadena vacía para pagos confirmados al momento. |
+| `metodo_pago` | `TEXT` | No | Método de pago seleccionado: `Efectivo`, `Transferencia` o `Crédito`. |
+| `pago_confirmado` | `TEXT` | Sí | Estado del pago. Para ventas en Efectivo o Transferencia se guarda `pagado`. Para ventas a Crédito se marca como `deudor`. |
 
 ---
 
@@ -71,6 +72,7 @@ Líneas de detalle de cada venta. Relación N:1 con `ventas`.
 | `cantidad` | `INTEGER` | No | Unidades vendidas de este producto. |
 | `codigo` | `TEXT` | No | Código/SKU del producto al momento de la venta. |
 | `precio` | `REAL` | No | Precio unitario al que se vendió el producto. |
+| `precio_costo` | `REAL` | Sí | Precio unitario de costo al momento de la venta (snapshot histórico). Permite calcular la utilidad neta exacta de cada ítem. |
 | `total` | `REAL` | No | Subtotal del detalle: `precio × cantidad`. |
 
 ---

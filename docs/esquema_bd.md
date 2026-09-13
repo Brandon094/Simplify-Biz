@@ -80,16 +80,17 @@ CREATE TABLE IF NOT EXISTS usuarios (
 
 ### 3.2 Tabla `productos`
 
-Catálogo de productos con stock y categorización.
+Catálogo de productos con stock, costos y categorización.
 
 ```sql
 CREATE TABLE IF NOT EXISTS productos (
-    id        INTEGER PRIMARY KEY AUTOINCREMENT,
-    producto  TEXT    NOT NULL,
-    precio    REAL    NOT NULL,
-    cantidad  INTEGER NOT NULL,
-    codigo    TEXT    NOT NULL,
-    categoria TEXT
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    producto     TEXT    NOT NULL,
+    precio       REAL    NOT NULL,
+    precio_costo REAL    DEFAULT 0.0,
+    cantidad     INTEGER NOT NULL,
+    codigo       TEXT    NOT NULL,
+    categoria    TEXT
 );
 ```
 
@@ -116,13 +117,14 @@ Líneas de detalle asociadas a una venta (relación 1:N).
 
 ```sql
 CREATE TABLE IF NOT EXISTS detalles_venta (
-    id        INTEGER PRIMARY KEY AUTOINCREMENT,
-    venta_id  INTEGER NOT NULL,
-    producto  TEXT    NOT NULL,
-    cantidad  INTEGER NOT NULL,
-    codigo    TEXT    NOT NULL,
-    precio    REAL    NOT NULL,
-    total     REAL    NOT NULL,
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    venta_id     INTEGER NOT NULL,
+    producto     TEXT    NOT NULL,
+    cantidad     INTEGER NOT NULL,
+    codigo       TEXT    NOT NULL,
+    precio       REAL    NOT NULL,
+    precio_costo REAL    DEFAULT 0.0,
+    total        REAL    NOT NULL,
     FOREIGN KEY (venta_id) REFERENCES ventas(id)
 );
 ```
