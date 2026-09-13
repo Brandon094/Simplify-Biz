@@ -102,8 +102,9 @@ El punto de venta (POS) cuenta con un diseño de tres tarjetas simétricas dise�
 
 - **Venta por Transferencia (Nequi / Bancolombia / Daviplata):**
   1. Selecciona el método **Transferencia**.
-  2. Si deseas asociar el comprobante a un cliente recurrente, desmarca la casilla de Consumidor Final e ingresa su **Cédula / NIT** (presiona `Enter` para autocompletar su Nombre, Teléfono y Correo).
-  3. Pulsa **Confirmar venta**.
+  2. El sistema desactiva automáticamente la casilla de Consumidor Final y despliega los campos para asociar el comprobante a la Cédula/Nombre del titular.
+  3. Al escribir la **Cédula / NIT** y presionar `Enter`, la información se autocompleta al instante si el usuario ya existe.
+  4. Pulsa **Confirmar venta**.
 
 - **Venta a Crédito (Fiado / Cuentas por Cobrar):**
   1. Selecciona el método **Crédito**.
