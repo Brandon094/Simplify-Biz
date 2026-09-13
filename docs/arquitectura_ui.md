@@ -93,3 +93,12 @@ Todos los iconos son archivos SVG alojados en `src/main/resources/icons/`. Se ca
   - Centrado automático para cantidades, stock, códigos, números de documento, fechas y estados.
   - Alineación a la izquierda para nombres, categorías, correos y direcciones.
   - Filas de zebra alternadas y selección neumórfica en tono `NEON_PURPLE`.
+
+---
+
+## 6. Módulo de Ventas (POS) — Sincronización Estructurada (`SalesPage`)
+
+- **Venta Ágil sin Fricción (`syncClientState`):** Gestión centralizada del estado del cliente basada en el método de pago seleccionado.
+  - En **Efectivo** u **Otro**, los campos de cliente se ocultan dinámicamente (`clientFieldsContainer.setVisible(false)`) permitiendo la venta inmediata en 2 clics a `CONSUMIDOR FINAL`.
+  - En **Transferencia** o **Crédito**, el contenedor reaparece automáticamente (`setVisible(true)`), deshabilitando la opción de consumidor final para exigir los datos del titular o comprobante.
+- **Resguardo contra Desbordamientos (`JScrollPane`):** El panel de checkout está envuelto en un `JScrollPane` silencioso (sin bordes y con viewport transparente), garantizando que en pantallas pequeñas o al desplegar campos el botón **Confirmar venta** nunca se corte.

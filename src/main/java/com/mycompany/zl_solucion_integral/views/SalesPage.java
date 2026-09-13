@@ -46,8 +46,8 @@ public class SalesPage extends JPanel {
 
     public SalesPage() {
         setOpaque(false);
-        setLayout(new BorderLayout(20, 20));
-        setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+        setLayout(new BorderLayout(15, 15));
+        setBorder(BorderFactory.createEmptyBorder(25, 25, 20, 25));
 
         // Header (microcopy de contexto)
         JPanel headerPanel = new JPanel();
@@ -76,65 +76,72 @@ public class SalesPage extends JPanel {
         // Col 3: Datos de Cliente y Pago
         panelCheckout = createCheckoutPanel();
 
-        mainGrid = new JPanel(new GridLayout(1, 3, 20, 0));
+        // Envolver panelCheckout en ScrollPane sin bordes para evitar desbordamiento vertical de botones
+        JScrollPane checkoutScroll = new JScrollPane(panelCheckout);
+        checkoutScroll.setOpaque(false);
+        checkoutScroll.getViewport().setOpaque(false);
+        checkoutScroll.setBorder(BorderFactory.createEmptyBorder());
+        checkoutScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        mainGrid = new JPanel(new GridLayout(1, 3, 15, 0));
         mainGrid.setOpaque(false);
         mainGrid.add(panelBusqueda);
         mainGrid.add(panelCarrito);
-        mainGrid.add(panelCheckout);
+        mainGrid.add(checkoutScroll);
 
         add(mainGrid, BorderLayout.CENTER);
 
         // Reflow adaptable: en móvil (una columna) los paneles se apilan.
         LayoutResponsive.listen(this, bp -> LayoutResponsive.reflowColumnas(
                 mainGrid,
-                LayoutResponsive.list(panelBusqueda, panelCarrito, panelCheckout),
-                3, 20, bp));
+                LayoutResponsive.list(panelBusqueda, panelCarrito, checkoutScroll),
+                3, 15, bp));
 
-        // Aplicar estado inicial de visibilidad (ocultar campos si Consumidor Final está seleccionado)
-        syncClientState();
+        // Aplicar estado inicial de visibilidad
+        SwingUtilities.invokeLater(this::syncClientState);
     }
 
     private JPanel createProductSearchPanel() {
-        RoundedPanel p = new RoundedPanel(20, ThemeConstants.SIDEBAR_BACKGROUND);
+        RoundedPanel p = new RoundedPanel(16, ThemeConstants.SIDEBAR_BACKGROUND);
         p.setLayout(new GridBagLayout());
-        p.setBorder(BorderFactory.createEmptyBorder(24, 24, 24, 24));
+        p.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0; gbc.gridx = 0;
 
-        JLabel title = new JLabel("Agregar productos", createIcon("icons/products.svg", ThemeConstants.NEON_PURPLE, 20, 20), SwingConstants.LEFT);
+        JLabel title = new JLabel("Agregar productos", createIcon("icons/products.svg", ThemeConstants.NEON_PURPLE, 18, 18), SwingConstants.LEFT);
         title.setForeground(ThemeConstants.TEXT_PRIMARY);
         title.setFont(ThemeConstants.FONT_SUBTITLE);
-        gbc.gridy = 0; gbc.insets = new Insets(0, 0, 16, 0);
+        gbc.gridy = 0; gbc.insets = new Insets(0, 0, 10, 0);
         p.add(title, gbc);
 
-        gbc.gridy = 1; gbc.insets = new Insets(0, 0, 4, 0);
+        gbc.gridy = 1; gbc.insets = new Insets(0, 0, 2, 0);
         p.add(createLabel("BUSCAR PRODUCTO (CÓDIGO/NOMBRE)"), gbc);
         txtSearch = createTextField("Ej: SKU-001...");
         setupFieldIcon(txtSearch, "icons/products.svg");
         txtSearch.addActionListener(e -> searchProduct());
-        gbc.gridy = 2; gbc.insets = new Insets(0, 0, 14, 0);
+        gbc.gridy = 2; gbc.insets = new Insets(0, 0, 8, 0);
         p.add(txtSearch, gbc);
 
-        gbc.gridy = 3; gbc.insets = new Insets(0, 0, 4, 0);
+        gbc.gridy = 3; gbc.insets = new Insets(0, 0, 2, 0);
         p.add(createLabel("CANTIDAD"), gbc);
         txtQty = createTextField("1");
         setupFieldIcon(txtQty, "icons/dashboard.svg");
-        gbc.gridy = 4; gbc.insets = new Insets(0, 0, 14, 0);
+        gbc.gridy = 4; gbc.insets = new Insets(0, 0, 8, 0);
         p.add(txtQty, gbc);
 
-        gbc.gridy = 5; gbc.insets = new Insets(0, 0, 4, 0);
+        gbc.gridy = 5; gbc.insets = new Insets(0, 0, 2, 0);
         p.add(createLabel("DESCUENTO %"), gbc);
         txtDiscount = createTextField("0");
         setupFieldIcon(txtDiscount, "icons/reports.svg");
-        gbc.gridy = 6; gbc.insets = new Insets(0, 0, 20, 0);
+        gbc.gridy = 6; gbc.insets = new Insets(0, 0, 12, 0);
         p.add(UIUtils.createFieldWithHelper(txtDiscount, "Deja 0 si no aplicas descuento"), gbc);
 
         NeonButton btnAdd = new NeonButton("Agregar al carrito");
         btnAdd.setNeonColor(ThemeConstants.NEON_PURPLE);
-        btnAdd.setIcon(createIcon("icons/plus.svg", ThemeConstants.NEON_PURPLE, 17, 17));
-        btnAdd.setIconTextGap(8);
-        btnAdd.setPreferredSize(new Dimension(0, 46));
+        btnAdd.setIcon(createIcon("icons/plus.svg", ThemeConstants.NEON_PURPLE, 15, 15));
+        btnAdd.setIconTextGap(6);
+        btnAdd.setPreferredSize(new Dimension(0, 40));
         btnAdd.addActionListener(e -> addToCart());
         btnAdd.setToolTipText("Agrega el producto buscado al carrito con la cantidad y el descuento indicados");
         gbc.gridy = 7; gbc.insets = new Insets(0, 0, 0, 0);
@@ -144,11 +151,11 @@ public class SalesPage extends JPanel {
     }
 
     private JPanel createCartPanel() {
-        RoundedPanel p = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
-        p.setLayout(new BorderLayout(0, 16));
-        p.setBorder(BorderFactory.createEmptyBorder(24, 24, 24, 24));
+        RoundedPanel p = new RoundedPanel(16, ThemeConstants.CARD_BACKGROUND);
+        p.setLayout(new BorderLayout(0, 10));
+        p.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
 
-        JLabel title = new JLabel("Carrito de compras", createIcon("icons/cart-shopping.svg", ThemeConstants.NEON_CYAN, 20, 20), SwingConstants.LEFT);
+        JLabel title = new JLabel("Carrito de compras", createIcon("icons/cart-shopping.svg", ThemeConstants.NEON_CYAN, 18, 18), SwingConstants.LEFT);
         title.setForeground(ThemeConstants.TEXT_PRIMARY);
         title.setFont(ThemeConstants.FONT_SUBTITLE);
         p.add(title, BorderLayout.NORTH);
@@ -185,13 +192,13 @@ public class SalesPage extends JPanel {
         cartHeader.setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
         cartHeader.setForeground(ThemeConstants.TEXT_SECONDARY);
         cartHeader.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
-        cartHeader.setPreferredSize(new Dimension(0, 34));
+        cartHeader.setPreferredSize(new Dimension(0, 30));
         cartHeader.setReorderingAllowed(false);
         
         JScrollPane scroll = new JScrollPane(tbCart);
         scroll.setOpaque(false);
         scroll.getViewport().setOpaque(false);
-        scroll.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+        scroll.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
         p.add(scroll, BorderLayout.CENTER);
 
         lblTotal = new JLabel("TOTAL: $ 0.00", SwingConstants.RIGHT);
@@ -203,28 +210,28 @@ public class SalesPage extends JPanel {
     }
 
     private JPanel createCheckoutPanel() {
-        RoundedPanel p = new RoundedPanel(20, ThemeConstants.SIDEBAR_BACKGROUND);
+        RoundedPanel p = new RoundedPanel(16, ThemeConstants.SIDEBAR_BACKGROUND);
         p.setLayout(new GridBagLayout());
-        p.setBorder(BorderFactory.createEmptyBorder(24, 24, 24, 24));
+        p.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0; gbc.gridx = 0;
 
-        JLabel title = new JLabel("Método de pago y cliente", createIcon("icons/clients.svg", ThemeConstants.NEON_GREEN, 20, 20), SwingConstants.LEFT);
+        JLabel title = new JLabel("Método de pago y cliente", createIcon("icons/clients.svg", ThemeConstants.NEON_GREEN, 18, 18), SwingConstants.LEFT);
         title.setForeground(ThemeConstants.TEXT_PRIMARY);
         title.setFont(ThemeConstants.FONT_SUBTITLE);
-        gbc.gridy = 0; gbc.insets = new Insets(0, 0, 16, 0);
+        gbc.gridy = 0; gbc.insets = new Insets(0, 0, 10, 0);
         p.add(title, gbc);
 
         // 1. Selector de Método de Pago Prominente arriba
-        gbc.gridy = 1; gbc.insets = new Insets(0, 0, 4, 0);
+        gbc.gridy = 1; gbc.insets = new Insets(0, 0, 2, 0);
         p.add(createLabel("MÉTODO DE PAGO"), gbc);
 
         cbPaymentMethod = new JComboBox<>(new String[]{"Efectivo", "Transferencia", "Crédito", "Otro"});
         cbPaymentMethod.setBackground(ThemeConstants.INPUT_BACKGROUND);
         cbPaymentMethod.setForeground(ThemeConstants.TEXT_PRIMARY);
         cbPaymentMethod.addActionListener(e -> syncClientState());
-        gbc.gridy = 2; gbc.insets = new Insets(0, 0, 14, 0);
+        gbc.gridy = 2; gbc.insets = new Insets(0, 0, 8, 0);
         p.add(cbPaymentMethod, gbc);
 
         // Checkbox Venta Rápida / Consumidor Final
@@ -234,7 +241,7 @@ public class SalesPage extends JPanel {
         chkGenericClient.setForeground(ThemeConstants.TEXT_SECONDARY);
         chkGenericClient.setFont(ThemeConstants.FONT_SMALL);
         chkGenericClient.addActionListener(e -> syncClientState());
-        gbc.gridy = 3; gbc.insets = new Insets(0, 0, 14, 0);
+        gbc.gridy = 3; gbc.insets = new Insets(0, 0, 8, 0);
         p.add(chkGenericClient, gbc);
 
         // Panel contenedor de campos de cliente (para ocultar/mostrar limpiamente)
@@ -244,7 +251,7 @@ public class SalesPage extends JPanel {
         subGbc.fill = GridBagConstraints.HORIZONTAL;
         subGbc.weightx = 1.0; subGbc.gridx = 0;
 
-        subGbc.gridy = 0; subGbc.insets = new Insets(0, 0, 4, 0);
+        subGbc.gridy = 0; subGbc.insets = new Insets(0, 0, 2, 0);
         lblClientCC = createLabel("CÉDULA / NIT (ENTER PARA BUSCAR)");
         clientFieldsContainer.add(lblClientCC, subGbc);
 
@@ -257,48 +264,49 @@ public class SalesPage extends JPanel {
                 searchClientByCC();
             }
         });
-        subGbc.gridy = 1; subGbc.insets = new Insets(0, 0, 10, 0);
+        subGbc.gridy = 1; subGbc.insets = new Insets(0, 0, 6, 0);
         txtClientCCHelper = UIUtils.createFieldWithHelper(txtClientCC, "Presiona Enter o cambia de campo para autocompletar");
         clientFieldsContainer.add(txtClientCCHelper, subGbc);
 
-        subGbc.gridy = 2; subGbc.insets = new Insets(0, 0, 4, 0);
+        subGbc.gridy = 2; subGbc.insets = new Insets(0, 0, 2, 0);
         lblClientName = createLabel("NOMBRE DEL CLIENTE / RAZÓN SOCIAL");
         clientFieldsContainer.add(lblClientName, subGbc);
 
         txtClientName = createTextField("Nombre o negocio");
         setupFieldIcon(txtClientName, "icons/user.svg");
-        subGbc.gridy = 3; subGbc.insets = new Insets(0, 0, 10, 0);
+        subGbc.gridy = 3; subGbc.insets = new Insets(0, 0, 6, 0);
         clientFieldsContainer.add(txtClientName, subGbc);
 
-        subGbc.gridy = 4; subGbc.insets = new Insets(0, 0, 4, 0);
+        subGbc.gridy = 4; subGbc.insets = new Insets(0, 0, 2, 0);
         lblClientTel = createLabel("TELÉFONO (OPCIONAL)");
         clientFieldsContainer.add(lblClientTel, subGbc);
 
         txtClientTel = createTextField("Contacto");
         setupFieldIcon(txtClientTel, "icons/phone.svg");
-        subGbc.gridy = 5; subGbc.insets = new Insets(0, 0, 10, 0);
+        subGbc.gridy = 5; subGbc.insets = new Insets(0, 0, 6, 0);
         clientFieldsContainer.add(txtClientTel, subGbc);
 
-        subGbc.gridy = 6; subGbc.insets = new Insets(0, 0, 4, 0);
+        subGbc.gridy = 6; subGbc.insets = new Insets(0, 0, 2, 0);
         lblClientEmail = createLabel("CORREO ELECTRÓNICO (OPCIONAL)");
         clientFieldsContainer.add(lblClientEmail, subGbc);
 
         txtClientEmail = createTextField("cliente@correo.com");
         setupFieldIcon(txtClientEmail, "icons/email.svg");
-        subGbc.gridy = 7; subGbc.insets = new Insets(0, 0, 14, 0);
+        subGbc.gridy = 7; subGbc.insets = new Insets(0, 0, 8, 0);
         clientFieldsContainer.add(txtClientEmail, subGbc);
 
         gbc.gridy = 4; gbc.insets = new Insets(0, 0, 0, 0);
+        clientFieldsContainer.setVisible(false);
         p.add(clientFieldsContainer, gbc);
 
         NeonButton btnConfirm = new NeonButton("Confirmar venta");
         btnConfirm.setNeonColor(ThemeConstants.NEON_GREEN);
-        btnConfirm.setIcon(createIcon("icons/check-double.svg", ThemeConstants.NEON_GREEN, 17, 17));
-        btnConfirm.setIconTextGap(8);
-        btnConfirm.setPreferredSize(new Dimension(0, 48));
+        btnConfirm.setIcon(createIcon("icons/check-double.svg", ThemeConstants.NEON_GREEN, 15, 15));
+        btnConfirm.setIconTextGap(6);
+        btnConfirm.setPreferredSize(new Dimension(0, 40));
         btnConfirm.addActionListener(e -> finishSale());
         btnConfirm.setToolTipText("Procesa el cobro, guarda la venta y descuenta el stock");
-        gbc.gridy = 5; gbc.insets = new Insets(10, 0, 0, 0);
+        gbc.gridy = 5; gbc.insets = new Insets(6, 0, 0, 0);
         p.add(btnConfirm, gbc);
 
         // Inicializar estado por defecto (Efectivo / Consumidor Final)
@@ -446,6 +454,12 @@ public class SalesPage extends JPanel {
             panelCheckout.revalidate();
             panelCheckout.repaint();
         }
+        if (mainGrid != null) {
+            mainGrid.revalidate();
+            mainGrid.repaint();
+        }
+        revalidate();
+        repaint();
     }
 
     private void finishSale() {
