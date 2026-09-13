@@ -380,8 +380,8 @@ public class VentasController {
                 int cantidad = rs.getInt("cantidad");
                 double precioTotal = precio * cantidad;
 
-                Date fecha = rs.getDate("fecha");
-                String fechaFormateada = formatearFecha(fecha);
+                String fechaRaw = rs.getString("fecha");
+                String fechaFormateada = com.mycompany.zl_solucion_integral.views.components.UIUtils.formatDate(fechaRaw);
 
                 modelo.addRow(new Object[]{
                     rs.getInt("id"),
@@ -843,10 +843,10 @@ public class VentasController {
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 data.add(new Object[]{
-                    rs.getString("fecha"),
+                    com.mycompany.zl_solucion_integral.views.components.UIUtils.formatDate(rs.getString("fecha")),
                     rs.getString("cliente"),
                     rs.getString("producto"),
-                    "$ " + String.format("%.2f", rs.getDouble("total"))
+                    rs.getDouble("total")
                 });
             }
         } catch (SQLException e) { e.printStackTrace(); }
