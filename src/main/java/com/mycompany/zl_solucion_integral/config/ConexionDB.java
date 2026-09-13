@@ -35,6 +35,7 @@ public class ConexionDB {
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "producto TEXT NOT NULL,"
                 + "precio REAL NOT NULL,"
+                + "precio_costo REAL DEFAULT 0.0,"
                 + "cantidad INTEGER NOT NULL,"
                 + "codigo TEXT NOT NULL,"
                 + "categoria TEXT);", "productos");
@@ -56,8 +57,13 @@ public class ConexionDB {
                 + "cantidad INTEGER NOT NULL,"
                 + "codigo TEXT NOT NULL,"
                 + "precio REAL NOT NULL,"
+                + "precio_costo REAL DEFAULT 0.0,"
                 + "total REAL NOT NULL,"
                 + "FOREIGN KEY (venta_id) REFERENCES ventas(id));", "detalles_venta");
+
+        // Migración limpia para instalaciones previas que no tenían la columna precio_costo
+        migrarColumnaSegura(conn, "productos", "precio_costo", "REAL DEFAULT 0.0");
+        migrarColumnaSegura(conn, "detalles_venta", "precio_costo", "REAL DEFAULT 0.0");
 
         crearTabla(conn, "CREATE TABLE IF NOT EXISTS configuracion ("
                 + "id INTEGER PRIMARY KEY,"
@@ -106,6 +112,16 @@ public class ConexionDB {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error al insertar valor inicial en configuracion", e);
+        }
+    }
+
+    private void migrarColumnaSegura(Connection conn, String tabla, String columna, String definicion) {
+        String sql = "ALTER TABLE " + tabla + " ADD COLUMN " + columna + " " + definicion;
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.execute();
+            LOGGER.log(Level.INFO, "Columna ''{0}'' agregada exitosamente a la tabla ''{1}''.", new Object[]{columna, tabla});
+        } catch (SQLException e) {
+            // Ignorar error si la columna ya existe en SQLite
         }
     }
 }

@@ -20,7 +20,7 @@ import java.util.Map;
 public class ProductPage extends JPanel {
     private final ProductoController productoCtrl = new ProductoController();
     private JTable tbProductos;
-    private JTextField txtNombre, txtPrecio, txtCantidad, txtCodigo;
+    private JTextField txtNombre, txtPrecio, txtPrecioCosto, txtCantidad, txtCodigo;
     private JComboBox<String> cbCategoria;
     private JPanel chartContainer;
     private JScrollPane productsScroll;
@@ -145,25 +145,32 @@ public class ProductPage extends JPanel {
         gbc.gridy = 6; gbc.insets = new Insets(0, 0, 12, 0);
         p.add(cbCategoria, gbc);
 
-        // Fila para Precio y Cantidad
-        JPanel row = new JPanel(new GridLayout(1, 2, 12, 0));
+        // Fila para Precio Venta, Precio Costo y Cantidad
+        JPanel row = new JPanel(new GridLayout(1, 3, 8, 0));
         row.setOpaque(false);
         
         JPanel p1 = new JPanel(new BorderLayout(0, 4)); p1.setOpaque(false);
-        p1.add(createLabel("PRECIO"), BorderLayout.NORTH);
+        p1.add(createLabel("P. VENTA"), BorderLayout.NORTH);
         txtPrecio = createTextField("0.00"); 
         setupFieldIcon(txtPrecio, "icons/sales.svg");
         p1.add(txtPrecio, BorderLayout.CENTER);
-        p1.add(UIUtils.createHelperLabel("Ej: 2500.00"), BorderLayout.SOUTH);
+        p1.add(UIUtils.createHelperLabel("Ej: 2500"), BorderLayout.SOUTH);
         
+        JPanel pCosto = new JPanel(new BorderLayout(0, 4)); pCosto.setOpaque(false);
+        pCosto.add(createLabel("P. COSTO"), BorderLayout.NORTH);
+        txtPrecioCosto = createTextField("0.00");
+        setupFieldIcon(txtPrecioCosto, "icons/reports.svg");
+        pCosto.add(txtPrecioCosto, BorderLayout.CENTER);
+        pCosto.add(UIUtils.createHelperLabel("Ej: 1800"), BorderLayout.SOUTH);
+
         JPanel p2 = new JPanel(new BorderLayout(0, 4)); p2.setOpaque(false);
         p2.add(createLabel("STOCK"), BorderLayout.NORTH);
         txtCantidad = createTextField("0"); 
         setupFieldIcon(txtCantidad, "icons/dashboard.svg");
         p2.add(txtCantidad, BorderLayout.CENTER);
-        p2.add(UIUtils.createHelperLabel("Ej: 50 unidades"), BorderLayout.SOUTH);
+        p2.add(UIUtils.createHelperLabel("Ej: 50"), BorderLayout.SOUTH);
         
-        row.add(p1); row.add(p2);
+        row.add(p1); row.add(pCosto); row.add(p2);
         gbc.gridy = 7; gbc.insets = new Insets(0, 0, 18, 0);
         p.add(row, gbc);
 
@@ -272,6 +279,7 @@ public class ProductPage extends JPanel {
                     txtNombre.setText(p.getProducto());
                     txtCodigo.setText(p.getCodigo());
                     txtPrecio.setText(String.valueOf(p.getPrecio()));
+                    txtPrecioCosto.setText(String.valueOf(p.getPrecioCosto()));
                     txtCantidad.setText(String.valueOf(p.getCantidad()));
                     cbCategoria.setSelectedItem(p.getCategoria() != null ? p.getCategoria() : "OTROS");
                 }
@@ -300,6 +308,7 @@ public class ProductPage extends JPanel {
         String name = txtNombre.getText().trim();
         String code = txtCodigo.getText().trim();
         String priceStr = txtPrecio.getText().trim();
+        String costStr = txtPrecioCosto.getText().trim();
         String qtyStr = txtCantidad.getText().trim();
         Object rawCat = cbCategoria.getSelectedItem();
         String cat = rawCat != null ? rawCat.toString().trim().toUpperCase() : "GENERAL";
@@ -311,15 +320,16 @@ public class ProductPage extends JPanel {
         }
 
         Double price = com.mycompany.zl_solucion_integral.config.Validaciones.parseDecimalNoNegativo(priceStr);
+        Double cost = costStr.isEmpty() ? 0.0 : com.mycompany.zl_solucion_integral.config.Validaciones.parseDecimalNoNegativo(costStr);
         Integer qty = com.mycompany.zl_solucion_integral.config.Validaciones.parseEnteroPositivo(qtyStr);
 
-        if (price == null || qty == null) {
-            UIUtils.showError(this, "Precio y stock deben ser valores numéricos válidos.");
+        if (price == null || qty == null || cost == null) {
+            UIUtils.showError(this, "Precio de venta, costo y stock deben ser valores numéricos válidos.");
             return;
         }
 
         productoCtrl.guardarCategoriaSiNoExiste(cat);
-        Producto p = new Producto(selectedProductId, name, price, qty, code, price * qty, cat);
+        Producto p = new Producto(selectedProductId, name, price, cost, qty, code, price * qty, cat);
         com.mycompany.zl_solucion_integral.config.ResultadoOperacion res = productoCtrl.modificarProducto(p);
         if (res.esExito()) {
             UIUtils.showSuccess(this, res.getMensaje());
@@ -345,6 +355,7 @@ public class ProductPage extends JPanel {
         String name = txtNombre.getText().trim();
         String code = txtCodigo.getText().trim();
         String priceStr = txtPrecio.getText().trim();
+        String costStr = txtPrecioCosto.getText().trim();
         String qtyStr = txtCantidad.getText().trim();
         Object rawCat = cbCategoria.getSelectedItem();
         String cat = rawCat != null ? rawCat.toString().trim().toUpperCase() : "GENERAL";
@@ -356,10 +367,11 @@ public class ProductPage extends JPanel {
         }
 
         Double price = com.mycompany.zl_solucion_integral.config.Validaciones.parseDecimalNoNegativo(priceStr);
+        Double cost = costStr.isEmpty() ? 0.0 : com.mycompany.zl_solucion_integral.config.Validaciones.parseDecimalNoNegativo(costStr);
         Integer qty = com.mycompany.zl_solucion_integral.config.Validaciones.parseEnteroPositivo(qtyStr);
 
-        if (price == null) {
-            UIUtils.showError(this, "El precio debe ser un número decimal no negativo.");
+        if (price == null || cost == null) {
+            UIUtils.showError(this, "Los precios deben ser números decimales no negativos.");
             return;
         }
         if (qty == null) {
@@ -368,7 +380,7 @@ public class ProductPage extends JPanel {
         }
 
         productoCtrl.guardarCategoriaSiNoExiste(cat);
-        Producto p = new Producto(name, price, qty, code, cat);
+        Producto p = new Producto(0, name, price, cost, qty, code, price * qty, cat);
         com.mycompany.zl_solucion_integral.config.ResultadoOperacion res = productoCtrl.agregarOActualizarProductoSiExiste(p);
         
         if (res.esExito()) {
@@ -417,6 +429,7 @@ public class ProductPage extends JPanel {
         txtNombre.setText("");
         txtCodigo.setText("");
         txtPrecio.setText("");
+        txtPrecioCosto.setText("");
         txtCantidad.setText("");
         selectedProductId = -1;
     }

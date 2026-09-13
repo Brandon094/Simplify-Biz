@@ -28,8 +28,8 @@ public class ProductoController {
             guardarCategoriaSiNoExiste(producto.getCategoria());
         }
         String sqlSelect = "SELECT cantidad FROM productos WHERE codigo = ?";
-        String sqlUpdate = "UPDATE productos SET cantidad = ? WHERE codigo = ?";
-        String sqlInsert = "INSERT INTO productos (producto, precio, cantidad, codigo, categoria) VALUES (?, ?, ?, ?, ?)";
+        String sqlUpdate = "UPDATE productos SET cantidad = ?, precio = ?, precio_costo = ? WHERE codigo = ?";
+        String sqlInsert = "INSERT INTO productos (producto, precio, precio_costo, cantidad, codigo, categoria) VALUES (?, ?, ?, ?, ?, ?)";
 
         Connection conn = conn();
         try (PreparedStatement pstmtSelect = conn.prepareStatement(sqlSelect)) {
@@ -40,7 +40,9 @@ public class ProductoController {
                 int nuevaCantidad = rs.getInt("cantidad") + producto.getCantidad();
                 try (PreparedStatement pstmtUpdate = conn.prepareStatement(sqlUpdate)) {
                     pstmtUpdate.setInt(1, nuevaCantidad);
-                    pstmtUpdate.setString(2, producto.getCodigo());
+                    pstmtUpdate.setDouble(2, producto.getPrecio());
+                    pstmtUpdate.setDouble(3, producto.getPrecioCosto());
+                    pstmtUpdate.setString(4, producto.getCodigo());
                     pstmtUpdate.executeUpdate();
                     return ResultadoOperacion.ok(UIMessages.MSG_STOCK_ACTUALIZADO);
                 }
@@ -48,9 +50,10 @@ public class ProductoController {
             try (PreparedStatement pstmtInsert = conn.prepareStatement(sqlInsert)) {
                 pstmtInsert.setString(1, producto.getProducto());
                 pstmtInsert.setDouble(2, producto.getPrecio());
-                pstmtInsert.setInt(3, producto.getCantidad());
-                pstmtInsert.setString(4, producto.getCodigo());
-                pstmtInsert.setString(5, producto.getCategoria());
+                pstmtInsert.setDouble(3, producto.getPrecioCosto());
+                pstmtInsert.setInt(4, producto.getCantidad());
+                pstmtInsert.setString(5, producto.getCodigo());
+                pstmtInsert.setString(6, producto.getCategoria());
                 pstmtInsert.executeUpdate();
                 return ResultadoOperacion.ok(UIMessages.MSG_PRODUCTO_GUARDADO);
             }
@@ -62,7 +65,7 @@ public class ProductoController {
 
     public ResultadoOperacion modificarProducto(Producto producto) {
         String sqlCheck = "SELECT COUNT(*) FROM productos WHERE codigo = ? AND id != ?";
-        String sqlUpdate = "UPDATE productos SET producto = ?, precio = ?, cantidad = ?, codigo = ?, categoria = ? WHERE id = ?";
+        String sqlUpdate = "UPDATE productos SET producto = ?, precio = ?, precio_costo = ?, cantidad = ?, codigo = ?, categoria = ? WHERE id = ?";
 
         Connection conn = conn();
         try (PreparedStatement pstmtCheck = conn.prepareStatement(sqlCheck)) {
@@ -80,10 +83,11 @@ public class ProductoController {
         try (PreparedStatement pstmtUpdate = conn.prepareStatement(sqlUpdate)) {
             pstmtUpdate.setString(1, producto.getProducto());
             pstmtUpdate.setDouble(2, producto.getPrecio());
-            pstmtUpdate.setInt(3, producto.getCantidad());
-            pstmtUpdate.setString(4, producto.getCodigo());
-            pstmtUpdate.setString(5, producto.getCategoria());
-            pstmtUpdate.setInt(6, producto.getId());
+            pstmtUpdate.setDouble(3, producto.getPrecioCosto());
+            pstmtUpdate.setInt(4, producto.getCantidad());
+            pstmtUpdate.setString(5, producto.getCodigo());
+            pstmtUpdate.setString(6, producto.getCategoria());
+            pstmtUpdate.setInt(7, producto.getId());
             pstmtUpdate.executeUpdate();
             return ResultadoOperacion.ok(UIMessages.MSG_PRODUCTO_MODIFICADO);
         } catch (Exception e) {
@@ -253,21 +257,35 @@ public class ProductoController {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                return new Producto(
+                Producto p = new Producto(
                         rs.getInt("id"),
                         rs.getString("producto"),
                         rs.getDouble("precio"),
+                        rs.getDouble("precio_costo"),
                         rs.getInt("cantidad"),
                         rs.getString("codigo"),
                         rs.getDouble("precio") * rs.getInt("cantidad"),
                         rs.getString("categoria")
                 );
+                return p;
             }
             return null;
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error al obtener producto por ID", e);
             return null;
         }
+    }
+
+    public double obtenerInversionTotalInventario() {
+        String sql = "SELECT SUM(precio_costo * cantidad) FROM productos";
+        try (Statement st = conn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al obtener la inversión total del inventario", e);
+        }
+        return 0.0;
     }
 
     public Producto buscarProductoPorCodigo(String codigoProducto) {
@@ -278,11 +296,13 @@ public class ProductoController {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     double precio = rs.getDouble("precio");
+                    double precioCosto = rs.getDouble("precio_costo");
                     int cantidad = rs.getInt("cantidad");
                     producto = new Producto(
                             rs.getInt("id"),
                             rs.getString("producto"),
                             precio,
+                            precioCosto,
                             cantidad,
                             rs.getString("codigo"),
                             precio * cantidad,
@@ -304,11 +324,13 @@ public class ProductoController {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     double precio = rs.getDouble("precio");
+                    double precioCosto = rs.getDouble("precio_costo");
                     int cantidad = rs.getInt("cantidad");
                     producto = new Producto(
                             rs.getInt("id"),
                             rs.getString("producto"),
                             precio,
+                            precioCosto,
                             cantidad,
                             rs.getString("codigo"),
                             precio * cantidad,
@@ -335,11 +357,13 @@ public class ProductoController {
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     double precio = rs.getDouble("precio");
+                    double precioCosto = rs.getDouble("precio_costo");
                     int cantidad = rs.getInt("cantidad");
                     lista.add(new Producto(
                             rs.getInt("id"),
                             rs.getString("producto"),
                             precio,
+                            precioCosto,
                             cantidad,
                             rs.getString("codigo"),
                             precio * cantidad,

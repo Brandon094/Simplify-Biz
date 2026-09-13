@@ -30,8 +30,8 @@ public class DashboardPage extends JPanel {
 
     // Datos cargados en segundo plano por el SwingWorker.
     private double totalVentas;
-    private int totalOrdenes;
-    private int productosUnicos;
+    private double utilidadNeta;
+    private double inversionInventario;
     private int stockCritico;
     private Object[][] ventasRecientes;
     private List<Double> ventas7Dias;
@@ -59,7 +59,7 @@ public class DashboardPage extends JPanel {
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JTextArea subtitle = UIUtils.createWrappingLabel(
-                "Visión rápida del rendimiento y la actividad de tu negocio",
+                "Visión rápida del rendimiento, utilidad neta e inversión en inventario de tu negocio",
                 ThemeConstants.FONT_SMALL, ThemeConstants.TEXT_SECONDARY);
         subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -83,8 +83,8 @@ public class DashboardPage extends JPanel {
             @Override
             protected Void doInBackground() {
                 totalVentas = ventasCtrl.obtenerVentasTotales();
-                totalOrdenes = ventasCtrl.contarRegistros("Todas");
-                productosUnicos = productoCtrl.contarRegistros("Todas");
+                utilidadNeta = ventasCtrl.obtenerUtilidadTotal();
+                inversionInventario = productoCtrl.obtenerInversionTotalInventario();
                 stockCritico = productoCtrl.obtenerCantidadStockCritico(5);
                 ventasRecientes = ventasCtrl.obtenerUltimasVentas(5);
                 ventas7Dias = ventasCtrl.obtenerVentasUltimos7Dias();
@@ -110,13 +110,16 @@ public class DashboardPage extends JPanel {
         metricsPanel = new JPanel(new GridLayout(1, 4, 18, 0));
         metricsPanel.setOpaque(false);
         MetricCard cardVentas = new MetricCard("Ventas Totales", cur.format(totalVentas), "Acumulado histórico", ThemeConstants.NEON_GREEN, "icons/sales.svg");
-        MetricCard cardOrdenes = new MetricCard("Total Órdenes", String.valueOf(totalOrdenes), "Órdenes registradas", ThemeConstants.NEON_BLUE, "icons/dashboard.svg");
-        MetricCard cardProductos = new MetricCard("Productos Únicos", String.valueOf(productosUnicos), "En catálogo", ThemeConstants.NEON_PURPLE, "icons/products.svg");
+        
+        double porcentajeMargen = totalVentas > 0 ? (utilidadNeta / totalVentas) * 100.0 : 0.0;
+        MetricCard cardUtilidad = new MetricCard("Utilidad Neta", cur.format(utilidadNeta), String.format("Margen real: %.1f%%", porcentajeMargen), ThemeConstants.NEON_CYAN, "icons/check-double.svg");
+        MetricCard cardInversion = new MetricCard("Inversión Inventario", cur.format(inversionInventario), "Valor costo en bodega", ThemeConstants.NEON_PURPLE, "icons/products.svg");
         MetricCard cardStock = new MetricCard("Stock Crítico", stockCritico + " ítems", "Menos de 5 unidades", ThemeConstants.NEON_RED, "icons/reports.svg");
+        
         metricCards.clear();
         metricCards.add(cardVentas);
-        metricCards.add(cardOrdenes);
-        metricCards.add(cardProductos);
+        metricCards.add(cardUtilidad);
+        metricCards.add(cardInversion);
         metricCards.add(cardStock);
         for (MetricCard card : metricCards) {
             metricsPanel.add(card);

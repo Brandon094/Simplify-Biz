@@ -64,7 +64,7 @@ public class VentasController {
 
     public ResultadoOperacion guardarVenta(final Venta venta, List<Producto> productosVendidos, JTable tablaVentas) {
         String sqlInsertVenta = "INSERT INTO ventas (cliente, cc_cliente, vendedor, fecha, total, metodo_pago, pago_confirmado) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        String sqlInsertDetalleVenta = "INSERT INTO detalles_venta (venta_id, producto, cantidad, codigo, precio, total) VALUES (?, ?, ?, ?, ?, ?)";
+        String sqlInsertDetalleVenta = "INSERT INTO detalles_venta (venta_id, producto, cantidad, codigo, precio, precio_costo, total) VALUES (?, ?, ?, ?, ?, ?, ?)";
         String sqlUpdateStock = "UPDATE productos SET cantidad = cantidad - ? WHERE codigo = ? AND cantidad >= ?";
 
         Connection conn = null;
@@ -116,7 +116,8 @@ public class VentasController {
                 psDetalle.setInt(3, producto.getCantidadSolicitada());
                 psDetalle.setString(4, producto.getCodigo());
                 psDetalle.setDouble(5, producto.getPrecio());
-                psDetalle.setDouble(6, producto.getPrecio() * producto.getCantidadSolicitada());
+                psDetalle.setDouble(6, producto.getPrecioCosto());
+                psDetalle.setDouble(7, producto.getPrecio() * producto.getCantidadSolicitada());
                 psDetalle.executeUpdate();
 
                 // Actualizar stock del producto
@@ -852,5 +853,17 @@ public class VentasController {
         } catch (SQLException e) { e.printStackTrace(); }
         
         return data.toArray(new Object[0][]);
+    }
+
+    public double obtenerUtilidadTotal() {
+        String sql = "SELECT SUM(total - (precio_costo * cantidad)) FROM detalles_venta";
+        try (Statement st = conn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al obtener utilidad total", e);
+        }
+        return 0.0;
     }
 }

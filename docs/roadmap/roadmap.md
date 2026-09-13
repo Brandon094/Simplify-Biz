@@ -23,6 +23,7 @@ Este documento define el orden recomendado para continuar el desarrollo. La regl
 * [x] **Autocompletado de Clientes y Venta Ágil (v1.3.0):** Rediseño del POS con venta rápida en Efectivo por defecto (2 clics a `CONSUMIDOR FINAL`) y autocompletado inteligente por Cédula / NIT en Transferencias y Crédito.
 * [x] **Autocompletado Genérico DRY (`AutocompletePopup<T>`):** Componente reutilizable para campos `JTextField` implementado en **Punto de Venta** (búsqueda de productos y clientes) y en **Gestión de Inventario** (búsqueda y auto-rellenado de formulario de productos por Código o Nombre en tiempo real e insensible a mayúsculas/minúsculas).
 * [x] **Flujo Estandarizado de Métodos de Pago:** Limpieza de métodos de pago en POS (`Efectivo`, `Transferencia` y `Crédito`). Asignación automática de estado en base de datos (`pago_confirmado = 'pagado'` para Efectivo/Transferencia y `'deudor'` para Crédito).
+* [x] **Inteligencia de Negocio y Utilidad Neta (Fase 5 - v1.3.0):** Registro de `precio_costo` en productos y ventas. Tarjetas KPI dinámicas en el Dashboard con **Utilidad Neta Ganada ($)** (con % de margen real) e **Inversión Total en Inventario ($)**.
 * [x] Documentación técnica, funcional y de base de datos totalmente actualizada para la **versión 1.3.0**.
 
 ## Fase 1: Cierre de UI/UX (Pulido y Microcopy)
@@ -99,9 +100,10 @@ Este documento define el orden recomendado para continuar el desarrollo. La regl
 
 ## Fase 5: Inteligencia de negocio
 
-* [ ] Utilidades reales: venta menos costo.
-* [ ] Productos más vendidos.
-* [ ] Alertas de stock crítico.
+* [x] **Utilidades reales (venta menos costo):** Cálculo de Utilidad Neta acumulada y porcentaje de margen real sobre ventas en el Dashboard.
+* [x] **Inversión en inventario:** Sumatoria en tiempo real del valor del stock en bodega a precio de costo.
+* [x] **Alertas de stock crítico:** Indicador destacado en el Dashboard para ítems con 5 unidades o menos.
+* [x] **Distribución por categorías:** Gráfico de torta/anillo responsivo `NeonPieChart` con datos dinámicos de SQLite.
 * [ ] Comparación de periodos en dashboard.
 * [ ] Reportes con filtros persistentes y resumen ejecutivo.
 
