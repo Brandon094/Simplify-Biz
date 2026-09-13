@@ -21,6 +21,8 @@ Este documento define el orden recomendado para continuar el desarrollo. La regl
 * [x] **Categorías Dinámicas en SQLite (v1.3.0):** Gestión de categorías en tabla dedicada `categorias` con combo editable que aprende nuevas categorías automáticamente sin código duro.
 * [x] **Estándar DRY en Tablas (v1.3.0):** Implementación de `UIUtils.applyTableStyling` y `formatDate` en todas las tablas del sistema (Id oculto, alineación a derecha de moneda `$ 15.000,00`, fechas y códigos centrados).
 * [x] **Autocompletado de Clientes y Venta Ágil (v1.3.0):** Rediseño del POS con venta rápida en Efectivo por defecto (2 clics a `CONSUMIDOR FINAL`) y autocompletado inteligente por Cédula / NIT en Transferencias y Crédito.
+* [x] **Autocompletado Genérico DRY (`AutocompletePopup<T>`):** Componente reutilizable para campos `JTextField` implementado en **Punto de Venta** (búsqueda de productos y clientes) y en **Gestión de Inventario** (búsqueda y auto-rellenado de formulario de productos por Código o Nombre en tiempo real e insensible a mayúsculas/minúsculas).
+* [x] **Flujo Estandarizado de Métodos de Pago:** Limpieza de métodos de pago en POS (`Efectivo`, `Transferencia` y `Crédito`). Asignación automática de estado en base de datos (`pago_confirmado = 'pagado'` para Efectivo/Transferencia y `'deudor'` para Crédito).
 * [x] Documentación técnica, funcional y de base de datos totalmente actualizada para la **versión 1.3.0**.
 
 ## Fase 1: Cierre de UI/UX (Pulido y Microcopy)
@@ -87,8 +89,13 @@ Este documento define el orden recomendado para continuar el desarrollo. La regl
 * [ ] Implementar compras y entrada de inventario.
 * [ ] Completar exportación Excel y PDF.
 * [ ] Añadir historial de compras por cliente.
-* [ ] Añadir cartera y control de ventas a crédito.
-* [ ] Agregar filtros y búsqueda rápida al inventario.
+* [ ] **Módulo de Cartera y Cuentas por Cobrar (CxC):**
+  - Panel `CarteraPage.java` con KPIs de cartera pendiente y recaudado hoy.
+  - Tabla de ventas a crédito en estado `'deudor'`.
+  - Nueva tabla SQLite `abonos_cartera` para registro de abonos parciales o totales.
+  - Actualización automática de estado a `'pagado'` al saldar el 100% de la deuda.
+  - Generación e impresión de recibos de abono.
+* [x] **Búsqueda y sugerencias en tiempo real (v1.3.0):** Autocompletado genérico (`AutocompletePopup<T>`) en POS e Inventario.
 
 ## Fase 5: Inteligencia de negocio
 

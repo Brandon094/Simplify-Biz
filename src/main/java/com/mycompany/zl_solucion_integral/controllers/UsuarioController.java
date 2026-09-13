@@ -379,4 +379,41 @@ public class UsuarioController {
 
         return null;
     }
+
+    public java.util.List<Usuario> buscarClientesSugeridos(String query) {
+        java.util.List<Usuario> resultados = new java.util.ArrayList<>();
+        if (query == null || query.trim().isEmpty()) {
+            return resultados;
+        }
+        String term = "%" + query.trim().toLowerCase() + "%";
+        String sql = "SELECT DISTINCT nombre, email, telefono, no_cc FROM ("
+                + "  SELECT nombre, email, telefono, contraseña AS no_cc FROM usuarios "
+                + "  WHERE LOWER(nombre) LIKE ? OR LOWER(email) LIKE ? OR LOWER(telefono) LIKE ? OR LOWER(contraseña) LIKE ? "
+                + "  UNION "
+                + "  SELECT cliente AS nombre, '' AS email, '' AS telefono, cc_cliente AS no_cc FROM ventas "
+                + "  WHERE LOWER(cliente) LIKE ? OR LOWER(cc_cliente) LIKE ?"
+                + ") LIMIT 10";
+
+        try (PreparedStatement pstmt = conn().prepareStatement(sql)) {
+            pstmt.setString(1, term);
+            pstmt.setString(2, term);
+            pstmt.setString(3, term);
+            pstmt.setString(4, term);
+            pstmt.setString(5, term);
+            pstmt.setString(6, term);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Usuario u = new Usuario();
+                    u.setNombre(rs.getString("nombre"));
+                    u.setEmail(rs.getString("email"));
+                    u.setTelefono(rs.getString("telefono"));
+                    u.setNoCc(rs.getString("no_cc"));
+                    resultados.add(u);
+                }
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al buscar sugerencias de clientes", e);
+        }
+        return resultados;
+    }
 }

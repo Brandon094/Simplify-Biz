@@ -77,6 +77,9 @@ public class ProductPage extends JPanel {
         // Reflow adaptable: en móvil el formulario pasa arriba (una columna).
         LayoutResponsive.listen(this, this::aplicarBreakpoint);
 
+        // Autocompletado genérico (DRY) para buscar y rellenar productos existentes al digitar en el inventario
+        setupAutocompletes();
+
         // Cargar datos iniciales
         refreshData();
     }
@@ -475,5 +478,36 @@ public class ProductPage extends JPanel {
             BorderFactory.createEmptyBorder(10, 15, 10, 15)
         ));
         return f;
+    }
+
+    private void setupAutocompletes() {
+        com.mycompany.zl_solucion_integral.views.components.AutocompletePopup.SelectionListener<Producto> onProductSelect = p -> {
+            selectedProductId = p.getId();
+            txtNombre.setText(p.getProducto());
+            txtCodigo.setText(p.getCodigo());
+            txtPrecio.setText(String.valueOf(p.getPrecio()));
+            txtCantidad.setText(String.valueOf(p.getCantidad()));
+            if (p.getCategoria() != null) {
+                cbCategoria.setSelectedItem(p.getCategoria().toUpperCase());
+            }
+            txtNombre.setForeground(ThemeConstants.NEON_GREEN);
+            txtCodigo.setForeground(ThemeConstants.NEON_GREEN);
+        };
+
+        // Autocompletado en el campo Nombre del Producto
+        com.mycompany.zl_solucion_integral.views.components.AutocompletePopup.attach(
+            txtNombre,
+            query -> productoCtrl.buscarProductosSugeridos(query),
+            p -> String.format("[%s] %s - $%.2f (Stock: %d)", p.getCodigo(), p.getProducto(), p.getPrecio(), p.getCantidad()),
+            onProductSelect
+        );
+
+        // Autocompletado en el campo Código / SKU
+        com.mycompany.zl_solucion_integral.views.components.AutocompletePopup.attach(
+            txtCodigo,
+            query -> productoCtrl.buscarProductosSugeridos(query),
+            p -> String.format("[%s] %s - $%.2f (Stock: %d)", p.getCodigo(), p.getProducto(), p.getPrecio(), p.getCantidad()),
+            onProductSelect
+        );
     }
 }

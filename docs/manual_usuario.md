@@ -55,25 +55,27 @@ El panel principal muestra un resumen en tiempo real de la operación:
 
 ### 3.2 Productos
 
-#### Registrar un producto
+#### Registrar o Buscar un producto (Autocompletado en Tiempo Real)
 
 1. Abre la sección **Productos** desde el menú lateral.
-2. Completa los campos:
+2. Al empezar a escribir en el campo **Nombre del producto** o **Código/SKU**, el sistema mostrará sugerencias desplegables en tiempo real e insensibles a mayúsculas/minúsculas.
+3. Si seleccionas una sugerencia (con clic o la tecla `Enter`), se rellenarán automáticamente todos los campos del producto (Nombre, Código/SKU, Precio, Stock y Categoría) para consulta o reabastecimiento rápido.
+4. Si registras un producto nuevo, completa los campos:
    - **Nombre del producto** — Nombre descriptivo.
    - **Código/SKU** — Código único de identificación (ej: `SKU-001`).
    - **Categoría** — Selecciona una categoría existente de la lista desplegable **o escribe una categoría nueva** directamente en la casilla. El sistema la aprenderá y guardará automáticamente para tu negocio.
    - **Precio** — Precio unitario de venta.
    - **Stock** — Cantidad disponible.
-3. Pulsa **Guardar producto**.
+5. Pulsa **Crear producto**.
 
 > **Comportamiento:** Si el código ya existe, el sistema **suma** la cantidad al stock existente en lugar de crear un duplicado.
 
 #### Modificar un producto
 
-1. Selecciona un producto en la tabla haciendo clic sobre la fila.
+1. Selecciona un producto en la tabla haciendo clic sobre la fila o búscalo mediante el autocompletado en los campos de entrada.
 2. Los datos se cargan automáticamente en el formulario.
 3. Modifica los campos deseados.
-4. Pulsa **Modificar producto**.
+4. Pulsa **Actualizar**.
 
 #### Eliminar un producto
 
@@ -89,28 +91,28 @@ Utiliza el selector de categoría sobre la tabla para ver solo los productos de 
 
 El punto de venta (POS) cuenta con un diseño de tres tarjetas simétricas diseñadas para máxima eficiencia operativa:
 
-1. **Agregar productos (Izquierda):** Búsqueda ágil por código/SKU o nombre, cantidad y descuento porcentual opcional.
+1. **Agregar productos (Izquierda):** Campo de búsqueda ágil con **autocompletado en tiempo real e insensible a mayúsculas/minúsculas** (busca por código o nombre). Permite seleccionar sugerencias con las teclas $\uparrow$/$\downarrow$ o `Enter`.
 2. **Carrito de compras (Centro):** Listado dinámico con subtotal por ítem y cálculo del gran total en tiempo real.
-3. **Método de pago y cliente (Derecha):** Selector de método de pago prominente y gestión inteligente de cliente adaptada al flujo de caja.
+3. **Método de pago y cliente (Derecha):** Selector de método de pago prominente (`Efectivo`, `Transferencia` y `Crédito`), autocompletado inteligente de clientes por Cédula, Nombre, Teléfono o Correo, y gestión adaptada al flujo de caja.
 
 #### Flujo de Venta Rápida (Cero Fricción)
 
 - **Venta en Efectivo (Por Defecto):**
-  1. Busca el producto y agrégalo al carrito.
+  1. Escribe en el buscador de producto y presiona `Enter` sobre la sugerencia.
   2. El método de pago está predeterminado en **Efectivo** y el cliente en **Venta a Consumidor Final (Sin datos)**.
-  3. Pulsa **Confirmar venta**. ¡Procesado en 2 clics sin digitar datos de cliente!
+  3. Pulsa **Confirmar venta**. ¡Procesado en 2 clics! Se guarda automáticamente con estado `pago_confirmado = 'pagado'`.
 
 - **Venta por Transferencia (Nequi / Bancolombia / Daviplata):**
   1. Selecciona el método **Transferencia**.
-  2. El sistema desactiva automáticamente la casilla de Consumidor Final y despliega los campos para asociar el comprobante a la Cédula/Nombre del titular.
-  3. Al escribir la **Cédula / NIT** y presionar `Enter`, la información se autocompleta al instante si el usuario ya existe.
-  4. Pulsa **Confirmar venta**.
+  2. El sistema desactiva automáticamente la casilla de Consumidor Final y exige los datos del cliente.
+  3. Al escribir cualquier dato en **Cédula / NIT** (Cédula, Nombre, Teléfono o Correo), la lista desplegable sugerirá los clientes registrados o historial de clientes. Al seleccionar uno, se autocompletarán los 4 campos del cliente.
+  4. Pulsa **Confirmar venta**. Se registra con estado `pago_confirmado = 'pagado'`.
 
 - **Venta a Crédito (Fiado / Cuentas por Cobrar):**
   1. Selecciona el método **Crédito**.
   2. El sistema desactiva automáticamente la opción de Consumidor Final y exige los datos del cliente (**Cédula/NIT** y **Nombre/Razón Social**).
-  3. Si la cédula ya existe en el sistema, la información se autocompleta al instante.
-  4. Pulsa **Confirmar venta**.
+  3. Puedes autocompletar los datos usando el buscador inteligente de clientes.
+  4. Pulsa **Confirmar venta**. Se registra en la base de datos con estado `pago_confirmado = 'deudor'` para seguimiento en cartera.
 
 > **Seguridad:** El descuento de existencias en el inventario se ejecuta de forma atómica. Si ocurre una interrupción o fallo de base de datos, la transacción completa se revierte automáticamente.
 

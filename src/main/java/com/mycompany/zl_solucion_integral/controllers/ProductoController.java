@@ -322,6 +322,37 @@ public class ProductoController {
         return producto;
     }
 
+    public java.util.List<Producto> buscarProductosSugeridos(String query) {
+        java.util.List<Producto> lista = new java.util.ArrayList<>();
+        if (query == null || query.trim().isEmpty()) {
+            return lista;
+        }
+        String sql = "SELECT * FROM productos WHERE LOWER(codigo) LIKE LOWER(?) OR LOWER(producto) LIKE LOWER(?) LIMIT 10";
+        try (PreparedStatement pstmt = conn().prepareStatement(sql)) {
+            String term = "%" + query.trim() + "%";
+            pstmt.setString(1, term);
+            pstmt.setString(2, term);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    double precio = rs.getDouble("precio");
+                    int cantidad = rs.getInt("cantidad");
+                    lista.add(new Producto(
+                            rs.getInt("id"),
+                            rs.getString("producto"),
+                            precio,
+                            cantidad,
+                            rs.getString("codigo"),
+                            precio * cantidad,
+                            rs.getString("categoria")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al buscar sugerencias de productos", e);
+        }
+        return lista;
+    }
+
     public void actualizarCantidadProducto(String codigoProducto, int nuevaCantidad) {
         String query = "UPDATE productos SET cantidad = ? WHERE codigo = ?";
         try (PreparedStatement stmt = conn().prepareStatement(query)) {

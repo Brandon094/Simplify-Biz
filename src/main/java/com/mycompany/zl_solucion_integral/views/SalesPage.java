@@ -97,6 +97,9 @@ public class SalesPage extends JPanel {
                 LayoutResponsive.list(panelBusqueda, panelCarrito, checkoutScroll),
                 3, 15, bp));
 
+        // Configurar autocompletados una vez que todos los componentes UI fueron instanciados
+        setupAutocompletes();
+
         // Aplicar estado inicial de visibilidad
         SwingUtilities.invokeLater(this::syncClientState);
     }
@@ -227,7 +230,7 @@ public class SalesPage extends JPanel {
         gbc.gridy = 1; gbc.insets = new Insets(0, 0, 2, 0);
         p.add(createLabel("MÉTODO DE PAGO"), gbc);
 
-        cbPaymentMethod = new JComboBox<>(new String[]{"Efectivo", "Transferencia", "Crédito", "Otro"});
+        cbPaymentMethod = new JComboBox<>(new String[]{"Efectivo", "Transferencia", "Crédito"});
         cbPaymentMethod.setBackground(ThemeConstants.INPUT_BACKGROUND);
         cbPaymentMethod.setForeground(ThemeConstants.TEXT_PRIMARY);
         cbPaymentMethod.addActionListener(e -> syncClientState());
@@ -562,6 +565,39 @@ public class SalesPage extends JPanel {
         FlatSVGIcon icon = new FlatSVGIcon(path, width, height);
         icon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, color));
         return icon;
+    }
+
+    private void setupAutocompletes() {
+        // Autocompletado DRY para Productos
+        com.mycompany.zl_solucion_integral.views.components.AutocompletePopup.attach(
+            txtSearch,
+            query -> productoCtrl.buscarProductosSugeridos(query),
+            p -> String.format("[%s] %s - $%.2f (Stock: %d)", p.getCodigo(), p.getProducto(), p.getPrecio(), p.getCantidad()),
+            p -> {
+                selectedProduct = p;
+                txtSearch.setText(p.getProducto());
+                txtSearch.setForeground(ThemeConstants.NEON_CYAN);
+                txtQty.requestFocusInWindow();
+                txtQty.selectAll();
+            }
+        );
+
+        // Autocompletado DRY para Clientes (por Cédula/NIT, Nombre, Teléfono o Correo)
+        com.mycompany.zl_solucion_integral.views.components.AutocompletePopup.attach(
+            txtClientCC,
+            query -> usuarioCtrl.buscarClientesSugeridos(query),
+            c -> String.format("[%s] %s %s",
+                c.getNoCc() != null && !c.getNoCc().isEmpty() ? c.getNoCc() : "S/D",
+                c.getNombre() != null ? c.getNombre() : "",
+                c.getTelefono() != null && !c.getTelefono().isEmpty() ? "(" + c.getTelefono() + ")" : ""),
+            c -> {
+                txtClientCC.setText(c.getNoCc() != null ? c.getNoCc() : "");
+                txtClientName.setText(c.getNombre() != null ? c.getNombre() : "");
+                txtClientTel.setText(c.getTelefono() != null ? c.getTelefono() : "");
+                txtClientEmail.setText(c.getEmail() != null ? c.getEmail() : "");
+                txtClientCC.setForeground(ThemeConstants.NEON_GREEN);
+            }
+        );
     }
 
     private JTextField createTextField(String placeholder) {

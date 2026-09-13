@@ -86,7 +86,7 @@ public class VentasController {
             }
 
             // Determinar el valor de la columna "pago_confirmado"
-            String pagoConfirmado = venta.getMetodoPago().equalsIgnoreCase("crédito") ? "deudor" : "";
+            String pagoConfirmado = venta.getMetodoPago().equalsIgnoreCase("crédito") ? "deudor" : "pagado";
 
             // Insertar venta general
             psVenta = conn.prepareStatement(sqlInsertVenta, Statement.RETURN_GENERATED_KEYS);

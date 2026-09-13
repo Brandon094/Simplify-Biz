@@ -55,6 +55,7 @@ views/
   │   │   ├── NeonLineChart.java        Gráfico de líneas en Graphics2D con curva suave y grid
   │   │   ├── NeonPieChart.java         Gráfico de torta/anillo responsivo con paleta neón de 10 colores, métricas centrales y leyenda dinámica.
   │   │   └── ThemeToggleButton.java    Botón toggle (☀️/🌙) que conmuta la paleta en caliente
+  │   ├── AutocompletePopup.java        Componente genérico DRY de autocompletado y sugerencias flotantes para JTextFields.
   │   ├── molecules/
   │   │   └── SidebarItem.java          Fila de navegación con icono SVG, etiqueta y estado activo
   │   └── organisms/
