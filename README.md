@@ -13,7 +13,7 @@
 
 ## 🏗️ Estado del Proyecto
 
-Actualmente el sistema cuenta con las **Fases 1 (UI/UX), 2 (Responsive) y 3 (Core & Estabilidad)** cerradas y consolidadas. Consulta el [Roadmap](docs/roadmap/roadmap.md) para ver las fases futuras.
+Actualmente el sistema cuenta con las **Fases 1 (UI/UX), 2 (Responsive), 3 (Core & Estabilidad), 4 (Control de Acceso) y 5 (Dashboard Ejecutivo & Métricas Financieras con Gráficos Neón Interactivos)** cerradas y consolidadas. Consulta el [Roadmap](docs/roadmap/roadmap.md) para ver las fases futuras.
 
 ---
 
@@ -159,11 +159,13 @@ Desarrollo Desktop/
     │   │           ├── LayoutResponsive.java        Breakpoints y reflow adaptativo
     │   │           ├── UIUtils.java                 Utilidades de UI, estilos, componentes
     │   │           ├── UIMessages.java              Constantes de mensajes de usuario
+    │   │           ├── AutocompletePopup.java        Motor de autocompletado genérico desacoplado
     │   │           ├── atoms/
     │   │           │   ├── NeonButton.java          Botón neumórfico con brillo
     │   │           │   ├── RoundedPanel.java        Panel con esquinas redondeadas
     │   │           │   ├── NeonLineChart.java       Gráfico de líneas neon (Graphics2D)
-    │   │           │   ├── NeonPieChart.java        Gráfico de torta por categorías
+    │   │           │   ├── NeonBarChart.java        Gráfico de barras neón comparativo
+    │   │           │   ├── NeonPieChart.java        Gráfico de torta por categorías con hover activo
     │   │           │   └── ThemeToggleButton.java   Toggle de tema con SVG (sol/luna)
     │   │           ├── molecules/
     │   │           │   └── SidebarItem.java         Ítem de navegación lateral

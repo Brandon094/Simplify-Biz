@@ -6,6 +6,7 @@ import com.mycompany.zl_solucion_integral.controllers.VentasController;
 import com.mycompany.zl_solucion_integral.views.components.LayoutResponsive;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
 import com.mycompany.zl_solucion_integral.views.components.UIUtils;
+import com.mycompany.zl_solucion_integral.views.components.atoms.NeonBarChart;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonLineChart;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonPieChart;
 import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
@@ -146,8 +147,11 @@ public class DashboardPage extends JPanel {
         chartsRow.add(pieChartCard);
         mainContainer.add(chartsRow);
 
-        // FILA 2: Actividad Reciente y Widget de Salud del Sistema (Abajo)
-        JPanel tablaVentasCard = createActivityTable("Últimas Ventas Realizadas", ventasRecientes, new String[]{"Fecha", "Cliente", "Producto", "Total"});
+        // FILA 2: Balance Financiero Comparativo y Widget de Salud del Sistema (Abajo)
+        RoundedPanel barChartCard = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
+        barChartCard.setLayout(new BorderLayout());
+        barChartCard.add(new NeonBarChart("Balance Financiero Comparativo ($)", totalVentas, utilidadNeta, inversionInventario), BorderLayout.CENTER);
+
         JPanel statusWidgetCard = createSystemStatusWidget();
 
         tablesRow = new JPanel(new GridBagLayout());
@@ -156,12 +160,12 @@ public class DashboardPage extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weighty = 1.0;
 
-        // Tabla de Ventas ocupa el 68% del ancho
-        gbc.gridx = 0; gbc.weightx = 0.68; gbc.insets = new Insets(0, 0, 0, 10);
-        tablesRow.add(tablaVentasCard, gbc);
+        // Gráfico de Balance Financiero ocupa el 64% del ancho
+        gbc.gridx = 0; gbc.weightx = 0.64; gbc.insets = new Insets(0, 0, 0, 10);
+        tablesRow.add(barChartCard, gbc);
 
-        // Widget de Salud/Alertas ocupa el 32% del ancho
-        gbc.gridx = 1; gbc.weightx = 0.32; gbc.insets = new Insets(0, 8, 0, 0);
+        // Widget de Salud/Alertas ocupa el 36% del ancho
+        gbc.gridx = 1; gbc.weightx = 0.36; gbc.insets = new Insets(0, 6, 0, 0);
         tablesRow.add(statusWidgetCard, gbc);
 
         mainContainer.add(tablesRow);
@@ -174,74 +178,99 @@ public class DashboardPage extends JPanel {
             LayoutResponsive.reflowColumnas(chartsRow,
                     LayoutResponsive.list(lineChartCard, pieChartCard), 2, 18, bp);
             LayoutResponsive.reflowColumnas(tablesRow,
-                    LayoutResponsive.list(tablaVentasCard, statusWidgetCard), 2, 18, bp);
+                    LayoutResponsive.list(barChartCard, statusWidgetCard), 2, 18, bp);
         });
     }
 
     private RoundedPanel createSystemStatusWidget() {
         RoundedPanel card = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
         card.setLayout(new BorderLayout(0, 12));
-        card.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        card.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
 
-        JLabel lblTitle = new JLabel("Salud del Sistema & Alertas");
+        // Encabezado: Título + Badge de estado en vivo (ONLINE)
+        JPanel header = new JPanel(new BorderLayout());
+        header.setOpaque(false);
+
+        JLabel lblTitle = new JLabel("Salud del Sistema");
         lblTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
         lblTitle.setFont(ThemeConstants.FONT_SUBTITLE);
-        card.add(lblTitle, BorderLayout.NORTH);
 
-        JPanel content = new JPanel();
+        JLabel lblLive = createStatusPill("● ONLINE", ThemeConstants.NEON_GREEN);
+        
+        header.add(lblTitle, BorderLayout.WEST);
+        header.add(lblLive, BorderLayout.EAST);
+        card.add(header, BorderLayout.NORTH);
+
+        // Contenido: 4 filas horizontales con badges neón
+        JPanel content = new JPanel(new GridLayout(4, 1, 0, 6));
         content.setOpaque(false);
-        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
 
-        // 1. Estado Base de Datos
-        content.add(createStatusItem("Base de Datos SQLite", "Conectada (Modo WAL)", ThemeConstants.NEON_GREEN, "icons/check-double.svg"));
-        content.add(Box.createVerticalStrut(10));
+        // 1. Base de Datos
+        content.add(createStatusRow("Base de Datos", "icons/check-double.svg", "SQLite WAL", ThemeConstants.NEON_GREEN));
 
-        // 2. Alertas de Stock Crítico
-        String stockMsg = stockCritico > 0 ? stockCritico + " productos requieren pedido urgente" : "Stock en niveles óptimos";
+        // 2. Stock Crítico
+        String stockBadge = stockCritico > 0 ? stockCritico + " requeridos" : "Óptimo";
         Color stockColor = stockCritico > 0 ? ThemeConstants.NEON_RED : ThemeConstants.NEON_GREEN;
-        content.add(createStatusItem("Stock & Reposición", stockMsg, stockColor, "icons/reports.svg"));
-        content.add(Box.createVerticalStrut(10));
+        content.add(createStatusRow("Stock & Reposición", "icons/reports.svg", stockBadge, stockColor));
 
-        // 3. Usuario Sesión Activa
+        // 3. Sesión Activa
         String usuario = com.mycompany.zl_solucion_integral.models.Sesion.getUsuarioLogueado() != null
                 ? com.mycompany.zl_solucion_integral.models.Sesion.getUsuarioLogueado()
                 : "Administrador";
-        content.add(createStatusItem("Sesión Activa", usuario + " (Turno abierto)", ThemeConstants.NEON_CYAN, "icons/clients.svg"));
+        content.add(createStatusRow("Sesión Activa", "icons/clients.svg", usuario, ThemeConstants.NEON_CYAN));
+
+        // 4. Versión del Sistema
+        content.add(createStatusRow("Motor ERP+", "icons/settings.svg", "v1.3.0 Activo", ThemeConstants.NEON_PURPLE));
 
         card.add(content, BorderLayout.CENTER);
         return card;
     }
 
-    private JPanel createStatusItem(String title, String subtitle, Color color, String iconPath) {
-        JPanel item = new JPanel(new BorderLayout(10, 0));
-        item.setOpaque(false);
-        item.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(ThemeConstants.INPUT_BORDER, 1),
-                BorderFactory.createEmptyBorder(8, 12, 8, 12)
-        ));
+    private JPanel createStatusRow(String labelText, String iconPath, String badgeText, Color color) {
+        JPanel row = new JPanel(new BorderLayout(8, 0));
+        row.setOpaque(false);
 
-        FlatSVGIcon icon = new FlatSVGIcon(iconPath, 20, 20);
+        JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        left.setOpaque(false);
+
+        FlatSVGIcon icon = new FlatSVGIcon(iconPath, 16, 16);
         icon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, color));
         JLabel lblIcon = new JLabel(icon);
 
-        JPanel texts = new JPanel();
-        texts.setOpaque(false);
-        texts.setLayout(new BoxLayout(texts, BoxLayout.Y_AXIS));
+        JLabel lblTitle = new JLabel(labelText);
+        lblTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
+        lblTitle.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
 
-        JLabel lblT = new JLabel(title);
-        lblT.setForeground(ThemeConstants.TEXT_PRIMARY);
-        lblT.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
+        left.add(lblIcon);
+        left.add(lblTitle);
 
-        JLabel lblS = new JLabel(subtitle);
-        lblS.setForeground(color);
-        lblS.setFont(ThemeConstants.FONT_SMALL);
+        JLabel badge = createStatusPill(badgeText, color);
 
-        texts.add(lblT);
-        texts.add(lblS);
+        row.add(left, BorderLayout.WEST);
+        row.add(badge, BorderLayout.EAST);
+        return row;
+    }
 
-        item.add(lblIcon, BorderLayout.WEST);
-        item.add(texts, BorderLayout.CENTER);
-        return item;
+    private JLabel createStatusPill(String text, Color color) {
+        JLabel pill = new JLabel(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                // Fondo neón semitransparente (20% opacidad)
+                g2.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 35));
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                // Borde suave
+                g2.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 120));
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 10, 10);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        pill.setForeground(color);
+        pill.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD, 10.5f));
+        pill.setBorder(BorderFactory.createEmptyBorder(3, 8, 3, 8));
+        return pill;
     }
 
     private RoundedPanel createActivityTable(String title, Object[][] data, String[] cols) {

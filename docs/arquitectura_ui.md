@@ -53,7 +53,8 @@ views/
   │   │   ├── NeonButton.java           Botón neumórfico con bordes redondeados, brillo y filtro SVG
   │   │   ├── RoundedPanel.java         Contenedor con esquinas redondeadas ajustables (radius)
   │   │   ├── NeonLineChart.java        Gráfico de líneas en Graphics2D con curva suave y grid
-  │   │   ├── NeonPieChart.java         Gráfico de torta/anillo responsivo con paleta neón de 10 colores, métricas centrales y leyenda dinámica.
+  │   │   ├── NeonBarChart.java         Gráfico de barras neón comparativo (Ventas, Utilidad Neta e Inversión Bodega) con animación hover y valores contables
+  │   │   ├── NeonPieChart.java         Gráfico de dona neón interactivo (Top 5 + "OTROS", hover con animación de rebanada offset, línea conectora neón y resalte de leyenda)
   │   │   └── ThemeToggleButton.java    Botón toggle (☀️/🌙) que conmuta la paleta en caliente
   │   ├── AutocompletePopup.java        Componente genérico DRY de autocompletado y sugerencias flotantes para JTextFields.
   │   ├── molecules/

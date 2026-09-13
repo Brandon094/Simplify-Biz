@@ -44,12 +44,18 @@ La aplicación muestra directamente el formulario de **inicio de sesión**:
 
 ### 3.1 Dashboard
 
-El panel principal muestra un resumen en tiempo real de la operación:
+El panel principal ofrece una visión ejecutiva e inteligente del rendimiento del negocio:
 
-- **KPIs:** Ventas acumuladas, total de órdenes, productos en catálogo y stock crítico (≤5 unidades).
-- **Gráfico de ventas:** Línea neon con los totales de los últimos 7 días.
-- **Estado operativo:** Indicador visual del estado de la base de datos y la actividad.
-- **Últimas ventas:** Tabla con las transacciones más recientes.
+- **KPIs Financieros y Operativos:**
+  - **Ventas Totales ($):** Acumulado histórico total facturado.
+  - **Utilidad Neta ($):** Ganancia real neta descontando los costos de compra del inventario vendido, acompañada del % de margen real.
+  - **Inversión Inventario ($):** Valor total a precio costo de la mercancía disponible en bodega.
+  - **Stock Crítico:** Conteo dinámico de productos con 5 o menos unidades disponibles.
+- **Gráficos Ejecutivos e Interactivos:**
+  - **Ventas Últimos 7 Días:** Gráfico de línea neón con tendencia diaria acumulada.
+  - **Distribución de Inventario:** Gráfico de donut neón interactivo que agrupa automáticamente las 5 categorías con mayor stock y consolida el resto en `"OTROS"`. Al pasar el cursor sobre cualquier categoría, la rebanada se desplaza hacia afuera (*hover offset*) y se dibuja una línea conectora neón que apunta a su texto en la leyenda lateral.
+  - **Balance Financiero Comparativo:** Gráfico de barras neón que compara macroscópicamente las **Ventas Totales ($)**, la **Utilidad Neta ($)** y la **Inversión en Bodega ($)** con animación interactiva al pasar el cursor.
+- **Salud del Sistema & Alertas:** Widget con 3 indicadores en tiempo real: estado de conexión a la BD SQLite (Modo WAL), alerta de reposición urgente de stock, y sesión/turno activo del usuario.
 
 > **Nota:** Los mensajes como *"Aún no hay ventas registradas"* indican que no existen datos aún, no un error del sistema.
 

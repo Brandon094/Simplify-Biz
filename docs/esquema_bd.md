@@ -1,72 +1,56 @@
-# Esquema de Base de Datos — ERP+ Business
+# Esquema de Base de Datos — ERP+ Business (v1.3.0)
 
-> Definiciones DDL de todas las tablas SQLite, relaciones, reglas de operación y estrategia de evolución del esquema.
+> **Definición de Arquitectura DDL, Relaciones y Estrategia de Migración**
 
 ---
 
-## 1. Motor y Configuración
+## 1. Motor & Configuraciones JDBC
 
-| Propiedad | Valor |
+| Parámetro | Configuración |
 | :--- | :--- |
-| Motor | SQLite 3.46+ (embebido) |
+| Motor DB | **SQLite 3.46+** (Modo Embebido) |
 | Driver JDBC | `org.xerial:sqlite-jdbc:3.46.1.0` |
-| Archivo | `db.db` (dentro de la carpeta configurada en `db.path`) |
-| Journal Mode | WAL (Write-Ahead Logging) |
-| Busy Timeout | 5000 ms |
-| Foreign Keys | Habilitadas (`PRAGMA foreign_keys=ON`) |
+| Conexión | Singleton `GestorConexion` compartida |
+| Journal Mode | `PRAGMA journal_mode=WAL;` |
+| Busy Timeout | `PRAGMA busy_timeout=5000;` |
+| Foreign Keys | `PRAGMA foreign_keys=ON;` |
 
 ---
 
-## 2. Diagrama de Relaciones
+## 2. Diagrama Entidad-Relación ASCII
 
-```
-┌─────────────────┐     ┌──────────────────────┐
-│    usuarios      │     │      productos        │
-│─────────────────│     │──────────────────────│
-│ id (PK)         │     │ id (PK)              │
-│ nombre          │     │ producto              │
-│ telefono        │     │ precio               │
-│ email           │     │ cantidad             │
-│ rol             │     │ codigo               │
-│ contraseña      │     │ categoria            │
-└─────────────────┘     └──────────────────────┘
+```text
+┌─────────────────┐     ┌──────────────────────┐     ┌──────────────────────┐
+│    usuarios     │     │      productos       │     │      categorias      │
+├─────────────────┤     ├──────────────────────┤     ├──────────────────────┤
+│ id (PK)         │     │ id (PK)              │     │ id (PK)              │
+│ nombre          │     │ producto             │     │ nombre (UNIQUE)      │
+│ telefono        │     │ precio               │     └──────────────────────┘
+│ email           │     │ precio_costo         │
+│ rol             │     │ cantidad             │
+│ contraseña      │     │ codigo (SKU)         │
+└─────────────────┘     │ categoria (TEXT)     │
+                        └──────────────────────┘
 
 ┌─────────────────────┐      ┌─────────────────────────┐
-│       ventas         │      │     detalles_venta       │
-│─────────────────────│      │─────────────────────────│
-│ id (PK)             │◄─────│ venta_id (FK)            │
-│ cliente             │      │ id (PK)                  │
-│ cc_cliente          │      │ producto                 │
-│ vendedor            │      │ cantidad                 │
-│ fecha               │      │ codigo                   │
-│ total               │      │ precio                   │
-│ metodo_pago         │      │ total                    │
-│ pago_confirmado     │      └─────────────────────────┘
-└─────────────────────┘
-
-┌─────────────────────────────┐
-│       configuracion          │
-│─────────────────────────────│
-│ id (PK, siempre = 1)        │
-│ ultimoNumeroCotizacion      │
-└─────────────────────────────┘
-
-┌─────────────────────────────┐
-│         categorias          │
-│─────────────────────────────│
-│ id (PK)                     │
-│ nombre (UNIQUE, NOT NULL)   │
-└─────────────────────────────┘
+│       ventas        │      │     detalles_venta      │
+├─────────────────────┤      ├─────────────────────────┤
+│ id (PK)             │◄─────┤ venta_id (FK)           │
+│ cliente             │      │ id (PK)                 │
+│ cc_cliente          │      │ producto                │
+│ vendedor            │      │ cantidad                │
+│ fecha               │      │ codigo                  │
+│ total               │      │ precio                  │
+│ metodo_pago         │      │ precio_costo            │
+│ pago_confirmado     │      │ total                   │
+└─────────────────────┘      └─────────────────────────┘
 ```
 
 ---
 
-## 3. Definiciones DDL
+## 3. Sentencias DDL Oficiales
 
-### 3.1 Tabla `usuarios`
-
-Almacena administradores (rol 1), vendedores/empleados (rol 0) y clientes (rol 2).
-
+### 3.1 `usuarios`
 ```sql
 CREATE TABLE IF NOT EXISTS usuarios (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -78,10 +62,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
 );
 ```
 
-### 3.2 Tabla `productos`
-
-Catálogo de productos con stock, costos y categorización.
-
+### 3.2 `productos`
 ```sql
 CREATE TABLE IF NOT EXISTS productos (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,10 +75,7 @@ CREATE TABLE IF NOT EXISTS productos (
 );
 ```
 
-### 3.3 Tabla `ventas`
-
-Encabezado de cada transacción de venta.
-
+### 3.3 `ventas`
 ```sql
 CREATE TABLE IF NOT EXISTS ventas (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -111,10 +89,7 @@ CREATE TABLE IF NOT EXISTS ventas (
 );
 ```
 
-### 3.4 Tabla `detalles_venta`
-
-Líneas de detalle asociadas a una venta (relación 1:N).
-
+### 3.4 `detalles_venta`
 ```sql
 CREATE TABLE IF NOT EXISTS detalles_venta (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -125,84 +100,31 @@ CREATE TABLE IF NOT EXISTS detalles_venta (
     precio       REAL    NOT NULL,
     precio_costo REAL    DEFAULT 0.0,
     total        REAL    NOT NULL,
-    FOREIGN KEY (venta_id) REFERENCES ventas(id)
+    FOREIGN KEY (venta_id) REFERENCES ventas(id) ON DELETE CASCADE
 );
 ```
 
-### 3.5 Tabla `configuracion`
-
-Configuración interna de la aplicación (registro único `id = 1`).
-
+### 3.5 `categorias`
 ```sql
-CREATE TABLE IF NOT EXISTS configuracion (
-    id                      INTEGER PRIMARY KEY,
-    ultimoNumeroCotizacion  TEXT
+CREATE TABLE IF NOT EXISTS categorias (
+    id     INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT UNIQUE NOT NULL
 );
-```
-
-**Valor inicial:**
-
-```sql
-INSERT OR IGNORE INTO configuracion (id, ultimoNumeroCotizacion)
-VALUES (1, '20241212-000');
 ```
 
 ---
 
-## 4. Reglas de Operación
+## 4. Migración Automática de Esquemas (`migrarColumnaSegura`)
 
-### 4.1 Relaciones
-
-- `ventas` ↔ `detalles_venta`: Relación 1:N mediante `detalles_venta.venta_id → ventas.id`.
-- Las foreign keys están habilitadas vía `PRAGMA foreign_keys=ON`.
-
-### 4.2 Venta Mostrador
-
-- Cuando el cliente no proporciona datos personales, se registra como:
-  - `cliente = 'CONSUMIDOR FINAL'`
-  - `cc_cliente = 'N/A'`
-- **No se crea** un usuario ficticio en la tabla `usuarios`.
-
-### 4.3 Integridad de Stock
-
-- El stock se descuenta atómicamente al confirmar una venta dentro de una transacción SQL.
-- Si falla la actualización de stock para cualquier producto, toda la transacción se revierte (`rollback`).
-- La verificación `cantidad >= ?` en el `UPDATE` previene stocks negativos.
-
-### 4.4 Datos Históricos
-
-- `ventas` almacena nombres de cliente y vendedor como **texto plano** (snapshot histórico).
-- No existe clave foránea hacia `usuarios`, lo que permite que los datos de venta persistan incluso si se elimina un usuario.
-
-### 4.5 Seguridad
-
-- Las consultas de listado de usuarios **excluyen** la columna `contraseña` (constante `COLUMNAS_LISTADO`).
-- Las contraseñas se almacenan encriptadas mediante `Seguridad.encriptarContraseña()`.
-
-### 4.6 Proveedores
-
-- Actualmente **no existe** una tabla de proveedores.
-- `ProvidersPage` utiliza datos de demostración en memoria y no representa persistencia real.
-- La tabla se creará en la Fase 4 del roadmap.
-
----
-
-## 5. Inicialización y Evolución
-
-### 5.1 Creación Automática
-
-Las tablas se crean con `CREATE TABLE IF NOT EXISTS` durante el arranque en `ConexionDB.inicializarBaseDeDatos()`. Este mecanismo:
-
-- ✅ Crea tablas nuevas si no existen.
-- ✅ No borra ni modifica tablas existentes.
-- ✅ Inserta valores iniciales solo si no existen (`INSERT OR IGNORE`).
-- ❌ **No realiza migraciones** de columnas para bases existentes.
-
-### 5.2 Cambios Futuros del Esquema
-
-Todo cambio futuro del esquema **debe**:
-
-1. Respaldar la base de datos antes de aplicar cambios.
-2. Implementar una migración explícita (ej: `ALTER TABLE ADD COLUMN`).
-3. Actualizar este documento y el [Diccionario de Datos](diccionario_datos.md) en la misma tarea.
-4. Verificar con `mvn test` que las pruebas siguen pasando.
+`ConexionDB` incluye un mecanismo de auto-migración defensiva en tiempo de arranque:
+```java
+private static void migrarColumnaSegura(Connection conn, String tabla, String columna, String definicion) {
+    if (!existeColumna(conn, tabla, columna)) {
+        String sql = "ALTER TABLE " + tabla + " ADD COLUMN " + columna + " " + definicion;
+        try (Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
+        }
+    }
+}
+```
+Esto garantiza que bases de datos creadas en versiones previas reciban la columna `precio_costo` automáticamente sin requerir intervención manual del usuario.

@@ -1,159 +1,55 @@
-# Configuración del Sistema — ERP+ Business
+# Configuración del Sistema & Despliegue — ERP+ Business (v1.3.0)
 
-> Detalle completo sobre la configuración de la aplicación, el contrato de rutas de la base de datos, opciones de tema y procedimientos de respaldo.
+> **Guía de Despliegue, Rutas Protegidas por SO, Inyección de Datos y SMTP**
 
 ---
 
-## 1. Archivo `config.properties`
+## 1. Archivo de Propiedades `config.properties`
 
-El archivo se encuentra en el **directorio de ejecución** de la aplicación (junto al JAR) y se gestiona mediante `SelecionRuta`.
-
-### 1.1 Propiedades Disponibles
+Reside en la raíz de ejecución de la aplicación y administra las variables de entorno locales.
 
 ```properties
-# Ruta de la carpeta o archivo de base de datos SQLite (si se omite, se usa la ubicación protegida del SO)
-db.path=%APPDATA%\ERPPlusBusiness\db.db
+# Ruta de la base de datos (Si se omite, usa la ruta resguardada del SO)
+db.path=/home/user/.config/ERPPlusBusiness/db.db
 
-# Preferencia de tema (true = oscuro, false = claro)
+# Preferencia de tema (true = Oscuro Cyberpunk, false = Claro)
 theme.dark=true
 
-# Usuario recordado para autocompletar en inicio de sesión (opcional)
+# Recordar usuario en pantalla de login
 remember.user=admin
 ```
 
-### 1.2 Carga y Escritura
-
-| Operación | Método | Descripción |
-| :--- | :--- | :--- |
-| Leer ruta BD | `SelecionRuta.cargarRutaBaseDatos()` | Lee `db.path`. Si no existe o está vacía, devuelve la **ruta protegida automática por SO**. |
-| Ruta Protegida SO | `SelecionRuta.obtenerRutaProtegidaPredeterminada()` | Genera la ruta resguardada (`%APPDATA%\ERPPlusBusiness` en Windows / `~/.config/ERPPlusBusiness` en Linux). |
-| Guardar ruta BD | `Main.guardarRutaEnConfig(ruta)` | Escribe `db.path` en el archivo de propiedades. |
-| Leer tema | `SelecionRuta.cargarPreferenciaTema()` | Lee `theme.dark`. Devuelve `null` si no existe (se interpreta como oscuro). |
-| Guardar tema | `SelecionRuta.guardarPreferenciaTema(isDark)` | Escribe `theme.dark` como `true` o `false`. |
-| Leer usuario recordado | `SelecionRuta.cargarUsuarioRecordado()` | Lee `remember.user`. Devuelve `null` si no existe. |
-| Guardar/limpiar usuario | `SelecionRuta.guardarUsuarioRecordado(usuario)` | Guarda o borra la propiedad `remember.user`. |
-
 ---
 
-## 2. Contrato de Ruta y Archivo Efectivo
+## 2. Contrato de Ruta Segura por SO (`SelecionRuta`)
 
-`GestorConexion.resolverArchivo(dbPath)` define un contrato único de almacenamiento que mantiene compatibilidad total con instalaciones previas y resguarda la base de datos de borrados accidentales:
+Si el usuario no especifica una ruta personalizada en `ConfigPage`, el sistema resuelve de forma automática y transparente un directorio protegido por el sistema operativo:
 
-### 2.1 Ubicación Protegida por Defecto (Protección contra Borrado)
-
-Si el usuario no especifica una ruta manual en `config.properties`, el sistema almacena la base de datos en un directorio privado y oculto del sistema operativo:
-
-- **Windows**: `%APPDATA%\ERPPlusBusiness\db.db` (ej: `C:\Users\<Usuario>\AppData\Roaming\ERPPlusBusiness\db.db`)
+- **Windows**: `%APPDATA%\ERPPlusBusiness\db.db`
 - **Linux**: `~/.config/ERPPlusBusiness/db.db`
 - **macOS**: `~/Library/Application Support/ERPPlusBusiness/db.db`
 
-### 2.2 Reglas de Resolución
-
-| Prioridad | Condición | Archivo Efectivo | Ejemplo |
-| :--- | :--- | :--- | :--- |
-| 1 | `db.path` no configurado / nulo | **Ruta Protegida del SO** | `%APPDATA%\ERPPlusBusiness\db.db` |
-| 2 | `db.path` existe y es un **directorio** | `<db.path>/db.db` | `/home/user/data` → `/home/user/data/db.db` |
-| 3 | `db.path` existe y es un **archivo** | Se usa tal cual | `/home/user/mi_bd.db` → `/home/user/mi_bd.db` |
-| 4 | No existe, pero termina en `.db` o `.sqlite` | Se trata como archivo (crea carpeta padre) | `/home/user/nueva.sqlite` → `/home/user/nueva.sqlite` |
-| 5 | No existe y no parece archivo | Se crea como directorio + `/db.db` | `/home/user/nueva` → `/home/user/nueva/db.db` |
-
-### 2.3 URL JDBC Resultante
-
-```
-jdbc:sqlite:<archivo_efectivo_absoluto>
-```
-
-Ejemplo: `jdbc:sqlite:/home/user/.config/ERPPlusBusiness/db.db`
+Esto evita la pérdida de datos cuando el desarrollador o usuario ejecuta `mvn clean` o actualiza la versión del ejecutable JAR.
 
 ---
 
-## 3. Inicialización de la Base de Datos
+## 3. Scripts de Datos Demo & Pruebas en SQLite
 
-El flujo de inicialización al arrancar la aplicación:
+Para poblar la base de datos SQLite con datos de prueba realistas para demostración de métricas financieras del Dashboard (Fase 5), se proveen los siguientes scripts SQL:
 
-```
-Main.inicializarBaseDatos()
-  ├─ SelecionRuta.cargarRutaBaseDatos()  → lee db.path o carpeta protegida SO
-  ├─ Main.guardarRutaEnConfig(ruta)      → resguarda en config.properties
-  ├─ GestorConexion.inicializar(ruta)
-  │     ├─ resolverArchivo(ruta) → File efectivo
-  │     ├─ DriverManager.getConnection(jdbcUrl)
-  │     └─ aplicarPragmas(conn)
-  │           ├─ PRAGMA journal_mode=WAL
-  │           ├─ PRAGMA busy_timeout=5000
-  │           └─ PRAGMA foreign_keys=ON
-  ├─ ShutdownHook → GestorConexion.cerrar()
-  └─ DatabaseInitializer.inicializarTablas()
-        └─ ConexionDB.inicializarBaseDeDatos()
-              ├─ CREATE TABLE IF NOT EXISTS usuarios
-              ├─ CREATE TABLE IF NOT EXISTS productos
-              ├─ CREATE TABLE IF NOT EXISTS ventas
-              ├─ CREATE TABLE IF NOT EXISTS detalles_venta
-              ├─ CREATE TABLE IF NOT EXISTS configuracion
-              └─ INSERT OR IGNORE INTO configuracion (id=1)
+1. **`datos_demo_fase5.sql`**: Carga de categorías, productos con costo y compras históricas para probar Utilidad Neta ($) e Inversión ($).
+2. **`poblar_repuestos_motos.sql`**: Catálogo de prueba enfocado en repuestos y accesorios de motocicletas.
+3. **`poblar_sistema_completo.sql`**: Dataset masivo de clientes, empleados, catálogo y ventas.
+
+### Ejecución Directa en SQLite CLI:
+```bash
+sqlite3 ~/.config/ERPPlusBusiness/db.db < datos_demo_fase5.sql
 ```
 
-**Reglas:**
-
-- SQLite crea el archivo automáticamente si no existe.
-- Las tablas se crean con `CREATE TABLE IF NOT EXISTS` — no se borran datos existentes.
-- La tabla `configuracion` recibe el registro `id = 1` solo si aún no existe (`INSERT OR IGNORE`).
-- No se realizan migraciones de columnas. Todo cambio futuro del esquema requiere una migración explícita.
-
 ---
 
-## 4. Cambiar la Ruta desde la Aplicación
+## 4. Parámetros SMTP para Envío de Cotizaciones (`EnvioCotizacion`)
 
-1. Abre la sección **Configuración**.
-2. Pulsa **Cambiar ruta** y selecciona la nueva carpeta.
-3. El cambio se escribe en `config.properties`.
-4. **Reinicia la aplicación** para que las conexiones utilicen la nueva ruta.
-
-> **Nota:** La base de datos anterior no se copia automáticamente. Si deseas migrar los datos, copia manualmente el archivo SQLite a la nueva ubicación antes de cambiar la ruta.
-
----
-
-## 5. Configuración de Tema
-
-La preferencia de tema se gestiona de forma transparente:
-
-| Acción | Resultado |
-| :--- | :--- |
-| Pulsar toggle ☀️/🌙 en sidebar | Cambia el tema inmediatamente y guarda la preferencia |
-| Iniciar la aplicación | Lee `theme.dark` de `config.properties`. Oscuro por defecto si no existe. |
-| Cambiar `theme.dark` manualmente | Surte efecto en el próximo arranque |
-
----
-
-## 6. Requisitos y Permisos
-
-| Requisito | Detalle |
-| :--- | :--- |
-| JRE/JDK | 25 o superior |
-| Permiso de escritura | Carpeta de datos (donde reside `db.db`) |
-| Permiso de escritura | Directorio del archivo `config.properties` |
-| Red | No requerida (todo es local) |
-
-**Recomendaciones:**
-
-- Evitar rutas dentro de carpetas sincronizadas (Dropbox, Google Drive, OneDrive) mientras se realizan pruebas con SQLite.
-- En Linux, evitar particiones NTFS montadas vía FUSE para la carpeta `target` de Maven (ya configurado en `pom.xml`).
-
----
-
-## 7. Copias de Seguridad
-
-### 7.1 Respaldo Manual
-
-1. Cierra la aplicación completamente.
-2. Copia el archivo efectivo (`db.db` o la ruta especificada) a una carpeta de respaldo.
-3. Guarda copias con fecha (ej: `db_2026-09-12.db`).
-4. Prueba periódicamente la restauración en una carpeta separada.
-
-### 7.2 Restauración
-
-1. Cierra la aplicación.
-2. Reemplaza el archivo `db.db` en la carpeta de datos con el respaldo.
-3. Inicia la aplicación normalmente.
-
-> **Precaución:** No borrar ni reemplazar `config.properties` sin conservar una copia de la ruta utilizada. Si lo pierdes, deberás volver a seleccionar la carpeta de datos.
+- **Host SMTP**: `smtp.gmail.com`
+- **Puerto**: `587` (TLS)
+- **Autenticación**: Habilitada vía Contraseña de Aplicación de Google.
