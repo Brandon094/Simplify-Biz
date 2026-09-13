@@ -131,17 +131,7 @@ public class DashboardPage extends JPanel {
         JPanel mainContainer = new JPanel(new GridLayout(2, 1, 0, 14));
         mainContainer.setOpaque(false);
 
-        // Fila 1: Tablas
-        JPanel tablaVentasCard = createActivityTable("Últimas Ventas Realizadas", ventasRecientes, new String[]{"Fecha", "Cliente", "Producto", "Total"});
-        Object[][] lowStock = obtenerResumenInventario();
-        JPanel tablaEstadoCard = createActivityTable("Estado operativo del sistema", lowStock, new String[]{"Área", "Servicio", "Estado", "Resultado"});
-        tablesRow = new JPanel(new GridLayout(1, 2, 18, 0));
-        tablesRow.setOpaque(false);
-        tablesRow.add(tablaVentasCard);
-        tablesRow.add(tablaEstadoCard);
-        mainContainer.add(tablesRow);
-
-        // Fila 2: Gráficos
+        // FILA 1: Gráficos de Alto Valor Visual y Ejecutivo (Arriba)
         RoundedPanel lineChartCard = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
         lineChartCard.setLayout(new BorderLayout());
         lineChartCard.add(new NeonLineChart("Ventas Últimos 7 Días ($)", ventas7Dias), BorderLayout.CENTER);
@@ -154,28 +144,104 @@ public class DashboardPage extends JPanel {
         chartsRow.setOpaque(false);
         chartsRow.add(lineChartCard);
         chartsRow.add(pieChartCard);
-
         mainContainer.add(chartsRow);
+
+        // FILA 2: Actividad Reciente y Widget de Salud del Sistema (Abajo)
+        JPanel tablaVentasCard = createActivityTable("Últimas Ventas Realizadas", ventasRecientes, new String[]{"Fecha", "Cliente", "Producto", "Total"});
+        JPanel statusWidgetCard = createSystemStatusWidget();
+
+        tablesRow = new JPanel(new GridBagLayout());
+        tablesRow.setOpaque(false);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weighty = 1.0;
+
+        // Tabla de Ventas ocupa el 68% del ancho
+        gbc.gridx = 0; gbc.weightx = 0.68; gbc.insets = new Insets(0, 0, 0, 10);
+        tablesRow.add(tablaVentasCard, gbc);
+
+        // Widget de Salud/Alertas ocupa el 32% del ancho
+        gbc.gridx = 1; gbc.weightx = 0.32; gbc.insets = new Insets(0, 8, 0, 0);
+        tablesRow.add(statusWidgetCard, gbc);
+
+        mainContainer.add(tablesRow);
         add(mainContainer, BorderLayout.CENTER);
 
-        // Reflow adaptable: en móvil las métricas, tablas y gráficos se apilan.
+        // Reflow adaptable: en móvil las métricas, gráficos y tablas se apilan.
         LayoutResponsive.listen(this, bp -> {
             LayoutResponsive.reflowColumnas(metricsPanel,
                     new java.util.ArrayList<>(metricCards), 4, 14, bp);
-            LayoutResponsive.reflowColumnas(tablesRow,
-                    LayoutResponsive.list(tablaVentasCard, tablaEstadoCard), 2, 18, bp);
             LayoutResponsive.reflowColumnas(chartsRow,
                     LayoutResponsive.list(lineChartCard, pieChartCard), 2, 18, bp);
+            LayoutResponsive.reflowColumnas(tablesRow,
+                    LayoutResponsive.list(tablaVentasCard, statusWidgetCard), 2, 18, bp);
         });
     }
 
-    private Object[][] obtenerResumenInventario() {
-        // Podríamos traer los productos con menos stock directamente
-        return new Object[][]{
-            {"Revisión de Stock", "Sistema", "Auto", "OK"},
-            {"Base de Datos", "SQLite", "Conectada", "En Línea"},
-            {"Sincronización", "General", "100%", "Completada"}
-        };
+    private RoundedPanel createSystemStatusWidget() {
+        RoundedPanel card = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
+        card.setLayout(new BorderLayout(0, 12));
+        card.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JLabel lblTitle = new JLabel("Salud del Sistema & Alertas");
+        lblTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
+        lblTitle.setFont(ThemeConstants.FONT_SUBTITLE);
+        card.add(lblTitle, BorderLayout.NORTH);
+
+        JPanel content = new JPanel();
+        content.setOpaque(false);
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+
+        // 1. Estado Base de Datos
+        content.add(createStatusItem("Base de Datos SQLite", "Conectada (Modo WAL)", ThemeConstants.NEON_GREEN, "icons/check-double.svg"));
+        content.add(Box.createVerticalStrut(10));
+
+        // 2. Alertas de Stock Crítico
+        String stockMsg = stockCritico > 0 ? stockCritico + " productos requieren pedido urgente" : "Stock en niveles óptimos";
+        Color stockColor = stockCritico > 0 ? ThemeConstants.NEON_RED : ThemeConstants.NEON_GREEN;
+        content.add(createStatusItem("Stock & Reposición", stockMsg, stockColor, "icons/reports.svg"));
+        content.add(Box.createVerticalStrut(10));
+
+        // 3. Usuario Sesión Activa
+        String usuario = com.mycompany.zl_solucion_integral.models.Sesion.getUsuarioLogueado() != null
+                ? com.mycompany.zl_solucion_integral.models.Sesion.getUsuarioLogueado()
+                : "Administrador";
+        content.add(createStatusItem("Sesión Activa", usuario + " (Turno abierto)", ThemeConstants.NEON_CYAN, "icons/clients.svg"));
+
+        card.add(content, BorderLayout.CENTER);
+        return card;
+    }
+
+    private JPanel createStatusItem(String title, String subtitle, Color color, String iconPath) {
+        JPanel item = new JPanel(new BorderLayout(10, 0));
+        item.setOpaque(false);
+        item.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(ThemeConstants.INPUT_BORDER, 1),
+                BorderFactory.createEmptyBorder(8, 12, 8, 12)
+        ));
+
+        FlatSVGIcon icon = new FlatSVGIcon(iconPath, 20, 20);
+        icon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, color));
+        JLabel lblIcon = new JLabel(icon);
+
+        JPanel texts = new JPanel();
+        texts.setOpaque(false);
+        texts.setLayout(new BoxLayout(texts, BoxLayout.Y_AXIS));
+
+        JLabel lblT = new JLabel(title);
+        lblT.setForeground(ThemeConstants.TEXT_PRIMARY);
+        lblT.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
+
+        JLabel lblS = new JLabel(subtitle);
+        lblS.setForeground(color);
+        lblS.setFont(ThemeConstants.FONT_SMALL);
+
+        texts.add(lblT);
+        texts.add(lblS);
+
+        item.add(lblIcon, BorderLayout.WEST);
+        item.add(texts, BorderLayout.CENTER);
+        return item;
     }
 
     private RoundedPanel createActivityTable(String title, Object[][] data, String[] cols) {
