@@ -204,55 +204,67 @@ public class SalesPage extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0; gbc.gridx = 0;
 
-        JLabel title = new JLabel("Datos del cliente y pago", createIcon("icons/clients.svg", ThemeConstants.NEON_GREEN, 20, 20), SwingConstants.LEFT);
+        JLabel title = new JLabel("Método de pago y cliente", createIcon("icons/clients.svg", ThemeConstants.NEON_GREEN, 20, 20), SwingConstants.LEFT);
         title.setForeground(ThemeConstants.TEXT_PRIMARY);
         title.setFont(ThemeConstants.FONT_SUBTITLE);
         gbc.gridy = 0; gbc.insets = new Insets(0, 0, 16, 0);
         p.add(title, gbc);
 
-        chkGenericClient = new JCheckBox("Cliente no desea suministrar datos");
+        // 1. Selector de Método de Pago Prominente arriba
+        gbc.gridy = 1; gbc.insets = new Insets(0, 0, 4, 0);
+        p.add(createLabel("MÉTODO DE PAGO"), gbc);
+
+        cbPaymentMethod = new JComboBox<>(new String[]{"Efectivo", "Transferencia", "Crédito", "Otro"});
+        cbPaymentMethod.setBackground(ThemeConstants.INPUT_BACKGROUND);
+        cbPaymentMethod.setForeground(ThemeConstants.TEXT_PRIMARY);
+        cbPaymentMethod.addActionListener(e -> updatePaymentMethodState());
+        gbc.gridy = 2; gbc.insets = new Insets(0, 0, 14, 0);
+        p.add(cbPaymentMethod, gbc);
+
+        // Checkbox Venta Rápida / Consumidor Final
+        chkGenericClient = new JCheckBox("Venta a Consumidor Final (Sin datos)");
+        chkGenericClient.setSelected(true);
         chkGenericClient.setOpaque(false);
         chkGenericClient.setForeground(ThemeConstants.TEXT_SECONDARY);
         chkGenericClient.setFont(ThemeConstants.FONT_SMALL);
         chkGenericClient.addActionListener(e -> toggleGenericClient());
-        gbc.gridy = 1; gbc.insets = new Insets(0, 0, 14, 0);
+        gbc.gridy = 3; gbc.insets = new Insets(0, 0, 14, 0);
         p.add(chkGenericClient, gbc);
 
-        gbc.gridy = 2; gbc.insets = new Insets(0, 0, 4, 0);
-        p.add(createLabel("NOMBRE DEL CLIENTE"), gbc);
-        txtClientName = createTextField("Nombre completo");
-        setupFieldIcon(txtClientName, "icons/user.svg");
-        gbc.gridy = 3; gbc.insets = new Insets(0, 0, 10, 0);
-        p.add(txtClientName, gbc);
-
         gbc.gridy = 4; gbc.insets = new Insets(0, 0, 4, 0);
-        p.add(createLabel("CÉDULA / NIT"), gbc);
-        txtClientCC = createTextField("Documento");
+        p.add(createLabel("CÉDULA / NIT (ENTER PARA BUSCAR)"), gbc);
+        txtClientCC = createTextField("Ej: 1098765432...");
         setupFieldIcon(txtClientCC, "icons/id.svg");
+        txtClientCC.addActionListener(e -> searchClientByCC());
+        txtClientCC.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                searchClientByCC();
+            }
+        });
         gbc.gridy = 5; gbc.insets = new Insets(0, 0, 10, 0);
-        p.add(txtClientCC, gbc);
+        p.add(UIUtils.createFieldWithHelper(txtClientCC, "Presiona Enter o cambia de campo para autocompletar"), gbc);
 
         gbc.gridy = 6; gbc.insets = new Insets(0, 0, 4, 0);
-        p.add(createLabel("TELÉFONO"), gbc);
-        txtClientTel = createTextField("Contacto");
-        setupFieldIcon(txtClientTel, "icons/phone.svg");
+        p.add(createLabel("NOMBRE DEL CLIENTE / RAZÓN SOCIAL"), gbc);
+        txtClientName = createTextField("Nombre o negocio");
+        setupFieldIcon(txtClientName, "icons/user.svg");
         gbc.gridy = 7; gbc.insets = new Insets(0, 0, 10, 0);
-        p.add(txtClientTel, gbc);
+        p.add(txtClientName, gbc);
 
         gbc.gridy = 8; gbc.insets = new Insets(0, 0, 4, 0);
-        p.add(createLabel("CORREO ELECTRÓNICO"), gbc);
+        p.add(createLabel("TELÉFONO (OPCIONAL)"), gbc);
+        txtClientTel = createTextField("Contacto");
+        setupFieldIcon(txtClientTel, "icons/phone.svg");
+        gbc.gridy = 9; gbc.insets = new Insets(0, 0, 10, 0);
+        p.add(txtClientTel, gbc);
+
+        gbc.gridy = 10; gbc.insets = new Insets(0, 0, 4, 0);
+        p.add(createLabel("CORREO ELECTRÓNICO (OPCIONAL)"), gbc);
         txtClientEmail = createTextField("cliente@correo.com");
         setupFieldIcon(txtClientEmail, "icons/email.svg");
-        gbc.gridy = 9; gbc.insets = new Insets(0, 0, 10, 0);
-        p.add(txtClientEmail, gbc);
-
-        gbc.gridy = 10; gbc.insets = new Insets(4, 0, 4, 0);
-        p.add(createLabel("MÉTODO DE PAGO"), gbc);
-        cbPaymentMethod = new JComboBox<>(new String[]{"Efectivo", "Crédito", "Transferencia", "Otro"});
-        cbPaymentMethod.setBackground(ThemeConstants.INPUT_BACKGROUND);
-        cbPaymentMethod.setForeground(ThemeConstants.TEXT_PRIMARY);
         gbc.gridy = 11; gbc.insets = new Insets(0, 0, 18, 0);
-        p.add(cbPaymentMethod, gbc);
+        p.add(txtClientEmail, gbc);
 
         NeonButton btnConfirm = new NeonButton("Confirmar venta");
         btnConfirm.setNeonColor(ThemeConstants.NEON_GREEN);
@@ -263,6 +275,9 @@ public class SalesPage extends JPanel {
         btnConfirm.setToolTipText("Procesa el cobro, guarda la venta y descuenta el stock");
         gbc.gridy = 12; gbc.insets = new Insets(0, 0, 0, 0);
         p.add(btnConfirm, gbc);
+
+        // Inicializar estado por defecto (Efectivo / Consumidor Final)
+        SwingUtilities.invokeLater(this::updatePaymentMethodState);
 
         return p;
     }
@@ -279,6 +294,25 @@ public class SalesPage extends JPanel {
             txtSearch.setForeground(ThemeConstants.NEON_CYAN);
         } else {
             UIUtils.showError(this, "Producto no encontrado.");
+        }
+    }
+
+    private void searchClientByCC() {
+        if (chkGenericClient != null && chkGenericClient.isSelected()) {
+            return;
+        }
+        String cc = txtClientCC.getText().trim();
+        if (cc.isEmpty()) {
+            return;
+        }
+        Usuario clientFound = usuarioCtrl.buscarClientePorCC(cc);
+        if (clientFound != null) {
+            txtClientName.setText(clientFound.getNombre() != null ? clientFound.getNombre() : "");
+            txtClientTel.setText(clientFound.getTelefono() != null ? clientFound.getTelefono() : "");
+            txtClientEmail.setText(clientFound.getEmail() != null ? clientFound.getEmail() : "");
+            txtClientCC.setForeground(ThemeConstants.NEON_GREEN);
+        } else {
+            txtClientCC.setForeground(ThemeConstants.TEXT_PRIMARY);
         }
     }
 
@@ -334,21 +368,57 @@ public class SalesPage extends JPanel {
         lblTotal.setText(String.format("TOTAL: $ %.2f", total));
     }
 
+    private void updatePaymentMethodState() {
+        if (cbPaymentMethod == null) return;
+        String metodo = (String) cbPaymentMethod.getSelectedItem();
+        if ("Crédito".equals(metodo)) {
+            // Crédito requiere datos obligatorios del cliente
+            chkGenericClient.setSelected(false);
+            chkGenericClient.setEnabled(false);
+            toggleGenericClient();
+        } else if ("Transferencia".equals(metodo)) {
+            // Transferencia habilita los campos pero permite consumidor final si no hay datos
+            chkGenericClient.setEnabled(true);
+            if (chkGenericClient.isSelected()) {
+                toggleGenericClient();
+            }
+        } else {
+            // Efectivo u Otro: Consumidor final por defecto (Cero Fricción)
+            chkGenericClient.setEnabled(true);
+        }
+    }
+
     private void finishSale() {
         if (cartItems.isEmpty()) {
             UIUtils.showError(this, "El carrito está vacío.");
             return;
         }
 
+        String metodoPago = (String) cbPaymentMethod.getSelectedItem();
         boolean genericClient = chkGenericClient.isSelected();
+
+        // Validaciones específicas por método de pago
+        if ("Crédito".equals(metodoPago) && genericClient) {
+            UIUtils.showError(this, "Las ventas a Crédito requieren obligatoriamente los datos del cliente.");
+            return;
+        }
+
         String clientName = genericClient ? "CONSUMIDOR FINAL" : txtClientName.getText().trim();
         String clientCC = genericClient ? "N/A" : txtClientCC.getText().trim();
         String clientTel = genericClient ? "N/A" : txtClientTel.getText().trim();
         String clientEmail = genericClient ? "N/A" : txtClientEmail.getText().trim();
 
-        if (!genericClient && (clientName.isEmpty() || clientCC.isEmpty())) {
-            UIUtils.showError(this, "Nombre y Cédula del cliente son obligatorios.");
-            return;
+        if (!genericClient) {
+            if (clientCC.isEmpty() && clientName.isEmpty()) {
+                UIUtils.showError(this, "Ingresa al menos la Cédula/NIT o el Nombre del cliente.");
+                return;
+            }
+            if (clientName.isEmpty()) {
+                clientName = "Cliente (" + clientCC + ")";
+            }
+            if (clientCC.isEmpty()) {
+                clientCC = "S/D";
+            }
         }
 
         List<Producto> productsToSave = new ArrayList<>();
@@ -367,7 +437,7 @@ public class SalesPage extends JPanel {
         finalVenta.setVendedor(com.mycompany.zl_solucion_integral.models.Sesion.getUsuarioLogueado());
         finalVenta.setFecha(LocalDate.now());
         finalVenta.setTotal(currentGrandTotal);
-        finalVenta.setMetodoPago((String) cbPaymentMethod.getSelectedItem());
+        finalVenta.setMetodoPago(metodoPago);
 
         com.mycompany.zl_solucion_integral.config.ResultadoOperacion res = ventasCtrl.guardarVenta(finalVenta, productsToSave, new JTable());
 
@@ -395,11 +465,9 @@ public class SalesPage extends JPanel {
         cartItems.clear();
         cartModel.setRowCount(0);
         updateTotal();
-        txtClientName.setText("");
-        txtClientCC.setText("");
-        txtClientTel.setText("");
-        txtClientEmail.setText("");
-        chkGenericClient.setSelected(false);
+        cbPaymentMethod.setSelectedIndex(0); // Efectivo por defecto
+        chkGenericClient.setSelected(true);
+        updatePaymentMethodState();
         toggleGenericClient();
     }
 
@@ -415,11 +483,20 @@ public class SalesPage extends JPanel {
             txtClientCC.setText("N/A");
             txtClientTel.setText("N/A");
             txtClientEmail.setText("N/A");
+            txtClientCC.setForeground(ThemeConstants.TEXT_PRIMARY);
         } else {
-            txtClientName.setText("");
-            txtClientCC.setText("");
-            txtClientTel.setText("");
-            txtClientEmail.setText("");
+            if ("CONSUMIDOR FINAL".equals(txtClientName.getText().trim())) {
+                txtClientName.setText("");
+            }
+            if ("N/A".equals(txtClientCC.getText().trim())) {
+                txtClientCC.setText("");
+            }
+            if ("N/A".equals(txtClientTel.getText().trim())) {
+                txtClientTel.setText("");
+            }
+            if ("N/A".equals(txtClientEmail.getText().trim())) {
+                txtClientEmail.setText("");
+            }
         }
     }
 

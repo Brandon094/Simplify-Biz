@@ -140,7 +140,7 @@ public class UsuarioController {
                     rs.getString("nombre"),
                     rs.getString("email"),
                     rs.getString("telefono"),
-                    rs.getString("rol")
+                    convertirRolTexto(rs.getInt("rol"))
                 });
             }
             tablaUsuarios.setModel(modelo);
@@ -178,11 +178,20 @@ public class UsuarioController {
                     rs.getString("nombre"),
                     rs.getString("email"),
                     rs.getString("telefono"),
-                    rs.getInt("rol")
+                    convertirRolTexto(rs.getInt("rol"))
                 });
             }
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Error al filtrar usuarios por rol", e);
+        }
+    }
+
+    public static String convertirRolTexto(int rol) {
+        switch (rol) {
+            case 1: return "Administrador";
+            case 0: return "Empleado";
+            case 2: return "Cliente";
+            default: return "Usuario";
         }
     }
 
@@ -316,5 +325,58 @@ public class UsuarioController {
             logger.log(Level.SEVERE, "Error al restablecer la contraseña", e);
             return ResultadoOperacion.error(UIMessages.MSG_ERROR_BD);
         }
+    }
+
+    /**
+     * Busca un cliente o usuario por su número de documento/cédula o nombre exacto/email.
+     * Si no se especifica cédula explícita, se busca también en las ventas anteriores.
+     */
+    public Usuario buscarClientePorCC(final String cc) {
+        if (cc == null || cc.trim().isEmpty()) {
+            return null;
+        }
+        String ccLimpia = cc.trim();
+
+        // 1. Buscar en la tabla usuarios por cualquier campo identificador (nombre, email, o teléfono/contraseña)
+        String sqlUsuario = "SELECT nombre, telefono, email FROM usuarios WHERE LOWER(nombre) = LOWER(?) OR LOWER(email) = LOWER(?) OR LOWER(contraseña) = LOWER(?) OR LOWER(telefono) = LOWER(?) LIMIT 1";
+        try (PreparedStatement pstmt = conn().prepareStatement(sqlUsuario)) {
+            pstmt.setString(1, ccLimpia);
+            pstmt.setString(2, ccLimpia);
+            pstmt.setString(3, ccLimpia);
+            pstmt.setString(4, ccLimpia);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Usuario u = new Usuario();
+                    u.setNombre(rs.getString("nombre"));
+                    u.setTelefono(rs.getString("telefono"));
+                    u.setEmail(rs.getString("email"));
+                    u.setNoCc(ccLimpia);
+                    return u;
+                }
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error al buscar cliente por CC en usuarios", e);
+        }
+
+        // 2. Buscar en el historial de ventas (tabla ventas, columna cc_cliente y cliente)
+        String sqlVentas = "SELECT cliente, cc_cliente FROM ventas WHERE LOWER(cc_cliente) = LOWER(?) OR LOWER(cliente) = LOWER(?) ORDER BY id DESC LIMIT 1";
+        try (PreparedStatement pstmt = conn().prepareStatement(sqlVentas)) {
+            pstmt.setString(1, ccLimpia);
+            pstmt.setString(2, ccLimpia);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Usuario u = new Usuario();
+                    u.setNombre(rs.getString("cliente"));
+                    u.setNoCc(rs.getString("cc_cliente") != null ? rs.getString("cc_cliente") : ccLimpia);
+                    u.setTelefono("");
+                    u.setEmail("");
+                    return u;
+                }
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error al buscar cliente por CC en ventas", e);
+        }
+
+        return null;
     }
 }
