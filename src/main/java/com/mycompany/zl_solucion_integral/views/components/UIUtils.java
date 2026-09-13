@@ -466,6 +466,11 @@ public class UIUtils {
         JOptionPane.showMessageDialog(parent, message, UIMessages.TITULO_ERROR, JOptionPane.ERROR_MESSAGE);
     }
 
+    /** Muestra un diálogo de advertencia consistente con el tema. */
+    public static void showWarning(Component parent, String message) {
+        JOptionPane.showMessageDialog(parent, message, "Advertencia", JOptionPane.WARNING_MESSAGE);
+    }
+
     /** Muestra un diálogo de éxito consistente con el tema. */
     public static void showSuccess(Component parent, String message) {
         JOptionPane.showMessageDialog(parent, message, UIMessages.TITULO_EXITO, JOptionPane.INFORMATION_MESSAGE);
@@ -486,5 +491,177 @@ public class UIUtils {
     /** Muestra un diálogo de información consistente con el tema. */
     public static void showInfo(Component parent, String title, String message) {
         JOptionPane.showMessageDialog(parent, message, title, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private static final java.text.NumberFormat CURRENCY_FORMAT = java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("es", "CO"));
+    private static final java.text.SimpleDateFormat DISPLAY_DATE_FMT = new java.text.SimpleDateFormat("dd/MM/yyyy");
+    private static final java.text.SimpleDateFormat ISO_DATE_FMT = new java.text.SimpleDateFormat("yyyy-MM-dd");
+
+    /** Formatea un valor numérico a moneda contable ($ 15.000,00 o $ 15.000). */
+    public static String formatCurrency(double amount) {
+        return CURRENCY_FORMAT.format(amount);
+    }
+
+    /**
+     * Formatea cualquier objeto de fecha (Date, LocalDate, Timestamp o cadena 'yyyy-MM-dd')
+     * al formato estándar unificado 'dd/MM/yyyy'.
+     */
+    public static String formatDate(Object dateVal) {
+        if (dateVal == null) return "";
+        if (dateVal instanceof java.util.Date) {
+            return DISPLAY_DATE_FMT.format((java.util.Date) dateVal);
+        }
+        if (dateVal instanceof java.time.LocalDate) {
+            return ((java.time.LocalDate) dateVal).format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        }
+        String str = dateVal.toString().trim();
+        if (str.matches("^\\d{4}-\\d{2}-\\d{2}.*")) {
+            try {
+                java.util.Date d = ISO_DATE_FMT.parse(str.substring(0, 10));
+                return DISPLAY_DATE_FMT.format(d);
+            } catch (java.text.ParseException ignored) {}
+        }
+        return str;
+    }
+
+    /** Oculta visualmente la columna indicada por su nombre en el TableHeader. */
+    public static void hideColumn(JTable table, String columnName) {
+        if (table == null || table.getColumnModel() == null) return;
+        for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
+            javax.swing.table.TableColumn col = table.getColumnModel().getColumn(i);
+            if (col.getHeaderValue() != null && columnName.equalsIgnoreCase(col.getHeaderValue().toString().trim())) {
+                table.removeColumn(col);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Aplica el sistema de diseño DRY a cualquier JTable de la aplicación:
+     * - Oculta la columna "Id" visualmente si existe.
+     * - Configura colores de zebra, selección, fuentes y bordes.
+     * - Alinea y aplica formato por tipo de columna (Moneda a la derecha, datos numéricos/códigos/fechas/estados centrados, textos a la izquierda).
+     */
+    public static void applyTableStyling(JTable table) {
+        if (table == null) return;
+
+        // 1. Ocultar la columna Id visualmente si está presente
+        hideColumn(table, "Id");
+
+        table.setBackground(ThemeConstants.CARD_BACKGROUND);
+        table.setForeground(ThemeConstants.TEXT_PRIMARY);
+        table.setRowHeight(ThemeConstants.TABLE_ROW_HEIGHT);
+        table.setShowGrid(false);
+        table.setFillsViewportHeight(true);
+        table.setFont(ThemeConstants.FONT_SMALL);
+        table.setSelectionBackground(new Color(168, 85, 247, 70));
+        table.setSelectionForeground(ThemeConstants.TEXT_PRIMARY);
+
+        // Encabezado
+        javax.swing.table.JTableHeader header = table.getTableHeader();
+        if (header != null) {
+            header.setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
+            header.setForeground(ThemeConstants.TEXT_SECONDARY);
+            header.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
+            header.setPreferredSize(new Dimension(0, 32));
+            header.setReorderingAllowed(false);
+        }
+
+        // Renderizadores por tipo de columna
+        for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
+            javax.swing.table.TableColumn col = table.getColumnModel().getColumn(i);
+            if (col.getHeaderValue() == null) continue;
+            String headerText = col.getHeaderValue().toString().trim();
+
+            if (isCurrencyColumn(headerText)) {
+                col.setCellRenderer(new javax.swing.table.DefaultTableCellRenderer() {
+                    @Override
+                    public Component getTableCellRendererComponent(JTable tbl, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                        Object formatted = value;
+                        if (value instanceof Number) {
+                            formatted = formatCurrency(((Number) value).doubleValue());
+                        } else if (value != null && !value.toString().isEmpty()) {
+                            try {
+                                double val = Double.parseDouble(value.toString().replace("$", "").replace(".", "").replace(",", ".").trim());
+                                formatted = formatCurrency(val);
+                            } catch (NumberFormatException ignored) {}
+                        }
+                        Component c = super.getTableCellRendererComponent(tbl, formatted, isSelected, hasFocus, row, column);
+                        if (isSelected) {
+                            c.setBackground(new Color(168, 85, 247, 40));
+                        } else {
+                            c.setBackground(row % 2 == 0 ? ThemeConstants.CARD_BACKGROUND : ThemeConstants.TABLE_ZEBRA);
+                            c.setForeground(ThemeConstants.TEXT_PRIMARY);
+                        }
+                        setHorizontalAlignment(SwingConstants.RIGHT);
+                        setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+                        return c;
+                    }
+                });
+                col.setPreferredWidth(headerText.equalsIgnoreCase("Precio Total") || headerText.equalsIgnoreCase("Total") ? 120 : 100);
+            } else if (isCenterColumn(headerText)) {
+                col.setCellRenderer(new javax.swing.table.DefaultTableCellRenderer() {
+                    @Override
+                    public Component getTableCellRendererComponent(JTable tbl, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                        Object cellValue = value;
+                        if (headerText.equalsIgnoreCase("Fecha") && value != null) {
+                            cellValue = formatDate(value);
+                        }
+                        Component c = super.getTableCellRendererComponent(tbl, cellValue, isSelected, hasFocus, row, column);
+                        if (isSelected) {
+                            c.setBackground(new Color(168, 85, 247, 40));
+                        } else {
+                            c.setBackground(row % 2 == 0 ? ThemeConstants.CARD_BACKGROUND : ThemeConstants.TABLE_ZEBRA);
+                            if (headerText.equalsIgnoreCase("Pago confirmado") && value != null && value.toString().equalsIgnoreCase("deudor")) {
+                                c.setForeground(new Color(245, 158, 11)); // Tono ámbar para deudores
+                            } else {
+                                c.setForeground(ThemeConstants.TEXT_SECONDARY);
+                            }
+                        }
+                        setHorizontalAlignment(SwingConstants.CENTER);
+                        setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+                        return c;
+                    }
+                });
+                if (headerText.equalsIgnoreCase("Cantidad") || headerText.equalsIgnoreCase("Stock")) col.setPreferredWidth(75);
+                else if (headerText.equalsIgnoreCase("Código") || headerText.equalsIgnoreCase("SKU")) col.setPreferredWidth(90);
+                else if (headerText.equalsIgnoreCase("Fecha")) col.setPreferredWidth(100);
+                else col.setPreferredWidth(110);
+            } else {
+                col.setCellRenderer(new javax.swing.table.DefaultTableCellRenderer() {
+                    @Override
+                    public Component getTableCellRendererComponent(JTable tbl, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                        Component c = super.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, column);
+                        if (isSelected) {
+                            c.setBackground(new Color(168, 85, 247, 40));
+                        } else {
+                            c.setBackground(row % 2 == 0 ? ThemeConstants.CARD_BACKGROUND : ThemeConstants.TABLE_ZEBRA);
+                            c.setForeground(ThemeConstants.TEXT_SECONDARY);
+                        }
+                        setHorizontalAlignment(SwingConstants.LEFT);
+                        setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+                        return c;
+                    }
+                });
+                if (headerText.equalsIgnoreCase("Producto") || headerText.equalsIgnoreCase("Nombre")) col.setPreferredWidth(180);
+                else if (headerText.equalsIgnoreCase("Cliente") || headerText.equalsIgnoreCase("Categoría")) col.setPreferredWidth(140);
+                else if (headerText.equalsIgnoreCase("Vendedor")) col.setPreferredWidth(120);
+                else col.setPreferredWidth(110);
+            }
+        }
+    }
+
+    private static boolean isCurrencyColumn(String header) {
+        if (header == null) return false;
+        String h = header.toLowerCase();
+        return h.contains("precio") || h.equals("total") || h.contains("monto") || h.contains("valor");
+    }
+
+    private static boolean isCenterColumn(String header) {
+        if (header == null) return false;
+        String h = header.toLowerCase();
+        return h.contains("cantidad") || h.contains("stock") || h.contains("código") || h.contains("codigo") || h.contains("sku")
+                || h.contains("fecha") || h.contains("teléfono") || h.contains("telefono") || h.contains("cc") || h.contains("nit")
+                || h.contains("método") || h.contains("metodo") || h.contains("pago") || h.contains("rol");
     }
 }

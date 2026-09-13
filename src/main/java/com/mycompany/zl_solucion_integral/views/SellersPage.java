@@ -319,13 +319,18 @@ public class SellersPage extends JPanel {
     }
 
     private void loadSelectedSeller() {
-        int row = tbSellers.getSelectedRow();
-        if (row != -1) {
-            selectedSellerId = Integer.parseInt(tbSellers.getValueAt(row, 0).toString());
-            txtName.setText(tbSellers.getValueAt(row, 1).toString());
-            txtEmail.setText(tbSellers.getValueAt(row, 2).toString());
-            txtTel.setText(tbSellers.getValueAt(row, 3).toString());
-            txtPassword.setText(""); // Por seguridad no cargamos la clave
+        int viewRow = tbSellers.getSelectedRow();
+        if (viewRow != -1) {
+            int modelRow = tbSellers.convertRowIndexToModel(viewRow);
+            Object idVal = tbSellers.getModel().getValueAt(modelRow, 0);
+            Integer idParsed = com.mycompany.zl_solucion_integral.config.Validaciones.parseEntero(idVal != null ? idVal.toString() : "");
+            if (idParsed != null && idParsed != -1) {
+                selectedSellerId = idParsed;
+                txtName.setText(tbSellers.getModel().getValueAt(modelRow, 1).toString());
+                txtEmail.setText(tbSellers.getModel().getValueAt(modelRow, 2).toString());
+                txtTel.setText(tbSellers.getModel().getValueAt(modelRow, 3).toString());
+                txtPassword.setText(""); // Por seguridad no cargamos la clave
+            }
         }
     }
 
@@ -343,32 +348,7 @@ public class SellersPage extends JPanel {
     }
 
     private void estilizarTabla() {
-        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if (isSelected) {
-                    c.setBackground(new Color(34, 197, 94, 40)); // Verde neón suave
-                } else {
-                    c.setBackground(row % 2 == 0
-                            ? ThemeConstants.CARD_BACKGROUND
-                            : ThemeConstants.TABLE_ZEBRA);
-                    c.setForeground(ThemeConstants.TEXT_SECONDARY);
-                }
-                setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
-                return c;
-            }
-        };
-        for (int i = 0; i < tbSellers.getColumnCount(); i++) {
-            tbSellers.getColumnModel().getColumn(i).setCellRenderer(renderer);
-        }
-
-        JTableHeader header = tbSellers.getTableHeader();
-        header.setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
-        header.setForeground(ThemeConstants.TEXT_SECONDARY);
-        header.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
-        header.setPreferredSize(new Dimension(0, 32));
-        header.setReorderingAllowed(false);
+        UIUtils.applyTableStyling(tbSellers);
         actualizarEstadoVacio();
     }
 

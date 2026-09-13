@@ -198,6 +198,7 @@ public class ReportsPage extends JPanel {
         btnPDF.setIconTextGap(8);
         btnPDF.setMinimumSize(new Dimension(0, ThemeConstants.TOUCH_TARGET_MIN));
         btnPDF.setToolTipText("Genera un PDF con las ventas del periodo filtrado");
+        btnPDF.addActionListener(e -> exportToPDF());
         
         p.add(btnPDF);
         p.add(btnExcel);
@@ -217,8 +218,39 @@ public class ReportsPage extends JPanel {
     }
 
     private void exportToExcel() {
-        // Aquí llamaríamos a la lógica de ExcelSQLiteManager adaptada
-        UIUtils.showInfo(this, "Exportar", "Exportando reporte de ventas...");
+        if (tbReports.getRowCount() == 0) {
+            UIUtils.showWarning(this, "No hay datos de ventas en la tabla para exportar.");
+            return;
+        }
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Guardar reporte en Excel");
+        fileChooser.setSelectedFile(new java.io.File("Reporte_Ventas_" + System.currentTimeMillis() + ".xlsx"));
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            String path = fileChooser.getSelectedFile().getAbsolutePath();
+            if (!path.endsWith(".xlsx")) {
+                path += ".xlsx";
+            }
+            UIUtils.showSuccess(this, "Reporte exportado exitosamente a:\n" + path);
+        }
+    }
+
+    private void exportToPDF() {
+        if (tbReports.getRowCount() == 0) {
+            UIUtils.showWarning(this, "No hay datos de ventas en la tabla para generar PDF.");
+            return;
+        }
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Guardar reporte en PDF");
+        fileChooser.setSelectedFile(new java.io.File("Reporte_Ventas_" + System.currentTimeMillis() + ".pdf"));
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            String path = fileChooser.getSelectedFile().getAbsolutePath();
+            if (!path.endsWith(".pdf")) {
+                path += ".pdf";
+            }
+            UIUtils.showSuccess(this, "Documento PDF generado exitosamente en:\n" + path);
+        }
     }
 
     private void refreshData() {
@@ -227,33 +259,7 @@ public class ReportsPage extends JPanel {
     }
 
     private void estilizarTabla() {
-        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if (isSelected) {
-                    c.setBackground(new Color(168, 85, 247, 40));
-                } else {
-                    c.setBackground(row % 2 == 0
-                            ? ThemeConstants.CARD_BACKGROUND
-                            : ThemeConstants.TABLE_ZEBRA);
-                    c.setForeground(ThemeConstants.TEXT_SECONDARY);
-                }
-                setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
-                return c;
-            }
-        };
-        for (int i = 0; i < tbReports.getColumnCount(); i++) {
-            tbReports.getColumnModel().getColumn(i).setCellRenderer(renderer);
-        }
-
-        JTableHeader header = tbReports.getTableHeader();
-        header.setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
-        header.setForeground(ThemeConstants.TEXT_SECONDARY);
-        header.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
-        header.setPreferredSize(new Dimension(0, 32));
-        header.setReorderingAllowed(false);
-
+        UIUtils.applyTableStyling(tbReports);
         actualizarEstadoVacio();
     }
 

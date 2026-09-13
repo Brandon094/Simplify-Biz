@@ -28,6 +28,7 @@ public class ProductPage extends JPanel {
     private JPanel formPanel;
     private JPanel rightPanel;
     private JPanel header;
+    private int selectedProductId = -1;
 
     public ProductPage() {
         setOpaque(false);
@@ -61,7 +62,7 @@ public class ProductPage extends JPanel {
         // Gráfico de Distribución (Abajo de la tabla, formato compacto)
         chartContainer = new JPanel(new BorderLayout());
         chartContainer.setOpaque(false);
-        chartContainer.setPreferredSize(new Dimension(0, 150));
+        chartContainer.setPreferredSize(new Dimension(0, 190));
         updateChart();
         rightPanel.add(chartContainer, BorderLayout.SOUTH);
 
@@ -133,9 +134,11 @@ public class ProductPage extends JPanel {
 
         gbc.gridy = 5; gbc.insets = new Insets(0, 0, 4, 0);
         p.add(createLabel("CATEGORÍA"), gbc);
-        cbCategoria = new JComboBox<>(new String[]{"HERRAMIENTAS", "MATERIALES", "ELECTRÓNICA", "BEBIDAS", "LIMPIEZA", "OTROS"});
+        cbCategoria = new JComboBox<>();
+        cbCategoria.setEditable(true);
         cbCategoria.setBackground(ThemeConstants.INPUT_BACKGROUND);
         cbCategoria.setForeground(ThemeConstants.TEXT_PRIMARY);
+        cargarCategorias();
         gbc.gridy = 6; gbc.insets = new Insets(0, 0, 12, 0);
         p.add(cbCategoria, gbc);
 
@@ -254,22 +257,39 @@ public class ProductPage extends JPanel {
     }
 
     private void loadSelectedProductToForm() {
-        int selectedId = productoCtrl.obtenerIdProductoSeleccionado(tbProductos);
-        if (selectedId != -1) {
-            Producto p = productoCtrl.obtenerProductoPorId(selectedId);
-            if (p != null) {
-                txtNombre.setText(p.getProducto());
-                txtCodigo.setText(p.getCodigo());
-                txtPrecio.setText(String.valueOf(p.getPrecio()));
-                txtCantidad.setText(String.valueOf(p.getCantidad()));
-                cbCategoria.setSelectedItem(p.getCategoria() != null ? p.getCategoria() : "OTROS");
+        int viewRow = tbProductos.getSelectedRow();
+        if (viewRow != -1) {
+            int modelRow = tbProductos.convertRowIndexToModel(viewRow);
+            Object idVal = tbProductos.getModel().getValueAt(modelRow, 0);
+            Integer idParsed = com.mycompany.zl_solucion_integral.config.Validaciones.parseEntero(idVal != null ? idVal.toString() : "");
+            if (idParsed != null && idParsed != -1) {
+                selectedProductId = idParsed;
+                Producto p = productoCtrl.obtenerProductoPorId(selectedProductId);
+                if (p != null) {
+                    txtNombre.setText(p.getProducto());
+                    txtCodigo.setText(p.getCodigo());
+                    txtPrecio.setText(String.valueOf(p.getPrecio()));
+                    txtCantidad.setText(String.valueOf(p.getCantidad()));
+                    cbCategoria.setSelectedItem(p.getCategoria() != null ? p.getCategoria() : "OTROS");
+                }
             }
         }
     }
 
+    private void cargarCategorias() {
+        Object selected = cbCategoria.getSelectedItem();
+        cbCategoria.removeAllItems();
+        java.util.List<String> cats = productoCtrl.obtenerCategorias();
+        for (String c : cats) {
+            cbCategoria.addItem(c);
+        }
+        if (selected != null) {
+            cbCategoria.setSelectedItem(selected);
+        }
+    }
+
     private void updateProductFromForm() {
-        int selectedId = productoCtrl.obtenerIdProductoSeleccionado(tbProductos);
-        if (selectedId == -1) {
+        if (selectedProductId == -1) {
             UIUtils.showError(this, "Seleccione un producto de la tabla para actualizar.");
             return;
         }
@@ -278,7 +298,9 @@ public class ProductPage extends JPanel {
         String code = txtCodigo.getText().trim();
         String priceStr = txtPrecio.getText().trim();
         String qtyStr = txtCantidad.getText().trim();
-        String cat = (String) cbCategoria.getSelectedItem();
+        Object rawCat = cbCategoria.getSelectedItem();
+        String cat = rawCat != null ? rawCat.toString().trim().toUpperCase() : "GENERAL";
+        if (cat.isEmpty()) cat = "GENERAL";
 
         if (name.isEmpty() || code.isEmpty() || priceStr.isEmpty() || qtyStr.isEmpty()) {
             UIUtils.showError(this, UIMessages.MSG_CAMPOS_OBLIGATORIOS);
@@ -293,7 +315,8 @@ public class ProductPage extends JPanel {
             return;
         }
 
-        Producto p = new Producto(selectedId, name, price, qty, code, price * qty, cat);
+        productoCtrl.guardarCategoriaSiNoExiste(cat);
+        Producto p = new Producto(selectedProductId, name, price, qty, code, price * qty, cat);
         com.mycompany.zl_solucion_integral.config.ResultadoOperacion res = productoCtrl.modificarProducto(p);
         if (res.esExito()) {
             UIUtils.showSuccess(this, res.getMensaje());
@@ -320,7 +343,9 @@ public class ProductPage extends JPanel {
         String code = txtCodigo.getText().trim();
         String priceStr = txtPrecio.getText().trim();
         String qtyStr = txtCantidad.getText().trim();
-        String cat = (String) cbCategoria.getSelectedItem();
+        Object rawCat = cbCategoria.getSelectedItem();
+        String cat = rawCat != null ? rawCat.toString().trim().toUpperCase() : "GENERAL";
+        if (cat.isEmpty()) cat = "GENERAL";
 
         if (name.isEmpty() || code.isEmpty() || priceStr.isEmpty() || qtyStr.isEmpty()) {
             UIUtils.showError(this, UIMessages.MSG_CAMPOS_OBLIGATORIOS);
@@ -339,6 +364,7 @@ public class ProductPage extends JPanel {
             return;
         }
 
+        productoCtrl.guardarCategoriaSiNoExiste(cat);
         Producto p = new Producto(name, price, qty, code, cat);
         com.mycompany.zl_solucion_integral.config.ResultadoOperacion res = productoCtrl.agregarOActualizarProductoSiExiste(p);
         
@@ -352,8 +378,7 @@ public class ProductPage extends JPanel {
     }
 
     private void deleteProduct() {
-        int selectedId = productoCtrl.obtenerIdProductoSeleccionado(tbProductos);
-        if (selectedId == -1) {
+        if (selectedProductId == -1) {
             UIUtils.showError(this, "Seleccione un producto de la tabla.");
             return;
         }
@@ -367,7 +392,7 @@ public class ProductPage extends JPanel {
         );
 
         if (confirmacion == JOptionPane.YES_OPTION) {
-            com.mycompany.zl_solucion_integral.config.ResultadoOperacion res = productoCtrl.eliminarProducto(selectedId);
+            com.mycompany.zl_solucion_integral.config.ResultadoOperacion res = productoCtrl.eliminarProducto(selectedProductId);
             if (res.esExito()) {
                 UIUtils.showSuccess(this, res.getMensaje());
                 refreshData();
@@ -381,6 +406,7 @@ public class ProductPage extends JPanel {
     private void refreshData() {
         productoCtrl.mostrarProductos(tbProductos);
         estilizarTabla();
+        cargarCategorias();
         updateChart();
     }
 
@@ -389,47 +415,12 @@ public class ProductPage extends JPanel {
         txtCodigo.setText("");
         txtPrecio.setText("");
         txtCantidad.setText("");
+        selectedProductId = -1;
     }
 
     private void estilizarTabla() {
-        if (tbProductos.getColumnCount() > 0
-                && "Id".equals(tbProductos.getColumnName(0))) {
-            tbProductos.removeColumn(tbProductos.getColumnModel().getColumn(0));
-        }
-
-        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if (isSelected) {
-                    c.setBackground(new Color(59, 130, 246, 40));
-                } else {
-                    c.setBackground(row % 2 == 0
-                            ? ThemeConstants.CARD_BACKGROUND
-                            : ThemeConstants.TABLE_ZEBRA);
-                    c.setForeground(ThemeConstants.TEXT_SECONDARY);
-                }
-                setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
-                return c;
-            }
-        };
-        for (int i = 0; i < tbProductos.getColumnCount(); i++) {
-            tbProductos.getColumnModel().getColumn(i).setCellRenderer(renderer);
-        }
-
-        int[] preferredWidths = {220, 100, 80, 105, 135};
-        for (int i = 0; i < tbProductos.getColumnCount(); i++) {
-            int width = preferredWidths[Math.min(i, preferredWidths.length - 1)];
-            tbProductos.getColumnModel().getColumn(i).setPreferredWidth(width);
-        }
-
+        UIUtils.applyTableStyling(tbProductos);
         actualizarEstadoVacio();
-        JTableHeader header = tbProductos.getTableHeader();
-        header.setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
-        header.setForeground(ThemeConstants.TEXT_SECONDARY);
-        header.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
-        header.setPreferredSize(new Dimension(0, 32));
-        header.setReorderingAllowed(false);
     }
 
     private void actualizarEstadoVacio() {

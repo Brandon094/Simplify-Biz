@@ -187,44 +187,9 @@ public class DashboardPage extends JPanel {
 
         JTable table = new JTable(data, cols);
         table.setBackground(ThemeConstants.CARD_BACKGROUND);
-        table.setForeground(ThemeConstants.TEXT_SECONDARY);
-        table.setSelectionBackground(new Color(59, 130, 246, 70));
-        table.setSelectionForeground(ThemeConstants.TEXT_PRIMARY);
-        table.setRowHeight(ThemeConstants.TABLE_ROW_HEIGHT);
-        table.setShowGrid(false);
-        table.setIntercellSpacing(new Dimension(0, 1));
-        table.setFont(ThemeConstants.FONT_SMALL);
-        table.setFillsViewportHeight(true);
         table.setAutoCreateRowSorter(true);
 
-        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus, int row, int column) {
-                Component component = super.getTableCellRendererComponent(
-                        table, value, isSelected, hasFocus, row, column);
-                if (!isSelected) {
-                    component.setBackground(row % 2 == 0
-                            ? ThemeConstants.CARD_BACKGROUND
-                            : ThemeConstants.TABLE_ZEBRA);
-                    component.setForeground(ThemeConstants.TEXT_SECONDARY);
-                }
-                setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
-                return component;
-            }
-        });
-
-        JTableHeader tableHeader = table.getTableHeader();
-        tableHeader.setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
-        tableHeader.setForeground(ThemeConstants.TEXT_SECONDARY);
-        tableHeader.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
-        tableHeader.setPreferredSize(new Dimension(0, 32));
-        tableHeader.setReorderingAllowed(false);
-
-        int columnWidth = Math.max(90, 680 / cols.length);
-        for (int column = 0; column < table.getColumnCount(); column++) {
-            table.getColumnModel().getColumn(column).setPreferredWidth(columnWidth);
-        }
+        UIUtils.applyTableStyling(table);
 
         if (data == null || data.length == 0) {
             FlatSVGIcon icon = new FlatSVGIcon("icons/sales.svg", 36, 36);

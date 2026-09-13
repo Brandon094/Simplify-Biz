@@ -84,48 +84,9 @@ public class ClientsPage extends JPanel {
     }
 
     private void estilizarTabla() {
-        ocultarColumnasInternas();
-
-        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus, int row, int column) {
-                Component component = super.getTableCellRendererComponent(
-                        table, value, isSelected, hasFocus, row, column);
-                if (!isSelected) {
-                    component.setBackground(row % 2 == 0
-                            ? ThemeConstants.CARD_BACKGROUND
-                            : ThemeConstants.TABLE_ZEBRA);
-                    component.setForeground(ThemeConstants.TEXT_SECONDARY);
-                }
-                setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
-                return component;
-            }
-        };
-
-        for (int column = 0; column < tbClientes.getColumnCount(); column++) {
-            tbClientes.getColumnModel().getColumn(column).setCellRenderer(renderer);
-        }
-
-        JTableHeader header = tbClientes.getTableHeader();
-        header.setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
-        header.setForeground(ThemeConstants.TEXT_SECONDARY);
-        header.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
-        header.setPreferredSize(new Dimension(0, 32));
-        header.setReorderingAllowed(false);
+        UIUtils.applyTableStyling(tbClientes);
+        UIUtils.hideColumn(tbClientes, "Rol");
         actualizarEstadoVacio();
-    }
-
-    private void ocultarColumnasInternas() {
-        String[] hiddenColumns = {"Id", "Rol"};
-        for (String columnName : hiddenColumns) {
-            for (int column = 0; column < tbClientes.getColumnCount(); column++) {
-                if (columnName.equals(tbClientes.getColumnName(column))) {
-                    tbClientes.removeColumn(tbClientes.getColumnModel().getColumn(column));
-                    break;
-                }
-            }
-        }
     }
 
     private void actualizarEstadoVacio() {
