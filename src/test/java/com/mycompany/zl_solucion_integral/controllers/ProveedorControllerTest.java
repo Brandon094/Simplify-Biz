@@ -9,8 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 import java.nio.file.Path;
 import java.util.List;
 

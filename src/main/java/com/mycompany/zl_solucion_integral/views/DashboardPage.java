@@ -13,8 +13,6 @@ import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
 import com.mycompany.zl_solucion_integral.views.components.atoms.ShimmerSkeleton;
 import com.mycompany.zl_solucion_integral.views.components.organisms.MetricCard;
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.text.NumberFormat;
 import java.util.List;
@@ -27,7 +25,6 @@ public class DashboardPage extends JPanel {
 
     // Panel norte fijo: título arriba y métricas después de la carga asíncrona.
     private final JPanel northWrap = new JPanel(new BorderLayout(0, 18));
-    private final JPanel headerPanel = new JPanel();
 
     // Datos cargados en segundo plano por el SwingWorker.
     private double totalVentas;

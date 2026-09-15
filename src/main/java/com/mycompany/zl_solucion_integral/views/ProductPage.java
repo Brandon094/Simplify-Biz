@@ -5,24 +5,19 @@ import com.mycompany.zl_solucion_integral.models.Producto;
 import com.mycompany.zl_solucion_integral.views.components.LayoutResponsive;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonButton;
-import com.mycompany.zl_solucion_integral.views.components.atoms.NeonPieChart;
 import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
 import com.mycompany.zl_solucion_integral.views.components.UIUtils;
 import com.mycompany.zl_solucion_integral.views.components.UIMessages;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.JTableHeader;
 import java.awt.*;
-import java.util.Map;
 
 public class ProductPage extends JPanel {
     private final ProductoController productoCtrl = new ProductoController();
     private JTable tbProductos;
     private JTextField txtNombre, txtPrecio, txtPrecioCosto, txtCantidad, txtCodigo;
     private JComboBox<String> cbCategoria;
-    private JPanel chartContainer;
     private JScrollPane productsScroll;
     private JPanel centerPanel;
     private JPanel formPanel;

@@ -1,7 +1,5 @@
 package com.mycompany.zl_solucion_integral.config;
 
-import javax.swing.JOptionPane;
-
 public class Validaciones {
 
     /**

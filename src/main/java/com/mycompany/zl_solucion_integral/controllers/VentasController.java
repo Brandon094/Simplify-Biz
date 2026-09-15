@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.text.ParseException;
 import javax.swing.table.TableModel;
 
 /* Clase encargada de manejar las operaciones
@@ -606,12 +605,6 @@ public class VentasController {
             logger.log(Level.SEVERE, "Error al mostrar ventas por día", e);
             return ResultadoOperacion.error(UIMessages.MSG_ERROR_BD);
         }
-    }
-
-    // Método para formatear la fecha
-    private String formatearFecha(Date fecha) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");  // Formato de fecha deseado
-        return sdf.format(fecha);  // Retorna la fecha en formato legible
     }
 
     /**
