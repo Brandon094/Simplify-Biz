@@ -1,137 +1,163 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ERP+ Business | Sistema de Gestión Comercial, POS & Inventarios 100% Offline</title>
-  <meta name="description" content="Potencia las ventas y el control de tu negocio con ERP+ Business. Punto de venta POS ultrarrápido, gestión de inventario, cartera de clientes y compras en una solución segura e intuitiva.">
-  <meta name="keywords" content="ERP, Punto de Venta, POS, Inventario, Gestión Comercial, Software Negocios, Cierre Z, Cartera, Colombia">
+  <meta name="description" content="Potencia las ventas y el control de tu negocio con ERP+ Business. Punto de venta POS ultrarrápido, gestión de inventario, cartera de clientes y compras.">
   
+  <!-- TailwindCSS v3 CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: '#0B0F19',
+              card: '#111827',
+              blue: '#3B82F6',
+              purple: '#A855F7',
+              green: '#22C55E',
+              amber: '#F59E0B',
+              cyan: '#06B6D4'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            heading: ['Outfit', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
   <!-- Google Fonts: Outfit & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
   
-  <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/animations.css">
-
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/images/app_icon.png">
 </head>
-<body>
+<body class="bg-[#0B0F19] text-slate-100 font-sans antialiased selection:bg-purple-500 selection:text-white overflow-x-hidden">
 
   <!-- Ambient Glowing Background Orbs -->
-  <div class="orb orb-purple"></div>
-  <div class="orb orb-blue"></div>
-  <div class="orb orb-green"></div>
+  <div class="fixed -top-24 -right-24 w-96 h-96 bg-purple-600/30 rounded-full blur-[120px] pointer-events-none z-0"></div>
+  <div class="fixed top-96 -left-24 w-96 h-96 bg-blue-600/25 rounded-full blur-[120px] pointer-events-none z-0"></div>
+  <div class="fixed bottom-48 right-10 w-80 h-80 bg-emerald-500/20 rounded-full blur-[120px] pointer-events-none z-0"></div>
 
-  <!-- 1. Floating Glassmorphism Navbar -->
-  <nav class="navbar" id="navbar">
-    <a href="#" class="nav-logo">
-      <img src="assets/images/app_icon.png" alt="ERP+ Business Logo">
-      <span>ERP+ <span class="gradient-text">Business</span></span>
+  <!-- ATOMS: Navbar Fixed Floating Container -->
+  <header class="fixed top-0 md:top-4 left-0 md:left-1/2 md:-translate-x-1/2 w-full md:w-[calc(100%-3rem)] max-w-7xl bg-[#0B0F19]/90 backdrop-blur-xl border-b md:border border-white/10 md:rounded-full px-5 py-3 flex items-center justify-between z-50 transition-all duration-300 shadow-2xl">
+    <a href="#" class="flex items-center gap-2.5 font-heading text-xl font-extrabold text-white">
+      <img src="assets/images/app_icon.png" alt="ERP+ Business Logo" class="w-8 h-8 rounded-lg shadow-md">
+      <span>ERP+ <span class="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">Business</span></span>
     </a>
 
-    <!-- Mobile Menu Hamburger Button -->
-    <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú de navegación" aria-expanded="false">
-      <span></span>
-      <span></span>
-      <span></span>
+    <!-- Mobile Drawer Toggle Button -->
+    <button id="menuToggle" aria-label="Abrir menú" class="md:hidden flex flex-col justify-around w-9 h-9 bg-white/5 border border-white/10 rounded-lg p-2 focus:outline-none">
+      <span class="w-full h-0.5 bg-slate-200 rounded"></span>
+      <span class="w-full h-0.5 bg-slate-200 rounded"></span>
+      <span class="w-full h-0.5 bg-slate-200 rounded"></span>
     </button>
 
-    <ul class="nav-links" id="navLinks">
-      <li><a href="#modulos">Módulos</a></li>
-      <li><a href="#beneficios">Beneficios</a></li>
-      <li><a href="#calculadora">Calculadora de Ahorro</a></li>
-      <li><a href="#descarga">Descargas</a></li>
-      <li style="margin-top: 0.5rem;" class="mobile-only-cta">
-        <a href="#descarga" class="btn btn-primary">Probar Gratis</a>
-      </li>
-    </ul>
+    <!-- Navigation Links (Molecules) -->
+    <nav id="navLinks" class="fixed md:static top-16 left-0 w-full md:w-auto bg-[#0B0F19]/95 md:bg-transparent backdrop-blur-2xl md:backdrop-blur-none border-b md:border-none border-white/10 p-6 md:p-0 flex flex-col md:flex-row gap-5 md:gap-8 -translate-y-[150%] md:translate-y-0 opacity-0 md:opacity-100 transition-all duration-300 ease-in-out z-40">
+      <a href="#modulos" class="text-slate-300 hover:text-cyan-400 font-medium transition-colors text-base md:text-sm">Módulos</a>
+      <a href="#beneficios" class="text-slate-300 hover:text-cyan-400 font-medium transition-colors text-base md:text-sm">Beneficios</a>
+      <a href="#calculadora" class="text-slate-300 hover:text-cyan-400 font-medium transition-colors text-base md:text-sm">Calculadora ROI</a>
+      <a href="#descarga" class="text-slate-300 hover:text-cyan-400 font-medium transition-colors text-base md:text-sm">Descargas</a>
+      <a href="#descarga" class="md:hidden mt-2 w-full py-3 text-center font-semibold rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-purple-500/25">Probar Gratis</a>
+    </nav>
 
-    <a href="#descarga" class="btn btn-primary nav-cta-desktop">Probar Gratis</a>
-  </nav>
+    <a href="#descarga" class="hidden md:inline-flex items-center justify-center px-6 py-2.5 rounded-full font-semibold text-sm bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg shadow-blue-500/25 hover:shadow-purple-500/40 transition-all duration-300 transform hover:-translate-y-0.5">Probar Gratis</a>
+  </header>
 
-  <!-- 2. Hero Section -->
-  <section class="hero container">
-    <div class="hero-badge animated-float">
-      <img src="assets/icons/rocket.svg" width="16" alt="Rocket">
-      <span>Sistema Comercial v2.0.2 • Ultra Rápido</span>
+  <!-- ORGANISM: Hero Section -->
+  <section class="relative pt-28 md:pt-40 pb-16 px-4 max-w-7xl mx-auto flex flex-col items-center text-center z-10">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs md:text-sm font-semibold mb-6 animate-pulse">
+      <img src="assets/icons/rocket.svg" class="w-4 h-4" alt="Rocket">
+      <span>Sistema Comercial v2.0.2 • Ultra Rápido & Seguro</span>
     </div>
 
-    <h1 class="hero-title">
-      Toma el Control Absoluto de tu Negocio en <span class="gradient-text">Menos de 3 Clics</span>
+    <h1 class="font-heading text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight max-w-4xl leading-tight mb-6">
+      Toma el Control Absoluto de tu Negocio en <span class="bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent">Menos de 3 Clics</span>
     </h1>
 
-    <p class="hero-subtitle">
+    <p class="text-slate-400 text-base md:text-xl max-w-2xl mb-8 leading-relaxed">
       Optimiza tus ventas, elimina las pérdidas de inventario y gestiona tu cartera de clientes con el ERP comercial más intuitivo, potente y 100% independiente de internet.
     </p>
 
-    <div class="hero-ctas">
-      <a href="#descarga" class="btn btn-primary animated-glow">
-        <img src="assets/icons/boxes-stacked.svg" width="20" alt="Descargar">
+    <!-- CTAs -->
+    <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mb-16">
+      <a href="#descarga" class="w-full sm:w-auto px-8 py-4 rounded-full font-semibold text-base bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-xl shadow-blue-500/30 hover:shadow-purple-500/50 transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-2">
+        <img src="assets/icons/boxes-stacked.svg" class="w-5 h-5" alt="Icon">
         Descargar ERP+ Business Gratis
       </a>
-      <a href="#preview" class="btn btn-secondary">
-        <img src="assets/icons/chart-column.svg" width="20" alt="Demo">
+      <a href="#preview" class="w-full sm:w-auto px-8 py-4 rounded-full font-semibold text-base bg-white/5 hover:bg-white/10 border border-white/15 text-slate-200 backdrop-blur-md transition-all duration-300 flex items-center justify-center gap-2">
+        <img src="assets/icons/chart-column.svg" class="w-5 h-5" alt="Icon">
         Ver Maqueta Interactiva
       </a>
     </div>
 
-    <!-- 3. Dynamic Interactive App Preview Mockup -->
-    <div class="mockup-container" id="preview">
-      <div class="mockup-header">
-        <div class="dot dot-red"></div>
-        <div class="dot dot-yellow"></div>
-        <div class="dot dot-green"></div>
-        <span class="mockup-title">ERP+ Business v2.0.2 - Panel Principal de Control</span>
+    <!-- ORGANISM: Interactive App Preview Mockup (MVVM Data Bound) -->
+    <div id="preview" class="w-full max-w-5xl bg-slate-900 border border-white/15 rounded-2xl overflow-hidden shadow-2xl shadow-purple-950/50 text-left">
+      <div class="bg-slate-800/80 px-4 py-3 flex items-center gap-2 border-b border-white/10">
+        <div class="w-3 h-3 rounded-full bg-rose-500"></div>
+        <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+        <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+        <span class="text-xs text-slate-400 ml-2 font-mono truncate">ERP+ Business v2.0.2 - Panel Principal de Control</span>
       </div>
-      <div class="mockup-body">
-        <div class="mock-sidebar">
-          <div class="mock-item active">
-            <img src="assets/icons/dashboard.svg" width="18" alt="Dashboard"> Dashboard
-          </div>
-          <div class="mock-item">
-            <img src="assets/icons/cart-shopping.svg" width="18" alt="POS"> POS Ventas
-          </div>
-          <div class="mock-item">
-            <img src="assets/icons/products.svg" width="18" alt="Productos"> Inventario
-          </div>
-          <div class="mock-item">
-            <img src="assets/icons/wallet.svg" width="18" alt="Cartera"> Cartera
-          </div>
-          <div class="mock-item">
-            <img src="assets/icons/reports.svg" width="18" alt="Reportes"> Cierre Z
-          </div>
+
+      <div class="p-4 md:p-6 grid grid-cols-1 md:grid-cols-4 gap-6 min-h-[420px]">
+        <!-- Sidebar Navigation (Molecules) -->
+        <div class="md:col-span-1 flex md:flex-col overflow-x-auto md:overflow-x-visible gap-2 border-b md:border-b-0 md:border-r border-white/10 pb-3 md:pb-0 md:pr-4">
+          <button data-tab="dashboard" class="mock-tab flex-1 md:flex-initial px-4 py-2.5 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
+            <img src="assets/icons/dashboard.svg" class="w-4 h-4" alt="Icon"> Dashboard
+          </button>
+          <button data-tab="pos" class="mock-tab flex-1 md:flex-initial px-4 py-2.5 rounded-lg text-xs md:text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-all">
+            <img src="assets/icons/cart-shopping.svg" class="w-4 h-4" alt="Icon"> POS Ventas
+          </button>
+          <button data-tab="inventario" class="mock-tab flex-1 md:flex-initial px-4 py-2.5 rounded-lg text-xs md:text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-all">
+            <img src="assets/icons/products.svg" class="w-4 h-4" alt="Icon"> Inventario
+          </button>
+          <button data-tab="cartera" class="mock-tab flex-1 md:flex-initial px-4 py-2.5 rounded-lg text-xs md:text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-all">
+            <img src="assets/icons/wallet.svg" class="w-4 h-4" alt="Icon"> Cartera
+          </button>
         </div>
 
-        <div class="mock-dashboard">
-          <div class="mock-card">
-            <div class="mock-card-label">Ventas Hoy</div>
-            <div class="mock-card-value gradient-cyan">$ 1,480,000</div>
-          </div>
-          <div class="mock-card">
-            <div class="mock-card-label">Ganancia Neta</div>
-            <div class="mock-card-value gradient-text">$ 420,000</div>
-          </div>
-          <div class="mock-card">
-            <div class="mock-card-label">Stock Crítico</div>
-            <div class="mock-card-value" style="color: var(--neon-amber);">3 ítems</div>
+        <!-- Dynamic Content (ViewModel Reactive State) -->
+        <div class="md:col-span-3 flex flex-col gap-5">
+          <!-- Metric Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-slate-800/50 border border-white/10 rounded-xl p-4">
+              <span class="text-xs text-slate-400 font-medium">Ventas Hoy</span>
+              <div id="vmVentas" class="text-xl md:text-2xl font-extrabold text-cyan-400 mt-1">$ 1,480,000</div>
+            </div>
+            <div class="bg-slate-800/50 border border-white/10 rounded-xl p-4">
+              <span class="text-xs text-slate-400 font-medium">Ganancia Neta</span>
+              <div id="vmGanancia" class="text-xl md:text-2xl font-extrabold text-purple-400 mt-1">$ 420,000</div>
+            </div>
+            <div class="bg-slate-800/50 border border-white/10 rounded-xl p-4">
+              <span class="text-xs text-slate-400 font-medium">Stock Crítico</span>
+              <div id="vmStock" class="text-xl md:text-2xl font-extrabold text-amber-400 mt-1">3 ítems</div>
+            </div>
           </div>
 
-          <div class="mock-chart-full">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <strong style="color: #FFF; font-size: 0.9rem;">Ventas Semanales</strong>
-              <span style="font-size: 0.75rem; color: var(--text-secondary);">Esta semana</span>
+          <!-- Dynamic Chart -->
+          <div class="bg-slate-800/50 border border-white/10 rounded-xl p-5 flex flex-col justify-between h-52">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm font-bold text-white" id="vmChartTitle">Rendimiento Semanal de Ventas</span>
+              <span class="text-xs text-slate-400">Esta semana</span>
             </div>
-            <div class="bar-container">
-              <div class="bar" style="height: 45%;" title="Lunes"></div>
-              <div class="bar" style="height: 60%;" title="Martes"></div>
-              <div class="bar" style="height: 80%;" title="Miércoles"></div>
-              <div class="bar" style="height: 55%;" title="Jueves"></div>
-              <div class="bar" style="height: 95%;" title="Viernes"></div>
-              <div class="bar" style="height: 85%;" title="Sábado"></div>
+            <div class="flex items-end justify-between gap-3 h-32 pt-4">
+              <div class="vm-bar flex-1 bg-gradient-to-t from-blue-600 to-purple-500 rounded-t transition-all duration-500 h-[45%]" title="Lun"></div>
+              <div class="vm-bar flex-1 bg-gradient-to-t from-blue-600 to-purple-500 rounded-t transition-all duration-500 h-[60%]" title="Mar"></div>
+              <div class="vm-bar flex-1 bg-gradient-to-t from-blue-600 to-purple-500 rounded-t transition-all duration-500 h-[85%]" title="Mié"></div>
+              <div class="vm-bar flex-1 bg-gradient-to-t from-blue-600 to-purple-500 rounded-t transition-all duration-500 h-[50%]" title="Jue"></div>
+              <div class="vm-bar flex-1 bg-gradient-to-t from-blue-600 to-purple-500 rounded-t transition-all duration-500 h-[95%]" title="Vie"></div>
+              <div class="vm-bar flex-1 bg-gradient-to-t from-blue-600 to-purple-500 rounded-t transition-all duration-500 h-[75%]" title="Sáb"></div>
             </div>
           </div>
         </div>
@@ -139,215 +165,228 @@
     </div>
   </section>
 
-  <!-- 4. Social Proof & Key Metrics Bar -->
-  <section class="social-proof" id="beneficios">
-    <div class="container stats-grid">
+  <!-- ORGANISM: Social Proof Stats -->
+  <section class="bg-slate-900/60 border-y border-white/10 py-10 my-10" id="beneficios">
+    <div class="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
       <div>
-        <div class="stat-number gradient-cyan">99.9%</div>
-        <div class="stat-desc">Disponibilidad 100% Offline</div>
+        <div class="text-3xl md:text-4xl font-extrabold font-heading text-cyan-400">99.9%</div>
+        <div class="text-slate-400 text-xs md:text-sm mt-1">Disponibilidad 100% Offline</div>
       </div>
       <div>
-        <div class="stat-number gradient-text">3x</div>
-        <div class="stat-desc">Más Rápido en Caja</div>
+        <div class="text-3xl md:text-4xl font-extrabold font-heading bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">3x</div>
+        <div class="text-slate-400 text-xs md:text-sm mt-1">Más Rápido en Caja</div>
       </div>
       <div>
-        <div class="stat-number" style="color: var(--neon-green);">0$</div>
-        <div class="stat-desc">Comisiones Ocultas</div>
+        <div class="text-3xl md:text-4xl font-extrabold font-heading text-emerald-400">0$</div>
+        <div class="text-slate-400 text-xs md:text-sm mt-1">Comisiones Ocultas</div>
       </div>
       <div>
-        <div class="stat-number" style="color: var(--neon-amber);">100%</div>
-        <div class="stat-desc">Privacidad Local</div>
+        <div class="text-3xl md:text-4xl font-extrabold font-heading text-amber-400">100%</div>
+        <div class="text-slate-400 text-xs md:text-sm mt-1">Privacidad Local</div>
       </div>
     </div>
   </section>
 
-  <!-- 5. Core Business Modules -->
-  <section class="section container" id="modulos">
-    <h2 class="section-title">Módulos Inteligentes Diseñados para <span class="gradient-text">Impulsar tu Negocio</span></h2>
-    <p class="section-subtitle">
+  <!-- ORGANISM: Core Modules (Atomic Cards) -->
+  <section class="py-16 px-4 max-w-7xl mx-auto" id="modulos">
+    <h2 class="text-center font-heading text-2xl md:text-4xl font-extrabold mb-3">
+      Módulos Inteligentes Diseñados para <span class="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">Impulsar tu Negocio</span>
+    </h2>
+    <p class="text-center text-slate-400 text-sm md:text-base max-w-2xl mx-auto mb-12">
       Herramientas optimizadas para reducir tiempos operativos, evitar pérdidas y maximizar la rentabilidad de tu establecimiento.
     </p>
 
-    <div class="modules-grid">
-      <!-- Módulo 1: POS -->
-      <div class="glass-card">
-        <div class="module-icon-box" style="background: rgba(59, 130, 246, 0.12); border-color: rgba(59, 130, 246, 0.3);">
-          <img src="assets/icons/cart-shopping.svg" alt="POS">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Card POS (Molecule) -->
+      <div class="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-purple-500/40 hover:-translate-y-1 transition-all duration-300 shadow-xl">
+        <div class="w-12 h-12 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center mb-5">
+          <img src="assets/icons/cart-shopping.svg" class="w-6 h-6" alt="Icon">
         </div>
-        <h3 class="module-title">Punto de Venta (POS) Blitz</h3>
-        <p class="module-desc">
+        <h3 class="text-xl font-bold mb-2">Punto de Venta (POS) Blitz</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">
           Búsqueda instantánea con lector de código de barras, atajos de teclado y emisión de comprobantes en milisegundos sin demorar a tus clientes.
         </p>
       </div>
 
-      <!-- Módulo 2: Inventario -->
-      <div class="glass-card">
-        <div class="module-icon-box" style="background: rgba(168, 85, 247, 0.12); border-color: rgba(168, 85, 247, 0.3);">
-          <img src="assets/icons/boxes-stacked.svg" alt="Inventario">
+      <!-- Card Inventario (Molecule) -->
+      <div class="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-purple-500/40 hover:-translate-y-1 transition-all duration-300 shadow-xl">
+        <div class="w-12 h-12 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center mb-5">
+          <img src="assets/icons/boxes-stacked.svg" class="w-6 h-6" alt="Icon">
         </div>
-        <h3 class="module-title">Control de Inventario & Kardex</h3>
-        <p class="module-desc">
+        <h3 class="text-xl font-bold mb-2">Control de Inventario & Kardex</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">
           Evita fuga de dinero. Recibe alertas de stock crítico, historial de movimientos y realiza importación masiva de productos desde Excel en 1 clic.
         </p>
       </div>
 
-      <!-- Módulo 3: Cartera -->
-      <div class="glass-card">
-        <div class="module-icon-box" style="background: rgba(34, 197, 94, 0.12); border-color: rgba(34, 197, 94, 0.3);">
-          <img src="assets/icons/wallet.svg" alt="Cartera">
+      <!-- Card Cartera (Molecule) -->
+      <div class="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-purple-500/40 hover:-translate-y-1 transition-all duration-300 shadow-xl">
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mb-5">
+          <img src="assets/icons/wallet.svg" class="w-6 h-6" alt="Icon">
         </div>
-        <h3 class="module-title">Cartera & Control de Créditos</h3>
-        <p class="module-desc">
+        <h3 class="text-xl font-bold mb-2">Cartera & Control de Créditos</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">
           Gestiona las ventas a crédito de tus clientes recurrentes. Registra abonos con recibo y mantén el saldo adeudado siempre actualizado al centavo.
         </p>
       </div>
 
-      <!-- Módulo 4: Compras -->
-      <div class="glass-card">
-        <div class="module-icon-box" style="background: rgba(6, 182, 212, 0.12); border-color: rgba(6, 182, 212, 0.3);">
-          <img src="assets/icons/suppliers.svg" alt="Compras">
+      <!-- Card Compras (Molecule) -->
+      <div class="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-purple-500/40 hover:-translate-y-1 transition-all duration-300 shadow-xl">
+        <div class="w-12 h-12 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center mb-5">
+          <img src="assets/icons/suppliers.svg" class="w-6 h-6" alt="Icon">
         </div>
-        <h3 class="module-title">Compras & Proveedores</h3>
-        <p class="module-desc">
+        <h3 class="text-xl font-bold mb-2">Compras & Proveedores</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">
           Lleva el registro exacto de las facturas de tus proveedores, precio de costo e incrementos para proteger tu margen de ganancia real.
         </p>
       </div>
 
-      <!-- Módulo 5: Reportes -->
-      <div class="glass-card">
-        <div class="module-icon-box" style="background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.3);">
-          <img src="assets/icons/reports.svg" alt="Reportes">
+      <!-- Card Reportes (Molecule) -->
+      <div class="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-purple-500/40 hover:-translate-y-1 transition-all duration-300 shadow-xl">
+        <div class="w-12 h-12 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center mb-5">
+          <img src="assets/icons/reports.svg" class="w-6 h-6" alt="Icon">
         </div>
-        <h3 class="module-title">Cierre Z & Gráficos Financieros</h3>
-        <p class="module-desc">
+        <h3 class="text-xl font-bold mb-2">Cierre Z & Gráficos Financieros</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">
           Obtén reportes ejecutivos de cuadre de caja diario, productos estrella y utilidad neta exportables en PDF y Excel para la toma de decisiones.
         </p>
       </div>
 
-      <!-- Módulo 6: Manual de Uso Integrado -->
-      <div class="glass-card">
-        <div class="module-icon-box" style="background: rgba(239, 68, 68, 0.12); border-color: rgba(239, 68, 68, 0.3);">
-          <img src="assets/icons/manual.svg" alt="Manual">
+      <!-- Card Guía (Molecule) -->
+      <div class="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-purple-500/40 hover:-translate-y-1 transition-all duration-300 shadow-xl">
+        <div class="w-12 h-12 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center mb-5">
+          <img src="assets/icons/manual.svg" class="w-6 h-6" alt="Icon">
         </div>
-        <h3 class="module-title">Guía de Estrategias Comerciales</h3>
-        <p class="module-desc">
+        <h3 class="text-xl font-bold mb-2">Guía de Estrategias Comerciales</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">
           Capacitación directa dentro de la app con 12 claves maestras de atención y asesoría al cliente para impulsar las ventas en tu establecimiento.
         </p>
       </div>
     </div>
   </section>
 
-  <!-- 6. Interactive ROI Calculator -->
-  <section class="section container" id="calculadora">
-    <div class="calc-wrapper">
-      <div class="calc-inputs">
-        <h2>Calcula Cuánto <span class="gradient-cyan">Dinero y Tiempo</span> Ahorrarás al Mes</h2>
-        <p style="color: var(--text-secondary);">
+  <!-- ORGANISM: Reactive ROI Calculator (MVVM Pattern) -->
+  <section class="py-16 px-4 max-w-7xl mx-auto" id="calculadora">
+    <div class="bg-slate-900/90 border border-white/10 rounded-3xl p-6 md:p-12 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center shadow-2xl">
+      <!-- ViewModel Inputs -->
+      <div class="flex flex-col gap-6">
+        <h2 class="font-heading text-2xl md:text-3xl font-extrabold">
+          Calcula Cuánto <span class="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Dinero y Tiempo</span> Ahorrarás al Mes
+        </h2>
+        <p class="text-slate-400 text-sm md:text-base">
           Utiliza los deslizadores para estimar las ganancias no capturadas y el tiempo recuperado al sistematizar tu negocio con ERP+ Business.
         </p>
 
-        <div class="input-group">
-          <label>Ventas Mensuales Estimadas ($ COP) <span id="valVentas" class="val-badge">$5,000,000 COP</span></label>
-          <input type="range" id="rangeVentas" class="range-slider" min="1000000" max="30000000" step="500000" value="5000000">
+        <div class="flex flex-col gap-2">
+          <div class="flex justify-between items-center text-sm font-semibold text-slate-300">
+            <span>Ventas Mensuales Estimadas ($ COP)</span>
+            <span id="txtValVentas" class="text-cyan-400 font-bold">$5,000,000 COP</span>
+          </div>
+          <input type="range" id="inputVentas" min="1000000" max="30000000" step="500000" value="5000000" class="w-full h-2.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-500">
         </div>
 
-        <div class="input-group">
-          <label>Horas Gastadas por Semana en Inventario/Cuentas <span id="valHoras" class="val-badge">10 hrs / semana</span></label>
-          <input type="range" id="rangeHoras" class="range-slider" min="2" max="30" step="1" value="10">
+        <div class="flex flex-col gap-2">
+          <div class="flex justify-between items-center text-sm font-semibold text-slate-300">
+            <span>Horas Gastadas por Semana en Cuentas</span>
+            <span id="txtValHoras" class="text-cyan-400 font-bold">10 hrs / semana</span>
+          </div>
+          <input type="range" id="inputHoras" min="2" max="30" step="1" value="10" class="w-full h-2.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-500">
         </div>
       </div>
 
-      <div class="calc-results">
-        <h3 style="color: var(--text-secondary); font-size: 0.9rem;">ESTIMACIÓN DE IMPACTO MENSUAL</h3>
-        <div class="result-amount" id="resDinero">$ 675,000 COP / mes</div>
-        <div class="result-hours" id="resHoras">⏱️ Recuperas aprox. 21 horas libres al mes</div>
-        <p style="font-size: 0.8rem; color: var(--text-muted);">
+      <!-- ViewModel Bound Reactive Outputs -->
+      <div class="bg-slate-950/80 border border-purple-500/30 rounded-2xl p-8 text-center shadow-xl shadow-purple-950/40">
+        <span class="text-xs text-slate-400 font-bold tracking-wider">ESTIMACIÓN DE IMPACTO MENSUAL</span>
+        <div id="outDinero" class="font-heading text-3xl sm:text-4xl md:text-5xl font-extrabold text-emerald-400 my-4">$ 675,000 COP / mes</div>
+        <div id="outHoras" class="text-lg md:text-xl font-bold text-cyan-400 mb-4">⏱️ Recuperas aprox. 21 horas libres al mes</div>
+        <p class="text-xs text-slate-500 leading-relaxed">
           Basado en la reducción del 70% en tiempos operativos de cuadre y la prevención del 4.5% en pérdidas de stock.
         </p>
       </div>
     </div>
   </section>
 
-  <!-- 7. Download Section -->
-  <section class="section container" id="descarga">
-    <h2 class="section-title">Comienza Hoy Mismo con <span class="gradient-text">ERP+ Business</span></h2>
-    <p class="section-subtitle">
+  <!-- ORGANISM: Downloads Section -->
+  <section class="py-16 px-4 max-w-7xl mx-auto" id="descarga">
+    <h2 class="text-center font-heading text-2xl md:text-4xl font-extrabold mb-3">
+      Comienza Hoy Mismo con <span class="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">ERP+ Business</span>
+    </h2>
+    <p class="text-center text-slate-400 text-sm md:text-base max-w-2xl mx-auto mb-12">
       Descarga el instalador nativo para tu sistema operativo. Sin suscripciones forzosas ni tarjeta de crédito.
     </p>
 
-    <div class="download-grid">
-      <!-- Windows Card -->
-      <div class="glass-card download-card">
-        <img src="assets/icons/windows.svg" class="download-os-icon" alt="Windows" onerror="this.src='assets/icons/rocket.svg'">
-        <h3>Versión para Windows</h3>
-        <p style="color: var(--text-secondary); margin: 0.5rem 0 1.25rem 0; font-size: 0.9rem;">Windows 10, 11 (64-bit)</p>
-        <a href="../dist/Simplify-Biz-Setup.exe" class="btn btn-primary" onclick="alert('Iniciando descarga del instalador para Windows...');">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+      <!-- Windows OS Card -->
+      <div class="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8 text-center flex flex-col items-center shadow-xl">
+        <img src="assets/icons/windows.svg" class="w-14 h-14 mb-4" alt="Windows" onerror="this.src='assets/icons/rocket.svg'">
+        <h3 class="text-xl font-bold">Versión para Windows</h3>
+        <p class="text-slate-400 text-sm my-2">Windows 10, 11 (64-bit)</p>
+        <a href="../dist/Simplify-Biz-Setup.exe" class="w-full mt-4 py-3.5 rounded-full font-semibold text-sm bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg shadow-blue-500/25 transition-all" onclick="alert('Iniciando descarga del instalador para Windows...');">
           Descargar (.exe)
         </a>
       </div>
 
-      <!-- Linux Card -->
-      <div class="glass-card download-card">
-        <img src="assets/icons/linux.svg" class="download-os-icon" alt="Linux" onerror="this.src='assets/icons/boxes-stacked.svg'">
-        <h3>Versión para Linux</h3>
-        <p style="color: var(--text-secondary); margin: 0.5rem 0 1.25rem 0; font-size: 0.9rem;">Ubuntu, Debian, Mint (amd64)</p>
-        <a href="../erp-plus-business_2.0.0_amd64.deb" class="btn btn-success" onclick="alert('Iniciando descarga del paquete .deb para Linux...');">
+      <!-- Linux OS Card -->
+      <div class="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8 text-center flex flex-col items-center shadow-xl">
+        <img src="assets/icons/linux.svg" class="w-14 h-14 mb-4" alt="Linux" onerror="this.src='assets/icons/boxes-stacked.svg'">
+        <h3 class="text-xl font-bold">Versión para Linux</h3>
+        <p class="text-slate-400 text-sm my-2">Ubuntu, Debian, Mint (amd64)</p>
+        <a href="../erp-plus-business_2.0.0_amd64.deb" class="w-full mt-4 py-3.5 rounded-full font-semibold text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg shadow-emerald-500/25 transition-all" onclick="alert('Iniciando descarga del paquete .deb para Linux...');">
           Descargar (.deb)
         </a>
       </div>
     </div>
   </section>
 
-  <!-- 8. Footer -->
-  <footer class="footer">
-    <div class="container footer-grid">
+  <!-- ORGANISM: Footer -->
+  <footer class="bg-slate-950 border-t border-white/10 pt-16 pb-8 mt-20">
+    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
       <div>
-        <a href="#" class="nav-logo">
-          <img src="assets/images/app_icon.png" alt="Logo">
-          <span>ERP+ <span class="gradient-text">Business</span></span>
+        <a href="#" class="flex items-center gap-2 font-heading text-xl font-extrabold text-white mb-3">
+          <img src="assets/images/app_icon.png" class="w-7 h-7 rounded-lg" alt="Logo">
+          <span>ERP+ <span class="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">Business</span></span>
         </a>
-        <p class="footer-desc">
+        <p class="text-slate-400 text-xs leading-relaxed">
           La solución integral de gestión comercial para negocios y pymes. Diseñada para funcionar sin fricciones, offline y con máxima seguridad.
         </p>
       </div>
 
-      <div class="footer-col">
-        <h4>Navegación</h4>
-        <ul class="footer-links">
-          <li><a href="#modulos">Módulos Comercial</a></li>
-          <li><a href="#beneficios">Métricas & ROI</a></li>
-          <li><a href="#calculadora">Calculadora</a></li>
-          <li><a href="#descarga">Descargas</a></li>
+      <div>
+        <h4 class="text-sm font-bold text-white mb-4">Navegación</h4>
+        <ul class="flex flex-col gap-2.5 text-xs text-slate-400">
+          <li><a href="#modulos" class="hover:text-cyan-400 transition-colors">Módulos Comercial</a></li>
+          <li><a href="#beneficios" class="hover:text-cyan-400 transition-colors">Métricas & ROI</a></li>
+          <li><a href="#calculadora" class="hover:text-cyan-400 transition-colors">Calculadora</a></li>
+          <li><a href="#descarga" class="hover:text-cyan-400 transition-colors">Descargas</a></li>
         </ul>
       </div>
 
-      <div class="footer-col">
-        <h4>Sistemas</h4>
-        <ul class="footer-links">
-          <li><a href="#">Windows 64-bit</a></li>
-          <li><a href="#">Linux Debian / Ubuntu</a></li>
-          <li><a href="#">Base de Datos SQLite</a></li>
-          <li><a href="#">Motor Java 17+</a></li>
+      <div>
+        <h4 class="text-sm font-bold text-white mb-4">Sistemas</h4>
+        <ul class="flex flex-col gap-2.5 text-xs text-slate-400">
+          <li><span>Windows 64-bit</span></li>
+          <li><span>Linux Debian / Ubuntu</span></li>
+          <li><span>Base de Datos SQLite</span></li>
+          <li><span>Motor Java 17+</span></li>
         </ul>
       </div>
 
-      <div class="footer-col">
-        <h4>Contacto & Soporte</h4>
-        <ul class="footer-links">
-          <li><a href="#">Documentación Técnica</a></li>
-          <li><a href="#">Manual de Usuario</a></li>
-          <li><a href="#">Soporte Técnico ERP+</a></li>
+      <div>
+        <h4 class="text-sm font-bold text-white mb-4">Soporte</h4>
+        <ul class="flex flex-col gap-2.5 text-xs text-slate-400">
+          <li><a href="#" class="hover:text-cyan-400 transition-colors">Documentación Técnica</a></li>
+          <li><a href="#" class="hover:text-cyan-400 transition-colors">Manual de Usuario</a></li>
+          <li><a href="#" class="hover:text-cyan-400 transition-colors">Soporte Técnico ERP+</a></li>
         </ul>
       </div>
     </div>
 
-    <div class="container footer-bottom">
-      &copy; 2026 ERP+ Business v2.0.2. Todos los derechos reservados. Desarrollado con excelencia técnica.
+    <div class="max-w-7xl mx-auto px-4 pt-8 border-t border-white/5 text-center text-xs text-slate-500">
+      &copy; 2026 ERP+ Business v2.0.2. Todos los derechos reservados. Desarrollado con TailwindCSS, Atomic Design & MVVM.
     </div>
   </footer>
 
-  <!-- Scripts -->
-  <script src="js/calculator.js"></script>
-  <script src="js/main.js"></script>
+  <!-- MVVM ViewModels & Application Logic -->
+  <script src="js/app-viewmodel.js"></script>
 </body>
 </html>
