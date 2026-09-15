@@ -1,0 +1,63 @@
+<!-- MOLECULES: App Preview Mockup Component -->
+<div id="preview" class="w-full bg-slate-900 border border-white/15 rounded-2xl overflow-hidden shadow-2xl shadow-purple-950/50 text-left">
+  <div class="bg-slate-800/80 px-4 py-3 flex items-center justify-between border-b border-white/10">
+    <div class="flex items-center gap-2">
+      <div class="w-3 h-3 rounded-full bg-rose-500"></div>
+      <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+      <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+      <span class="text-xs text-slate-400 ml-2 font-mono truncate">ERP+ Business v2.0.2 - Swing FlatLaf MacDark</span>
+    </div>
+    <div class="text-[11px] font-mono text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">SQLite WAL Active</div>
+  </div>
+
+  <div class="p-4 md:p-6 grid grid-cols-1 md:grid-cols-4 gap-6 min-h-[420px]">
+    <!-- Sidebar Navigation -->
+    <div class="md:col-span-1 flex md:flex-col overflow-x-auto md:overflow-x-visible gap-2 border-b md:border-b-0 md:border-r border-white/10 pb-3 md:pb-0 md:pr-4">
+      <button data-tab="dashboard" class="mock-tab flex-1 md:flex-initial px-4 py-2.5 rounded-lg text-xs md:text-sm font-semibold flex items-center gap-2 transition-all bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
+        <img src="assets/icons/dashboard.svg" class="w-4 h-4" alt="Icon"> Dashboard 2D
+      </button>
+      <button data-tab="pos" class="mock-tab flex-1 md:flex-initial px-4 py-2.5 rounded-lg text-xs md:text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-all">
+        <img src="assets/icons/cart-shopping.svg" class="w-4 h-4" alt="Icon"> Ventas POS
+      </button>
+      <button data-tab="inventario" class="mock-tab flex-1 md:flex-initial px-4 py-2.5 rounded-lg text-xs md:text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-all">
+        <img src="assets/icons/products.svg" class="w-4 h-4" alt="Icon"> Productos & Stock
+      </button>
+      <button data-tab="cartera" class="mock-tab flex-1 md:flex-initial px-4 py-2.5 rounded-lg text-xs md:text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 flex items-center gap-2 transition-all">
+        <img src="assets/icons/wallet.svg" class="w-4 h-4" alt="Icon"> Cartera CxC
+      </button>
+    </div>
+
+    <!-- Dynamic Content -->
+    <div class="md:col-span-3 flex flex-col gap-5">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-slate-800/50 border border-white/10 rounded-xl p-4">
+          <span class="text-xs text-slate-400 font-medium">Ventas de Hoy</span>
+          <div id="vmVentas" class="text-xl md:text-2xl font-extrabold text-cyan-400 mt-1">$ 1,480,000</div>
+        </div>
+        <div class="bg-slate-800/50 border border-white/10 rounded-xl p-4">
+          <span class="text-xs text-slate-400 font-medium">Ganancia Neta (Costo)</span>
+          <div id="vmGanancia" class="text-xl md:text-2xl font-extrabold text-purple-400 mt-1">$ 420,000</div>
+        </div>
+        <div class="bg-slate-800/50 border border-white/10 rounded-xl p-4">
+          <span class="text-xs text-slate-400 font-medium">Alertas Stock Crítico</span>
+          <div id="vmStock" class="text-xl md:text-2xl font-extrabold text-amber-400 mt-1">3 ítems</div>
+        </div>
+      </div>
+
+      <div class="bg-slate-800/50 border border-white/10 rounded-xl p-5 flex flex-col justify-between h-52">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-sm font-bold text-white" id="vmChartTitle">NeonBarChart — Registro de Ventas</span>
+          <span class="text-xs text-slate-400 font-mono">SQLite Transaccional</span>
+        </div>
+        <div class="flex items-end justify-between gap-3 h-32 pt-4">
+          <div class="vm-bar flex-1 bg-gradient-to-t from-blue-600 to-purple-500 rounded-t transition-all duration-500 h-[45%]" title="Lun"></div>
+          <div class="vm-bar flex-1 bg-gradient-to-t from-blue-600 to-purple-500 rounded-t transition-all duration-500 h-[60%]" title="Mar"></div>
+          <div class="vm-bar flex-1 bg-gradient-to-t from-blue-600 to-purple-500 rounded-t transition-all duration-500 h-[85%]" title="Mié"></div>
+          <div class="vm-bar flex-1 bg-gradient-to-t from-blue-600 to-purple-500 rounded-t transition-all duration-500 h-[50%]" title="Jue"></div>
+          <div class="vm-bar flex-1 bg-gradient-to-t from-blue-600 to-purple-500 rounded-t transition-all duration-500 h-[95%]" title="Vie"></div>
+          <div class="vm-bar flex-1 bg-gradient-to-t from-blue-600 to-purple-500 rounded-t transition-all duration-500 h-[75%]" title="Sáb"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

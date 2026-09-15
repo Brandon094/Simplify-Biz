@@ -1,0 +1,31 @@
+<!-- ORGANISMS: Downloads Component -->
+<section class="py-16 px-4 max-w-7xl mx-auto" id="descarga">
+  <h2 class="text-center font-heading text-2xl md:text-4xl font-extrabold mb-3">
+    Descarga la Aplicación de Escritorio <span class="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">ERP+ Business</span>
+  </h2>
+  <p class="text-center text-slate-400 text-sm md:text-base max-w-2xl mx-auto mb-12">
+    Obtén el paquete ejecutable para tu sistema operativo. Sin conexión a internet requerida.
+  </p>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+    <!-- Windows OS Card -->
+    <div class="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8 text-center flex flex-col items-center shadow-xl">
+      <img src="assets/icons/windows.svg" class="w-14 h-14 mb-4" alt="Windows" onerror="this.src='assets/icons/rocket.svg'">
+      <h3 class="text-xl font-bold">Instalador para Windows</h3>
+      <p class="text-slate-400 text-sm my-2">Windows 10, 11 (64-bit)</p>
+      <a href="../dist/Simplify-Biz-Setup.exe" class="w-full mt-4 py-3.5 rounded-full font-semibold text-sm bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg shadow-blue-500/25 transition-all" onclick="alert('Iniciando descarga del instalador para Windows...');">
+        Descargar (.exe)
+      </a>
+    </div>
+
+    <!-- Linux OS Card -->
+    <div class="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8 text-center flex flex-col items-center shadow-xl">
+      <img src="assets/icons/linux.svg" class="w-14 h-14 mb-4" alt="Linux" onerror="this.src='assets/icons/boxes-stacked.svg'">
+      <h3 class="text-xl font-bold">Paquete para Linux</h3>
+      <p class="text-slate-400 text-sm my-2">Ubuntu, Debian, Mint (amd64)</p>
+      <a href="../erp-plus-business_2.0.0_amd64.deb" class="w-full mt-4 py-3.5 rounded-full font-semibold text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg shadow-emerald-500/25 transition-all" onclick="alert('Iniciando descarga del paquete .deb para Linux...');">
+        Descargar (.deb)
+      </a>
+    </div>
+  </div>
+</section>
