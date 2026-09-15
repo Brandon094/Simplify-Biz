@@ -34,16 +34,12 @@ Este documento define el orden recomendado para continuar el desarrollo. La regl
 * [x] **Asistente Inteligente de Importación Excel/CSV & Ergonomía POS (Fase 7 - v2.0.0):**
   - Motor `ExcelSQLiteManager` con lectura de cabeceras en caliente, mapeo dinámico de columnas y estrategia de Upsert por SKU.
   - Diálogo modal `ImportarProductosDialog` en 4 pasos con visualización de cabeceras y vista previa en vivo de 5 filas.
-  - Integración del importador en **Productos** y en **Compras a Proveedores** (facturas de entrada).
+  - Integración del importador en **Productos** y en **Abastecimiento & Proveedores** (facturas de entrada).
   - Reorganización de botones de acción en Productos debajo del título.
   - Botones del carrito POS ampliados a 115px con cursor mano (`HAND_CURSOR`) y efecto hover fluido.
   - Suite de pruebas de JUnit 5 ampliada a **41/41 pruebas automatizadas pasando con éxito**.
-* [x] **Reescritura de Neuroventas & Rediseño Visual del Manual (v2.0.2):**
-  - Reescritura persuasiva de los 12 capítulos basada en neuroventas y psicología comercial (ganancia neta, tranquilidad, agilidad).
-  - Eliminación del 100% de tecnicismos informáticos y de todos los emojis para un aspecto ejecutivo de clase mundial.
-  - Inserción de insignias HTML/CSS neón (`.badge-tip`, `.badge-note`) con colores de `ThemeConstants`.
-  - Integración total de la suite de 51 iconos vectoriales SVG (`FlatSVGIcon`).
-* [x] Documentación técnica, funcional, de arquitectura y de base de datos totalmente actualizada para la **versión 2.0.2**.
+* [x] **Calculadora de Vueltas Exactas en POS (v2.0.3):** Integración de campo interactivo "Paga con ($)" con icono `wallet.svg` en la parte inferior del carrito de compras (`SalesPage`), realizando cálculo automático de vueltas exactas en verde neón o dinero faltante en rojo en tiempo real sin calculadoras externas.
+* [x] Documentación técnica, funcional, de arquitectura y de base de datos totalmente actualizada para la **versión 2.0.3**.
 
 ---
 

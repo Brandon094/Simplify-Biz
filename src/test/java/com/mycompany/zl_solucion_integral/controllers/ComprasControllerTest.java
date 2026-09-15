@@ -74,4 +74,24 @@ public class ComprasControllerTest {
         assertEquals(1.0, kpis[1]);       // Entradas Recibidas
         assertEquals(1.0, kpis[2]);       // Proveedores Distintos
     }
+
+    @Test
+    void testGuardarEntradaCompraAutoCreaProductoNuevo() {
+        Compra compra = new Compra(null, "Proveedor Nuevo S.A.S.", "900111222-1", "FAC-2026", "AdminTest", "2026-09-15", 250000.0);
+        List<DetalleCompra> detalles = new ArrayList<>();
+        // Insumo que NO existe en la base de datos previa
+        detalles.add(new DetalleCompra("Bujía NGK C7HSA", "NUEVO-BUJIA-99", 20, 12500.0));
+
+        ResultadoOperacion res = comprasCtrl.guardarEntradaCompra(compra, detalles);
+
+        assertTrue(res.esExito());
+
+        // Verificar que el producto nuevo fue creado automáticamente en la base de datos
+        Producto prodNuevo = productoCtrl.buscarProductoPorCodigo("NUEVO-BUJIA-99");
+        assertNotNull(prodNuevo);
+        assertEquals("Bujía NGK C7HSA", prodNuevo.getProducto());
+        assertEquals(20, prodNuevo.getCantidad());
+        assertEquals(12500.0, prodNuevo.getPrecioCosto());
+        assertTrue(prodNuevo.getPrecio() > 12500.0); // Verifica margen de venta sugerido
+    }
 }

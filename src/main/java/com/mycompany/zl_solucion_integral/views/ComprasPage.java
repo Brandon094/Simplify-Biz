@@ -34,12 +34,6 @@ public class ComprasPage extends JPanel {
         setLayout(new BorderLayout(20, 20));
         setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        // Header
-        JPanel headerPanel = UIUtils.createHeader("icons/suppliers.svg", ThemeConstants.NEON_PURPLE,
-                "Compras y Entradas de Almacén",
-                "Administra el abastecimiento de mercancía, facturas de proveedores e ingreso de stock a bodega");
-        add(headerPanel, BorderLayout.NORTH);
-
         // Center Area (Metrics + ActionBar + Split Table)
         JPanel centerPanel = new JPanel(new BorderLayout(15, 15));
         centerPanel.setOpaque(false);

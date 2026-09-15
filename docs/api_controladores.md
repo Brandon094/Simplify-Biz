@@ -98,7 +98,7 @@ Abastecimiento de bodega, registro de facturas de compra e incremento atómico d
 
 | Método | Parámetros | Retorno | Descripción |
 | :--- | :--- | :--- | :--- |
-| `guardarEntradaCompra` | `Compra c, List<DetalleCompra> det` | `ResultadoOperacion` | **Transacción ACID atómica:** guarda compra, detalles, incrementa existencias (`cantidad = cantidad + ?`) y actualiza el costo de adquisición (`precio_costo`). |
+| `guardarEntradaCompra` | `Compra c, List<DetalleCompra> det` | `ResultadoOperacion` | **Transacción ACID atómica:** guarda compra, detalles, incrementa existencias de productos existentes (`cantidad = cantidad + ?`) y **crea de forma transparente** productos nuevos que no existían previamente en el catálogo en una sola operación. |
 | `mostrarHistorialCompras` | `JTable tabla, String filtro` | `void` | Carga el listado de entradas de almacén aplicando formato contable `UIUtils.applyTableStyling`. |
 | `mostrarDetallesCompra` | `JTable tabla, int compraId` | `void` | Carga los renglones de productos recibidos en una orden de compra específica. |
 | `obtenerResumenCompras` | — | `double[]` | Retorna los KPIs globales de compras: `[0]` Total Invertido ($), `[1]` Entradas Recibidas (#), `[2]` Proveedores Atendidos (#). |

@@ -100,7 +100,7 @@ public class ModernLoginPage extends JFrame {
         lblSubtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         lblSubtitle.setBorder(BorderFactory.createEmptyBorder(12, 0, 14, 0));
 
-        JLabel lblDescription = new JLabel("<html><body style='width: 360px;'>Plataforma integral de gestión empresarial: controla ventas en POS, inventario en tiempo real, recaudo de cartera, compras a proveedores y análisis financiero con cifrado local.</body></html>");
+        JLabel lblDescription = new JLabel("<html><body style='width: 360px;'>Plataforma integral de gestión empresarial: controla ventas en POS, inventario en tiempo real, recaudo de cartera, abastecimiento de proveedores y análisis financiero con cifrado local.</body></html>");
         lblDescription.setForeground(ThemeConstants.BRAND_TEXT_SECONDARY);
         lblDescription.setFont(ThemeConstants.FONT_BODY);
         lblDescription.setAlignmentX(Component.LEFT_ALIGNMENT);

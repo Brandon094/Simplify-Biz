@@ -67,9 +67,11 @@ public class ComprasController {
             }
             int compraId = generatedKeys.getInt(1);
 
-            // 2. Insertar detalles y actualizar stock + costo
+            // 2. Insertar detalles y actualizar stock + costo (o crear producto si es nuevo)
             psDetalle = conn.prepareStatement(sqlInsertDetalle);
             psStock = conn.prepareStatement(sqlUpdateStockCosto);
+            String sqlInsertNuevoProd = "INSERT INTO productos (producto, codigo, precio, precio_costo, cantidad, categoria) VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement psInsertNuevo = conn.prepareStatement(sqlInsertNuevoProd);
 
             for (DetalleCompra det : detalles) {
                 // Detalle
@@ -86,9 +88,18 @@ public class ComprasController {
                 psStock.setDouble(2, det.getPrecioCosto());
                 psStock.setString(3, det.getCodigo());
                 if (psStock.executeUpdate() == 0) {
-                    throw new SQLException("Error al actualizar inventario para el producto: " + det.getProducto());
+                    // Si no existía el producto en la BD, crearlo automáticamente de forma transparente
+                    double precioVentaSugerido = det.getPrecioCosto() * 1.30; // Margen base 30%
+                    psInsertNuevo.setString(1, det.getProducto());
+                    psInsertNuevo.setString(2, det.getCodigo());
+                    psInsertNuevo.setDouble(3, precioVentaSugerido);
+                    psInsertNuevo.setDouble(4, det.getPrecioCosto());
+                    psInsertNuevo.setInt(5, det.getCantidad());
+                    psInsertNuevo.setString(6, "General");
+                    psInsertNuevo.executeUpdate();
                 }
             }
+            if (psInsertNuevo != null) psInsertNuevo.close();
 
             conn.commit();
             return ResultadoOperacion.ok("Entrada de inventario registrada con éxito.");

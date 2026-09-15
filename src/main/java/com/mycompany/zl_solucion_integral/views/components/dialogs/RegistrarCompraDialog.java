@@ -45,7 +45,7 @@ public class RegistrarCompraDialog extends JDialog {
     private final List<DetalleCompra> listaCarrito = new ArrayList<>();
 
     public RegistrarCompraDialog(Window owner, Sesion sesion) {
-        super(owner, "Registrar Entrada de Inventario (Compra)", ModalityType.APPLICATION_MODAL);
+        super(owner, "Nueva Entrada de Abastecimiento", ModalityType.APPLICATION_MODAL);
         this.sesion = sesion;
 
         setSize(950, 700);
@@ -316,8 +316,9 @@ public class RegistrarCompraDialog extends JDialog {
     }
 
     private void agregarItemAlCarrito() {
-        if (productoSeleccionado == null) {
-            JOptionPane.showMessageDialog(this, "Por favor selecciona un producto usando el autocompletado.", "Atención", JOptionPane.WARNING_MESSAGE);
+        String textoBuscado = txtBuscarProducto.getText().trim();
+        if (textoBuscado.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Ingresa el nombre o código del producto.", "Atención", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -330,9 +331,21 @@ public class RegistrarCompraDialog extends JDialog {
                 return;
             }
 
+            String prodNombre;
+            String prodCodigo;
+
+            if (productoSeleccionado != null) {
+                prodNombre = productoSeleccionado.getProducto();
+                prodCodigo = productoSeleccionado.getCodigo();
+            } else {
+                // Producto nuevo digitado por el usuario de forma transparente
+                prodNombre = textoBuscado;
+                prodCodigo = "NUEVO-" + System.currentTimeMillis() % 100000;
+            }
+
             DetalleCompra det = new DetalleCompra(
-                    productoSeleccionado.getProducto(),
-                    productoSeleccionado.getCodigo(),
+                    prodNombre,
+                    prodCodigo,
                     cant,
                     costo
             );

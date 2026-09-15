@@ -442,11 +442,13 @@ public class ManualUsuarioDialog extends JDialog {
         String cardBgHex = dark ? "#0F172A" : "#F1F5F9";
         String borderHex = dark ? "#334155" : "#CBD5E1";
         
-        String tipBgHex = dark ? "#1E1B4B" : "#EFF6FF";
-        String tipBorderHex = dark ? "#6366F1" : "#3B82F6";
+        String tipBgHex = dark ? "#0F172A" : "#F8FAFC";
+        String tipBorderHex = dark ? "#22C55E" : "#16A34A";
         
-        String noteBgHex = dark ? "#312E81" : "#F5F3FF";
-        String noteBorderHex = dark ? "#8B5CF6" : "#7C3AED";
+        String noteBgHex = dark ? "#0F172A" : "#F8FAFC";
+        String noteBorderHex = dark ? "#A855F7" : "#7C3AED";
+
+        String infoBorderHex = dark ? "#06B6D4" : "#0891B2";
 
         return "<html><head><style>" +
                 "body { font-family: 'Segoe UI', sans-serif; background-color: " + bgHex + "; color: " + textHex + "; margin: 18px; font-size: 13px; line-height: 1.6; }" +
@@ -456,18 +458,36 @@ public class ManualUsuarioDialog extends JDialog {
                 "code { background-color: " + cardBgHex + "; color: " + accentHex + "; padding: 2px 6px; border-radius: 4px; font-family: monospace; border: 1px solid " + borderHex + "; }" +
                 "ul, ol { margin: 6px 0; padding-left: 22px; }" +
                 "li { margin-bottom: 6px; }" +
-                ".tip { background-color: " + tipBgHex + "; border-left: 4px solid " + tipBorderHex + "; padding: 10px 14px; margin: 14px 0; border-radius: 6px; font-size: 12px; color: " + textHex + "; }" +
-                ".note { background-color: " + noteBgHex + "; border-left: 4px solid " + noteBorderHex + "; padding: 10px 14px; margin: 14px 0; border-radius: 6px; font-size: 12px; color: " + textHex + "; }" +
-                ".badge-tip { background-color: " + tipBorderHex + "; color: #FFFFFF; padding: 2px 6px; font-size: 10px; font-weight: bold; margin-right: 6px; }" +
-                ".badge-note { background-color: " + noteBorderHex + "; color: #FFFFFF; padding: 2px 6px; font-size: 10px; font-weight: bold; margin-right: 6px; }" +
-                ".badge { background-color: " + accentHex + "; color: #FFFFFF; padding: 2px 8px; font-size: 11px; font-weight: bold; }" +
+                ".tip { background-color: " + tipBgHex + "; border-left: 4px solid " + tipBorderHex + "; padding: 12px 16px; margin: 14px 0; border-radius: 6px; font-size: 13px; color: " + textHex + "; border: 1px solid " + borderHex + "; border-left-width: 4px; }" +
+                ".note { background-color: " + noteBgHex + "; border-left: 4px solid " + noteBorderHex + "; padding: 12px 16px; margin: 14px 0; border-radius: 6px; font-size: 13px; color: " + textHex + "; border: 1px solid " + borderHex + "; border-left-width: 4px; }" +
+                ".info { background-color: " + tipBgHex + "; border-left: 4px solid " + infoBorderHex + "; padding: 12px 16px; margin: 14px 0; border-radius: 6px; font-size: 13px; color: " + textHex + "; border: 1px solid " + borderHex + "; border-left-width: 4px; }" +
+                ".tag-tip { color: " + tipBorderHex + "; font-weight: bold; font-size: 13px; margin-right: 4px; }" +
+                ".tag-note { color: " + noteBorderHex + "; font-weight: bold; font-size: 13px; margin-right: 4px; }" +
+                ".tag-info { color: " + infoBorderHex + "; font-weight: bold; font-size: 13px; margin-right: 4px; }" +
                 "table { width: 100%; border-collapse: collapse; margin: 14px 0; }" +
                 "th { background-color: " + cardBgHex + "; color: " + accentHex + "; padding: 8px; text-align: left; border: 1px solid " + borderHex + "; }" +
                 "td { padding: 8px; border: 1px solid " + borderHex + "; }" +
                 "</style></head><body>" +
                 "<h1>" + section.title + "</h1>" +
-                section.htmlContent +
+                cleanHtmlIcons(section.htmlContent) +
                 "</body></html>";
+    }
+
+    private String cleanHtmlIcons(String html) {
+        html = html.replace("<span class='tag-tip'>✔ ", "<span class='tag-tip'>");
+        html = html.replace("<span class='tag-note'>🛡 ", "<span class='tag-note'>");
+        html = html.replace("<span class='tag-note'>🔒 ", "<span class='tag-note'>");
+        html = html.replace("<span class='tag-note'>📌 ", "<span class='tag-note'>");
+        html = html.replace("<span class='tag-note'>📦 ", "<span class='tag-note'>");
+        html = html.replace("<span class='tag-note'>📊 ", "<span class='tag-note'>");
+        html = html.replace("<span class='tag-info'>💡 ", "<span class='tag-info'>");
+        html = html.replace("<span class='tag-info'>⚡ ", "<span class='tag-info'>");
+        html = html.replace("<span class='tag-tip'>🚀 ", "<span class='tag-tip'>");
+        html = html.replace("<span class='tag-tip'>⭐ ", "<span class='tag-tip'>");
+        html = html.replace("<span class='tag-tip'>🤝 ", "<span class='tag-tip'>");
+        html = html.replace("<span class='tag-tip'>🛡 ", "<span class='tag-tip'>");
+
+        return html;
     }
 
     private FlatSVGIcon createIcon(String path, Color color, int width, int height) {
@@ -483,23 +503,23 @@ public class ManualUsuarioDialog extends JDialog {
                 "¡Tu Máquina de Ventas y Ganancias RÁPIDAS!",
                 "<p>¡Felicitaciones! Has tomado la decisión de transformar tu negocio en una verdadera <b>máquina comercial de altas ganancias</b> con ERP+ Business.</p>" +
                 "<p>Dile adiós a los desvelos haciendo cuentas a mano, a las dudas sobre si estás ganando dinero y al temor de mercancía perdida. Esta herramienta fue diseñada pensando en la psicología del comerciante exitoso: te ahorra tiempo, protege cada billete que entra a tu local y te regala la paz mental de ver tu <b>Ganancia Limpia y Real</b> al instante.</p>" +
-                "<div class='tip'><span class='badge-tip'>CONSEJO DE ÉXITO</span> <b>Sensación de Control Total:</b> Imagina cerrar tu jornada con la tranquilidad absoluta de saber exactamente cuánto vendiste, cuánto ganaste de utilidad directa y qué productos le encantan a tus clientes. ¡Prepárate para llevar tu negocio al siguiente nivel!</div>" +
-                "<div class='note'><span class='badge-note'>SEGURIDAD DE DATOS</span> <b>Protección Total:</b> Tu información no viaja a servidores externos desconocidos; se almacena de forma blindada en tu propio computador.</div>",
+                "<div class='tip'><span class='tag-tip'>✔ CONSEJO DE ÉXITO:</span> <b>Sensación de Control Total —</b> Imagina cerrar tu jornada con la tranquilidad absoluta de saber exactamente cuánto vendiste, cuánto ganaste de utilidad directa y qué productos le encantan a tus clientes. ¡Prepárate para llevar tu negocio al siguiente nivel!</div>" +
+                "<div class='note'><span class='tag-note'>🛡 SEGURIDAD DE DATOS:</span> <b>Protección Total —</b> Tu información no viaja a servidores externos desconocidos; se almacena de forma blindada en tu propio computador.</div>",
                 "icons/manual.svg"
         ));
 
         sections.add(new ManualSection(
                 "Despega tu Negocio en 4 Pasos Sencillos",
                 "<p>Descubre la emoción de ver tu negocio funcionando solo, de manera rápida y sin complicaciones:</p>" +
-                "<h2>1. Llena tus Estantes (Inventario):</h2>" +
-                "<p>Ingresa la mercancía que le compras a tus proveedores. En pocos segundos tendrás cada artículo registrado con su precio de costo y su precio de venta al público.</p>" +
+                "<h2>1. Llena tus Estantes (Inventario & Abastecimiento):</h2>" +
+                "<p>Ingresa la mercancía que vendes en tu negocio. En pocos segundos tendrás cada artículo registrado con su precio de costo y su precio de venta al público.</p>" +
+                "<div class='info'><span class='tag-info'>💡 REGLA DE ORO:</span> <b>¿Inventario o Abastecimiento? —</b> Usa el módulo de <b>Inventario</b> para registrar productos que ya tienes en tu almacén o mercancía propia sin factura. Usa el módulo de <b>Abastecimiento</b> cuando ingreses compras respaldadas por una factura o remisión de tu proveedor.</div>" +
                 "<h2>2. Pon a Tu Equipo a Vender con Confianza:</h2>" +
                 "<p>Crea usuarios para tus colaboradores o cajeros. Ellos podrán cobrar a toda velocidad a tus clientes, mientras tus secretos de costos y tus ganancias privadas se mantienen 100% protegidos bajo tu control exclusivo.</p>" +
                 "<h2>3. Vive la Magia del Cobro Ágil (Punto de Venta):</h2>" +
                 "<p>Atiende a tus clientes en segundos. Cobra en Efectivo, Nequi, Bancolombia o Fiado. Tu cliente quedará descrestado con la rapidez de tu atención y la mercancía se descontará sola de la bodega.</p>" +
                 "<h2>4. Siente la Satisfacción de tus Resultados:</h2>" +
-                "<p>Mira en tus pantallas ejecutivas cómo crecen tus ganancias en tiempo real con cada venta que realiza tu equipo.</p>" +
-                "<div class='tip'><span class='badge-tip'>PASO RECOMENDADO</span> <b>Sugerencia de Inicio Rápido:</b> Comienza agregando 5 productos estrella para realizar tu primera prueba de cobro en el Punto de Venta y experimentar la agilidad del sistema.</div>",
+                "<p>Mira en tus pantallas ejecutivas cómo crecen tus ganancias en tiempo real con cada venta que realiza tu equipo.</p>",
                 "icons/bolt.svg"
         ));
 
@@ -510,9 +530,9 @@ public class ManualUsuarioDialog extends JDialog {
                 "<ul>" +
                 "<li><b>Entrada Rápida 'Recordarme':</b> Inicia tu jornada laboral de inmediato sin tener que escribir tus datos una y otra vez. Tu tiempo vale oro.</li>" +
                 "<li><b>Recuperación Inteligente de Clave:</b> Si un día olvidas tu clave, no te preocupes ni pierdas la calma. Con solo escribir tu usuario y teléfono recuperas el acceso en segundos.</li>" +
-                "<li><b>Cierre de Protección al Terminar:</b> Al finalizar el día, cierra tu sesión con un solo clic para asegurar que nadie sin autorización pueda curiosear tus ganancias ni tus datos confidenciales.</li>" +
+                "<li><b>Cierre de Sesión Seguro al Terminar:</b> Al finalizar el día, cierra tu sesión con un solo clic para asegurar que nadie sin autorización pueda curiosear tus ganancias ni tus datos confidenciales.</li>" +
                 "</ul>" +
-                "<div class='note'><span class='badge-note'>PRIVACIDAD VIP</span> <b>Control de Acceso:</b> Ningún empleado con perfil de Vendedor podrá acceder a este módulo ni modificar usuarios administradores.</div>",
+                "<div class='note'><span class='tag-note'>🔒 PRIVACIDAD VIP:</span> <b>Control de Acceso —</b> Ningún empleado con perfil de Vendedor podrá acceder a este módulo ni modificar usuarios administradores.</div>",
                 "icons/shield-heart.svg"
         ));
 
@@ -527,14 +547,14 @@ public class ManualUsuarioDialog extends JDialog {
                     "<li><b>Dinero Invertido en Bodega:</b> Descubre exactamente cuánto dinero tienes acumulado y listo para convertirse en ventas dentro de tu estantería.</li>" +
                     "<li><b>Alertas de Mercancía por Agotarse:</b> Te avisa a tiempo qué productos estrella se están terminando para que nunca le digas <i>'no hay'</i> a un cliente.</li>" +
                     "</ul>" +
-                    "<div class='tip'><span class='badge-tip'>INTELIGENCIA FINANCIERA</span> <b>Poder Comercial:</b> Observa en gráficos dinámicos qué días y a qué horas vendes más para aplicar promociones irresistibles y multiplicar tus ingresos.</div>",
+                    "<div class='info'><span class='tag-info'>⚡ INTELIGENCIA FINANCIERA:</span> <b>Poder Comercial —</b> Observa en gráficos dinámicos qué días y a qué horas vendes más para aplicar promociones irresistibles y multiplicar tus ingresos.</div>",
                     "icons/dashboard.svg"
             ));
         }
 
         sections.add(new ManualSection(
-                "Mercancía Organizada, Negocio Multiplicado",
-                "<p>Evita el dolor de perder mercancía por desorden o extravíos. Organizar tus artículos despierta el deseo de compra en tu cliente:</p>" +
+                "Mercancía Organizada, Negocio Multiplicado (Inventario)",
+                "<p>Evita el dolor de perder mercancía por desorden o extravíos. Utiliza <b>Inventario</b> para cargar productos existentes en tu bodega que no cuentan con factura de proveedor o para ajustar existencias manualmente:</p>" +
                 "<h2>Crear un Producto de Impacto:</h2>" +
                 "<ol>" +
                 "<li>Escribe el <b>Nombre Atractivo</b> y el código del artículo (o pásalo por tu lector láser).</li>" +
@@ -542,8 +562,8 @@ public class ManualUsuarioDialog extends JDialog {
                 "<li>Define tu <b>Precio de Venta</b> y la cantidad que tienes en tu vitrina o bodega.</li>" +
                 "<li>Guarda y listo: tu artículo queda listo para venderse de inmediato.</li>" +
                 "</ol>" +
-                "<div class='tip'><span class='badge-tip'>CERO ERRORES</span> <b>Suma Automática:</b> Si vuelves a registrar un producto que ya tenías, el sistema no crea duplicados molestos; simplemente suma las unidades nuevas a tu abundancia de stock.</div>" +
-                "<div class='note'><span class='badge-note'>MARGEN EXACTO</span> <b>Sugerencia de Precios:</b> Define siempre tu precio de costo real para que el cálculo del margen de utilidad sea 100% exacto en tus reportes.</div>",
+                "<div class='tip'><span class='tag-tip'>✔ CERO ERRORES:</span> <b>Suma Automática —</b> Si vuelves a registrar un producto que ya tenías, el sistema no crea duplicados molestos; simplemente suma las unidades nuevas a tu abundancia de stock.</div>" +
+                "<div class='note'><span class='tag-note'>📌 MARGEN EXACTO:</span> <b>Sugerencia de Precios —</b> Define siempre tu precio de costo real para que el cálculo del margen de utilidad sea 100% exacto en tus reportes.</div>",
                 "icons/products.svg"
         ));
 
@@ -557,7 +577,7 @@ public class ManualUsuarioDialog extends JDialog {
                 "<li><b>Conecta los Datos de Forma Visual:</b> Indica de manera súper fácil cuál columna es el nombre, cuál es el precio y cuál es la cantidad.</li>" +
                 "<li><b>Confirma y Disfruta:</b> En solo 5 segundos verás cientos de productos cargados en tu pantalla, listos para generar ventas.</li>" +
                 "</ol>" +
-                "<div class='tip'><span class='badge-tip'>AHORRO DE TIEMPO</span> <b>Cero Trabajo Repetido:</b> Si algunos artículos ya existían en tu tienda, el sistema actualiza sus precios y suma el stock de forma automática.</div>",
+                "<div class='tip'><span class='tag-tip'>🚀 AHORRO DE TIEMPO:</span> <b>Cero Trabajo Repetido —</b> Si algunos artículos ya existían en tu tienda, el sistema actualiza sus precios y suma el stock de forma automática.</div>",
                 "icons/excel.svg"
         ));
 
@@ -570,13 +590,20 @@ public class ManualUsuarioDialog extends JDialog {
                 "<li><b>Adapta la Venta a la Medida:</b> Cambia cantidades o aplica promociones especiales con botones amplios y cómodos diseñados para vender a toda prisa.</li>" +
                 "<li><b>Cierra el Cobro y Recibe el Dinero:</b>" +
                 "<ul>" +
-                "<li><b>Efectivo (Cobro Inmediato):</b> El favorito de tu caja. Presiona un botón, entrega el cambio y despacha al cliente feliz en 2 segundos.</li>" +
+                "<li><b>Efectivo (Calculadora de Vueltas Exactas):</b> Escribe en el campo <b>'Paga con ($)'</b> el billete que te entrega tu cliente. El sistema te dice de inmediato las <b>Vueltas Exactas</b> en verde neón (o cuánto dinero falta), eliminando errores de cálculo manual. Entrega el cambio y despacha al cliente en 2 segundos.</li>" +
                 "<li><b>Transferencia Digital (Nequi / Bancolombia):</b> Registra los datos del pago digital con total nitidez y sin dudas de dinero en el aire.</li>" +
                 "<li><b>Crédito Comercial (Fiado de Confianza):</b> Ofrécele crédito a tus clientes VIP. La cuenta se guarda sola en su expediente sin necesidad de cuadernos.</li>" +
                 "</ul>" +
                 "</li>" +
                 "</ol>" +
-                "<div class='tip'><span class='badge-tip'>NEUROVENTAS</span> <b>Recomendación de Venta Cruzada:</b> Aprovecha la velocidad del cobro para sugerir un producto complementario antes de cerrar la compra.</div>",
+                "<h2>Atajos de Teclado para Cobro Exprés:</h2>" +
+                "<table>" +
+                "<tr><th>Tecla / Acción</th><th>Función</th></tr>" +
+                "<tr><td><b>ENTER</b> en Búsqueda</td><td>Agrega el producto encontrado de inmediato al carrito.</td></tr>" +
+                "<tr><td><b>TAB</b> / <b>SHIFT + TAB</b></td><td>Salta velozmente entre campos del formulario sin soltar el teclado.</td></tr>" +
+                "<tr><td>Digitar en <b>Paga con ($)</b></td><td>Calcula automáticamente las vueltas en tiempo real.</td></tr>" +
+                "</table>" +
+                "<div class='tip'><span class='tag-tip'>💡 NEUROVENTAS:</span> <b>Recomendación de Venta Cruzada —</b> Aprovecha la velocidad del cobro para sugerir un producto complementario antes de cerrar la compra.</div>",
                 "icons/cart-shopping.svg"
         ));
 
@@ -590,21 +617,21 @@ public class ManualUsuarioDialog extends JDialog {
                 "<li>Mira cómo el saldo pendiente se reduce en tiempo real y entrégale un comprobante elegante de pago a tu cliente.</li>" +
                 "<li>Cuando termine de pagar la última cuota, la deuda se marca automáticamente como <b>PAGADA Y COMPLETADA</b>.</li>" +
                 "</ol>" +
-                "<div class='tip'><span class='badge-tip'>COBRO AMIGABLE</span> <b>Transparencia y Paz Mental:</b> Revisa en cualquier momento el historial exacto de qué día, a qué hora y con qué encargado se hizo cada abono de dinero.</div>",
+                "<div class='tip'><span class='tag-tip'>✔ COBRO AMIGABLE:</span> <b>Transparencia y Paz Mental —</b> Revisa en cualquier momento el historial exacto de qué día, a qué hora y con qué encargado se hizo cada abono de dinero.</div>",
                 "icons/wallet.svg"
         ));
 
         sections.add(new ManualSection(
-                "Surtido Inteligente y Alianzas con Proveedores",
-                "<p>Mantén tu local siempre lleno de los productos que más le gustan a tus clientes y negocia mejores condiciones con tus proveedores:</p>" +
-                "<h2>Entrada Inmediata de Mercancía:</h2>" +
+                "Abastecimiento Inteligente y Alianzas con Proveedores",
+                "<p>Mantén tu local siempre lleno de los productos que más le gustan a tus clientes. Utiliza <b>Abastecimiento</b> cada vez que recibas mercancía respaldada por una factura o remisión de compra de tu proveedor:</p>" +
+                "<h2>Entrada Inmediata de Mercancía con Factura:</h2>" +
                 "<ol>" +
-                "<li>Haz clic en <b>Registrar Entrada de Compras</b>.</li>" +
+                "<li>Haz clic en <b>Registrar Entrada de Abastecimiento</b>.</li>" +
                 "<li>Elige o agrega a tu <b>Proveedor</b> de confianza e ingresa el número de tu factura de compra.</li>" +
-                "<li>Añade los productos que recibiste en la puerta de tu local o carga la factura completa directamente desde Excel.</li>" +
-                "<li>Confirma la recepción: las cantidades en tu bodega aumentarán solas y el costo promedio de tu mercancía se recalculará para cuidar siempre tus márgenes de ganancia.</li>" +
+                "<li>Escribe el nombre o código de los productos que recibiste. <b>¿Es un producto completamente nuevo?</b> Digita su nombre y precio de costo directamente en la lista: el sistema lo registrará automáticamente en tu catálogo sin abrir ventanas extras.</li>" +
+                "<li>Confirma la recepción: las existencias en tu bodega aumentarán solas, se guardará el registro de la factura del proveedor y el costo de tu mercancía se actualizará para cuidar tus márgenes de ganancia.</li>" +
                 "</ol>" +
-                "<div class='note'><span class='badge-note'>CONTROL DE BODEGA</span> <b>Tip de Inventario:</b> Registra siempre tus compras antes de poner la mercancía a exhibición para mantener el control exacto de stock.</div>",
+                "<div class='note'><span class='tag-note'>📦 CONTROL DE BODEGA:</span> <b>Tip de Inventario —</b> Registra siempre tu abastecimiento antes de poner la mercancía a exhibición para mantener el control exacto de stock.</div>",
                 "icons/suppliers.svg"
         ));
 
@@ -620,7 +647,7 @@ public class ManualUsuarioDialog extends JDialog {
                     "<ul>" +
                     "<li>Crea accesos individuales para tus empleados con <b>Perfil Vendedor</b>. Ellos tendrán todas las facilidades para cobrar rápido a los clientes, pero tus ganancias netas, costos de compra y balances confidenciales permanecerán totalmente bloqueados bajo tu clave de Administrador.</li>" +
                     "</ul>" +
-                    "<div class='tip'><span class='badge-tip'>CLIENTES VIP</span> <b>Fidelización Efectiva:</b> Sorprende a tus clientes frecuentes ofreciéndoles pequeños descuentos en sus cumpleaños consultando su fecha de registro.</div>",
+                    "<div class='tip'><span class='tag-tip'>⭐ CLIENTES VIP:</span> <b>Fidelización Efectiva —</b> Sorprende a tus clientes frecuentes ofreciéndoles pequeños descuentos en sus cumpleaños consultando su fecha de registro.</div>",
                     "icons/clients.svg"
             ));
 
@@ -634,7 +661,7 @@ public class ManualUsuarioDialog extends JDialog {
                     "<li><b>Descarga en Excel con 1 Clic:</b> Genera reportes elegantes listos para analizar o enviar a tu contador.</li>" +
                     "<li><b>Impresión y Guardado en PDF:</b> Exporta balances oficiales impecables para respaldar la contabilidad de tu empresa.</li>" +
                     "</ul>" +
-                    "<div class='note'><span class='badge-note'>AUDITORÍA EJECUTIVA</span> <b>Revisión Semanal:</b> Genera este reporte al final de cada semana para ajustar precios en productos con bajo margen de ganancia.</div>",
+                    "<div class='note'><span class='tag-note'>📊 AUDITORÍA EJECUTIVA:</span> <b>Revisión Semanal —</b> Genera este reporte al final de cada semana para ajustar precios en productos con bajo margen de ganancia.</div>",
                     "icons/reports.svg"
             ));
 
@@ -646,8 +673,21 @@ public class ManualUsuarioDialog extends JDialog {
                     "<li><b>Activación de Licencia Definitiva:</b> Asegura la continuidad de tu empresa activando tu licencia permanente con el código único de tu equipo.</li>" +
                     "<li><b>Acompañamiento y Soporte Directo:</b> Cuenta con el respaldo de <b>ChopCode Solutions</b> y su desarrollador principal <b>Brandon Daza</b> para resolver tus dudas, capacitar a tu equipo o agregar nuevas funciones a la medida de tu negocio.</li>" +
                     "</ul>" +
-                    "<div class='tip'><span class='badge-tip'>GARANTÍA Y SOPORTE</span> <b>Evolución Continua:</b> Tu sistema está preparado para recibir actualizaciones continuas sin perder tu información comercial.</div>",
+                    "<div class='tip'><span class='tag-tip'>🤝 GARANTÍA Y SOPORTE:</span> <b>Evolución Continua —</b> Tu sistema está preparado para recibir actualizaciones continuas sin perder tu información comercial.</div>",
                     "icons/settings.svg"
+            ));
+
+            sections.add(new ManualSection(
+                    "Preguntas Frecuentes & Respaldo de Tranquilidad",
+                    "<p>Respuestas inmediatas a las dudas más comunes sobre la seguridad y operación de tu negocio:</p>" +
+                    "<h2>¿Mis datos están seguros si se interrumpe la energía eléctrica en mi local?</h2>" +
+                    "<p><b>Sí, 100% protegidos.</b> ERP+ Business funciona con un motor de base de datos local SQLite de grado industrial que guarda de manera atómica cada transacción en el instante preciso en que presionas confirmar. Nada se pierde.</p>" +
+                    "<h2>¿Puedo utilizar la aplicación en una laptop o PC de escasos recursos?</h2>" +
+                    "<p><b>Totalmente.</b> El sistema está optimizado con arquitectura ultraligera en Java Swing, consumiendo mínimo procesador y memoria RAM, lo que garantiza una velocidad de respuesta inmediata incluso en equipos de cómputo sencillos.</p>" +
+                    "<h2>¿Necesito pagar mensualidades por el uso de la aplicación?</h2>" +
+                    "<p><b>No.</b> Adquieres tu licencia definitiva de pago único con soporte directo de ChopCode Solutions. Tu software es tuyo para siempre.</p>" +
+                    "<div class='tip'><span class='tag-tip'>🛡 TRANQUILIDAD TOTAL:</span> <b>Respaldo Garantizado —</b> Tu información pertenece a tu negocio y jamás viaja a servidores externos desconocidos.</div>",
+                    "icons/shield-heart.svg"
             ));
         }
     }

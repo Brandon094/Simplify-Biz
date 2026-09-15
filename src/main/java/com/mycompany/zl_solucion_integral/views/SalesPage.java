@@ -30,6 +30,7 @@ public class SalesPage extends JPanel {
     // UI Components
     private JTextField txtSearch, txtQty, txtDiscount;
     private JTextField txtClientName, txtClientCC, txtClientTel, txtClientEmail;
+    private JTextField txtCashGiven;
     private JLabel lblClientName, lblClientCC, lblClientTel, lblClientEmail;
     private JComponent txtClientCCHelper;
     private JPanel clientFieldsContainer;
@@ -41,6 +42,8 @@ public class SalesPage extends JPanel {
     private JLabel lblSubtotal;
     private JLabel lblDiscountSavings;
     private JLabel lblItemCount;
+    private JLabel lblChangeDue;
+    private JPanel panelChangeCalculation;
     private JPanel centerCardPanel;
     private JPanel emptyCartState;
 
@@ -310,11 +313,46 @@ public class SalesPage extends JPanel {
         
         totalRow.add(lblTotal, BorderLayout.CENTER);
 
+        // Panel de Cálculo de Vueltas / Cambio (Monto entregado por el tendero)
+        panelChangeCalculation = new JPanel(new GridLayout(2, 2, 6, 4));
+        panelChangeCalculation.setOpaque(false);
+        panelChangeCalculation.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(1, 0, 0, 0, ThemeConstants.INPUT_BORDER),
+                BorderFactory.createEmptyBorder(6, 6, 4, 6)
+        ));
+
+        JLabel lblCashGivenTag = new JLabel("Paga con ($):");
+        lblCashGivenTag.setForeground(ThemeConstants.TEXT_SECONDARY);
+        lblCashGivenTag.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
+
+        txtCashGiven = createTextField("Ej: 50000");
+        txtCashGiven.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
+        setupFieldIcon(txtCashGiven, "icons/wallet.svg");
+        txtCashGiven.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override public void insertUpdate(javax.swing.event.DocumentEvent e) { updateChangeCalculation(); }
+            @Override public void removeUpdate(javax.swing.event.DocumentEvent e) { updateChangeCalculation(); }
+            @Override public void changedUpdate(javax.swing.event.DocumentEvent e) { updateChangeCalculation(); }
+        });
+
+        JLabel lblChangeDueTag = new JLabel("Vueltas:");
+        lblChangeDueTag.setForeground(ThemeConstants.TEXT_PRIMARY);
+        lblChangeDueTag.setFont(ThemeConstants.FONT_BODY.deriveFont(Font.BOLD));
+
+        lblChangeDue = new JLabel("$ 0.00", SwingConstants.RIGHT);
+        lblChangeDue.setForeground(ThemeConstants.TEXT_SECONDARY);
+        lblChangeDue.setFont(ThemeConstants.FONT_BODY.deriveFont(Font.BOLD, 15f));
+
+        panelChangeCalculation.add(lblCashGivenTag);
+        panelChangeCalculation.add(txtCashGiven);
+        panelChangeCalculation.add(lblChangeDueTag);
+        panelChangeCalculation.add(lblChangeDue);
+
         footerPanel.add(Box.createVerticalStrut(4));
         footerPanel.add(lineSep);
         footerPanel.add(breakdownPanel);
         footerPanel.add(Box.createVerticalStrut(2));
         footerPanel.add(totalRow);
+        footerPanel.add(panelChangeCalculation);
 
         p.add(footerPanel, BorderLayout.SOUTH);
 
@@ -795,6 +833,39 @@ public class SalesPage extends JPanel {
             } else {
                 cl.show(centerCardPanel, "CART");
             }
+        }
+
+        updateChangeCalculation();
+    }
+
+    private void updateChangeCalculation() {
+        if (lblChangeDue == null || txtCashGiven == null) return;
+
+        double grandTotal = cartItems.stream().mapToDouble(Venta::getTotal).sum();
+        String rawInput = txtCashGiven.getText().trim();
+
+        if (rawInput.isEmpty() || grandTotal <= 0) {
+            lblChangeDue.setText("$ 0.00");
+            lblChangeDue.setForeground(ThemeConstants.TEXT_SECONDARY);
+            return;
+        }
+
+        // Parseo numérico defensivo ignorando símbolos de moneda o comas
+        String cleaned = rawInput.replaceAll("[^0-9.,]", "").replace(",", ".");
+        try {
+            double cashGiven = Double.parseDouble(cleaned);
+            double change = cashGiven - grandTotal;
+
+            if (change >= 0) {
+                lblChangeDue.setText(String.format("$ %.2f", change));
+                lblChangeDue.setForeground(ThemeConstants.NEON_GREEN);
+            } else {
+                lblChangeDue.setText(String.format("Falta: $ %.2f", Math.abs(change)));
+                lblChangeDue.setForeground(ThemeConstants.NEON_RED);
+            }
+        } catch (NumberFormatException e) {
+            lblChangeDue.setText("Monto inválido");
+            lblChangeDue.setForeground(ThemeConstants.NEON_RED);
         }
     }
 

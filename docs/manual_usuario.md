@@ -10,7 +10,9 @@
 
 Dile adiós a los desvelos haciendo cuentas a mano, a las dudas sobre si estás ganando dinero y al temor de mercancía perdida. Esta herramienta fue diseñada pensando en la psicología del comerciante exitoso: te ahorra tiempo, protege cada billete que entra a tu local y te regala la paz mental de ver tu **Ganancia Limpia y Real** al instante.
 
-> **Sensación de Control Total:** Imagina cerrar tu jornada con la tranquilidad absoluta de saber exactamente cuánto vendiste, cuánto ganaste de utilidad directa y qué productos le encantan a tus clientes. ¡Prepárate para llevar tu negocio al siguiente nivel!
+<div style="background-color: #1E293B; border-left: 4px solid #22C55E; padding: 12px 16px; border-radius: 8px; margin: 14px 0;">
+  <strong style="color: #22C55E;">Sensación de Control Total:</strong> Imagina cerrar tu jornada con la tranquilidad absoluta de saber exactamente cuánto vendiste, cuánto ganaste de utilidad directa y qué productos le encantan a tus clientes. ¡Prepárate para llevar tu negocio al siguiente nivel!
+</div>
 
 ---
 
@@ -18,8 +20,12 @@ Dile adiós a los desvelos haciendo cuentas a mano, a las dudas sobre si estás 
 
 Descubre la emoción de ver tu negocio funcionando solo, de manera rápida y sin complicaciones:
 
-### 1. Llena tus Estantes (Inventario)
-Ingresa la mercancía que le compras a tus proveedores. En pocos segundos tendrás cada artículo registrado con su precio de costo y su precio de venta al público.
+### 1. Llena tus Estantes (Inventario & Abastecimiento)
+Ingresa la mercancía que vendes en tu negocio. En pocos segundos tendrás cada artículo registrado con su precio de costo y su precio de venta al público.
+
+<div style="background-color: #1E293B; border-left: 4px solid #06B6D4; padding: 12px 16px; border-radius: 8px; margin: 14px 0;">
+  <strong style="color: #06B6D4;">Regla de Oro:</strong> Usa el módulo de <b>Inventario</b> para registrar productos que ya tienes en tu almacén o mercancía propia sin factura. Usa el módulo de <b>Abastecimiento</b> cuando ingreses compras respaldadas por una factura o remisión de tu proveedor.
+</div>
 
 ### 2. Pon a Tu Equipo a Vender con Confianza
 Crea usuarios para tus colaboradores o cajeros. Ellos podrán cobrar a toda velocidad a tus clientes, mientras tus secretos de costos y tus ganancias privadas se mantienen 100% protegidos bajo tu control exclusivo.
@@ -39,7 +45,7 @@ Tu información comercial y tu dinero son sagrados. Por eso, el sistema protege 
 ### Comodidad y Tranquilidad Diario
 - **Entrada Rápida 'Recordarme':** Inicia tu jornada laboral de inmediato sin tener que escribir tus datos una y otra vez. Tu tiempo vale oro.
 - **Recuperación Inteligente de Clave:** Si un día olvidas tu clave, no te preocupes ni pierdas la calma. Con solo escribir tu usuario y teléfono recuperas el acceso en segundos.
-- **Cierre de Protección al Terminar:** Al finalizar el día, cierra tu sesión con un solo clic para asegurar que nadie sin autorización pueda curiosear tus ganancias ni tus datos confidenciales.
+- **Cierre de Sesión Seguro al Terminar:** Al finalizar el día, cierra tu sesión con un solo clic para asegurar que nadie sin autorización pueda curiosear tus ganancias ni tus datos confidenciales.
 
 ---
 
@@ -53,13 +59,15 @@ Imagina tener un consultor de negocios a tu lado 24/7 que te dice exactamente c�
 - **Dinero Invertido en Bodega:** Descubre exactamente cuánto dinero tienes acumulado y listo para convertirse en ventas dentro de tu estantería.
 - **Alertas de Mercancía por Agotarse:** Te avisa a tiempo qué productos estrella se están terminando para que nunca le digas *'no hay'* a un cliente.
 
-> **Poder Comercial:** Observa en gráficos dinámicos qué días y a qué horas vendes más para aplicar promociones irresistibles y multiplicar tus ingresos.
+<div style="background-color: #1E293B; border-left: 4px solid #06B6D4; padding: 12px 16px; border-radius: 8px; margin: 14px 0;">
+  <strong style="color: #06B6D4;">Poder Comercial:</strong> Observa en gráficos dinámicos qué días y a qué horas vendes más para aplicar promociones irresistibles y multiplicar tus ingresos.
+</div>
 
 ---
 
-## 5. Mercancía Organizada, Negocio Multiplicado
+## 5. Mercancía Organizada, Negocio Multiplicado (Inventario)
 
-Evita el dolor de perder mercancía por desorden o extravíos. Organizar tus artículos despierta el deseo de compra en tu cliente:
+Evita el dolor de perder mercancía por desorden o extravíos. Utiliza **Inventario** para cargar productos existentes en tu bodega que no cuentan con factura de proveedor o para ajustar existencias manualmente.
 
 ### Crear un Producto de Impacto
 1. Escribe el **Nombre Atractivo** y el código del artículo (o pásalo por tu lector láser).
@@ -67,7 +75,9 @@ Evita el dolor de perder mercancía por desorden o extravíos. Organizar tus art
 3. Define tu **Precio de Venta** y la cantidad que tienes en tu vitrina o bodega.
 4. Guarda y listo: tu artículo queda listo para venderse de inmediato.
 
-> **Cero Errores:** Si vuelves a registrar un producto que ya tenías, el sistema no crea duplicados molestos; simplemente suma las unidades nuevas a tu abundancia de stock.
+<div style="background-color: #1E293B; border-left: 4px solid #A855F7; padding: 12px 16px; border-radius: 8px; margin: 14px 0;">
+  <strong style="color: #A855F7;">Cero Errores:</strong> Si vuelves a registrar un producto que ya tenías, el sistema no crea duplicados molestos; simplemente suma las unidades nuevas a tu abundancia de stock.
+</div>
 
 ---
 
@@ -81,8 +91,6 @@ Evita el dolor de perder mercancía por desorden o extravíos. Organizar tus art
 3. **Conecta los Datos de Forma Visual:** Indica de manera súper fácil cuál columna es el nombre, cuál es el precio y cuál es la cantidad.
 4. **Confirma y Disfruta:** En solo 5 segundos verás cientos de productos cargados en tu pantalla, listos para generar ventas.
 
-> **Cero Trabajo Repetido:** Si algunos artículos ya existían en tu tienda, el sistema actualiza sus precios y suma el stock de forma automática.
-
 ---
 
 ## 7. Ventas Ultrarrápidas que Enamoran a tus Clientes
@@ -93,9 +101,16 @@ Ofrécele a tus clientes una experiencia de compra rápida, moderna y sin filas 
 1. **Encuentra el Producto al Instante:** Escribe una letra o pasa el lector de código de barras. El artículo salta de inmediato al carrito de compras.
 2. **Adapta la Venta a la Medida:** Cambia cantidades o aplica promociones especiales con botones amplios y cómodos diseñados para vender a toda prisa.
 3. **Cierra el Cobro y Recibe el Dinero:**
-   - **Efectivo (Cobro Inmediato):** El favorito de tu caja. Presiona un botón, entrega el cambio y despacha al cliente feliz en 2 segundos.
+   - **Efectivo (Calculadora de Vueltas Exactas):** Escribe en el campo **"Paga con ($)"** el billete que te entrega tu cliente. El sistema te dice de inmediato las **Vueltas Exactas** en neón verde (o cuánto dinero falta), eliminando errores de cálculo manual. Entrega el cambio y despacha al cliente en 2 segundos.
    - **Transferencia Digital (Nequi / Bancolombia):** Registra los datos del pago digital con total nitidez y sin dudas de dinero en el aire.
    - **Crédito Comercial (Fiado de Confianza):** Ofrécele crédito a tus clientes VIP. La cuenta se guarda sola en su expediente sin necesidad de cuadernos.
+
+### Atajos de Teclado para Cobro Exprés
+| Tecla / Acción | Función |
+| :--- | :--- |
+| `ENTER` en Búsqueda | Agrega el producto encontrado de inmediato al carrito. |
+| `TAB` / `SHIFT + TAB` | Salta velozmente entre campos del formulario sin soltar el teclado. |
+| Digitar en `Paga con ($)` | Calcula automáticamente las vueltas en tiempo real. |
 
 ---
 
@@ -109,19 +124,17 @@ Nunca vuelvas a perder dinero por cuentas anotadas en papeles sueltos que se tra
 3. Mira cómo el saldo pendiente se reduce en tiempo real y entrégale un comprobante elegante de pago a tu cliente.
 4. Cuando termine de pagar la última cuota, la deuda se marca automáticamente como **PAGADA Y COMPLETADA**.
 
-> **Transparencia y Paz Mental:** Revisa en cualquier momento el historial exacto de qué día, a qué hora y con qué encargado se hizo cada abono de dinero.
-
 ---
 
-## 9. Surtido Inteligente y Alianzas con Proveedores
+## 9. Abastecimiento Inteligente y Alianzas con Proveedores
 
-Mantén tu local siempre lleno de los productos que más le gustan a tus clientes y negocia mejores condiciones con tus proveedores:
+Mantén tu local siempre lleno de los productos que más le gustan a tus clientes. Utiliza **Abastecimiento** cada vez que recibas mercancía respaldada por una factura o remisión de compra de tu proveedor.
 
-### Entrada Inmediata de Mercancía
-1. Haz clic en **Registrar Entrada de Compras**.
+### Entrada Inmediata de Mercancía con Factura
+1. Haz clic en **Registrar Entrada de Abastecimiento**.
 2. Elige o agrega a tu **Proveedor** de confianza e ingresa el número de tu factura de compra.
-3. Añade los productos que recibiste en la puerta de tu local o carga la factura completa directamente desde Excel.
-4. Confirma la recepción: las cantidades en tu bodega aumentarán solas y el costo promedio de tu mercancía se recalculará para cuidar siempre tus márgenes de ganancia.
+3. Escribe el nombre o código de los productos que recibiste. **¿Es un producto completamente nuevo?** Digita su nombre y precio de costo directamente en la lista: el sistema lo registrará automáticamente en tu catálogo sin abrir ventanas extras.
+4. Confirma la recepción: las existencias en tu bodega aumentarán solas, se guardará el registro de la factura del proveedor y el costo de tu mercancía se actualizará para cuidar tus márgenes de ganancia.
 
 ---
 
@@ -155,5 +168,19 @@ Siéntete respaldado en todo momento por un equipo de tecnología enfocado en ha
 
 - **Prueba Sin Riesgos:** Disfruta de todas las capacidades del sistema y comprueba cómo agiliza las ventas de tu negocio.
 - **Activación de Licencia Definitiva:** Asegura la continuidad de tu empresa activando tu licencia permanente con el código único de tu equipo.
-- **Acompañamiento y Soporte Directo:** Cuenta com el respaldo de **ChopCode Solutions** y su desarrollador principal **Brandon Daza** para resolver tus dudas, capacitar a tu equipo o agregar nuevas funciones a la medida de tu negocio.
+- **Acompañamiento y Soporte Directo:** Cuenta con el respaldo de **ChopCode Solutions** y su desarrollador principal **Brandon Daza** para resolver tus dudas, capacitar a tu equipo o agregar nuevas funciones a la medida de tu negocio.
+
+---
+
+## 13. Preguntas Frecuentes & Respaldo de Tranquilidad
+
+### ¿Mis datos están seguros si se interrumpe la energía eléctrica en mi local?
+**Sí, 100% protegidos.** ERP+ Business funciona con un motor de base de datos local SQLite de grado industrial que guarda de manera atómica cada transacción en el instante preciso en que presionar confirmar. Nada se pierde.
+
+### ¿Puedo utilizar la aplicación en una laptop o PC de escasos recursos?
+**Totalmente.** El sistema está optimizado con arquitectura ultraligera en Java Swing, consumiendo mínimo procesador y memoria RAM, lo que garantiza una velocidad de respuesta inmediata incluso en equipos de cómputo sencillos.
+
+### ¿Necesito pagar mensualidades por el uso de la aplicación?
+**No.** Adquieres tu licencia definitiva de pago único con soporte directo de ChopCode Solutions. Tu software es tuyo para siempre.
+
 

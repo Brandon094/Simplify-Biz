@@ -213,9 +213,9 @@ public class MainTemplate extends JFrame {
             sidebar.addItem("Cartera", "icons/wallet.svg", () -> navegar(new CarteraPage(), "Cartera de clientes", "Control de ventas a crédito, seguimiento de deudores y registro de abonos", "icons/wallet.svg", ThemeConstants.NEON_PURPLE));
             sidebar.endSection();
 
-            sidebar.addSection("INVENTARIO Y COMPRAS", "inv", "icons/boxes-stacked.svg");
+            sidebar.addSection("INVENTARIO Y ABASTECIMIENTO", "inv", "icons/boxes-stacked.svg");
             sidebar.addItem("Inventario", "icons/boxes-stacked.svg", () -> navegar(new ProductPage(), "Gestión de inventario", "Administra productos, precios de costo, existencias en bodega y categorías", "icons/boxes-stacked.svg", ThemeConstants.NEON_GREEN));
-            sidebar.addItem("Compras", "icons/suppliers.svg", () -> navegar(new ComprasPage(), "Compras a proveedores", "Registra entradas de almacén y actualización automática de stock de mercancía", "icons/suppliers.svg", ThemeConstants.NEON_CYAN));
+            sidebar.addItem("Abastecimiento", "icons/suppliers.svg", () -> navegar(new ComprasPage(), "Abastecimiento & Proveedores", "Registra entradas de almacén y actualización automática de stock de mercancía", "icons/suppliers.svg", ThemeConstants.NEON_CYAN));
             sidebar.endSection();
 
             sidebar.addSection("GESTIÓN", "gestion", "icons/settings.svg");
@@ -231,7 +231,7 @@ public class MainTemplate extends JFrame {
 
             sidebar.addSection("Inventario", "inventario", "icons/boxes-stacked.svg");
             sidebar.addItem("Inventario", "icons/boxes-stacked.svg", () -> navegar(new ProductPage(), "Gestión de inventario", "Consulta existencias de productos y catálogo en bodega", "icons/boxes-stacked.svg", ThemeConstants.NEON_GREEN));
-            sidebar.addItem("Compras", "icons/cart-shopping.svg", () -> navegar(new ComprasPage(), "Entradas de almacén", "Registro de compras y recepciones de mercancía", "icons/suppliers.svg", ThemeConstants.NEON_CYAN));
+            sidebar.addItem("Abastecimiento", "icons/cart-shopping.svg", () -> navegar(new ComprasPage(), "Abastecimiento & Entradas", "Registro de abastecimiento y recepciones de mercancía", "icons/suppliers.svg", ThemeConstants.NEON_CYAN));
         }
 
 
