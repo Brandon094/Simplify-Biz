@@ -1,0 +1,68 @@
+/* ==========================================================================
+   ERP+ BUSINESS - ANIMATIONS & DYNAMIC GLOWS (KEYFRAMES)
+   ========================================================================== */
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(168, 85, 247, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+  }
+}
+
+@keyframes floatSlow {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes shimmerEffect {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animated-glow {
+  animation: pulseGlow 4s infinite ease-in-out;
+}
+
+.animated-float {
+  animation: floatSlow 6s infinite ease-in-out;
+}
+
+/* Background Ambient Orbs */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+.orb-purple {
+  width: 450px;
+  height: 450px;
+  background: var(--neon-purple);
+  top: -100px;
+  right: -100px;
+}
+
+.orb-blue {
+  width: 400px;
+  height: 400px;
+  background: var(--neon-blue);
+  top: 300px;
+  left: -150px;
+}
+
+.orb-green {
+  width: 350px;
+  height: 350px;
+  background: var(--neon-green);
+  bottom: 500px;
+  right: 10%;
+}
