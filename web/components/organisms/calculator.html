@@ -1,40 +1,75 @@
-<!-- ORGANISMS: ROI Calculator Component (MVVM Reactive View) -->
-<section class="py-16 px-4 max-w-7xl mx-auto" id="calculadora">
-  <div class="bg-slate-900/90 border border-white/10 rounded-3xl p-6 md:p-12 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center shadow-2xl">
-    <!-- ViewModel Inputs -->
-    <div class="flex flex-col gap-6">
-      <h2 class="font-heading text-2xl md:text-3xl font-extrabold">
-        Calcula Cuánto <span class="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Dinero y Tiempo</span> Ahorrarás al Mes
-      </h2>
-      <p class="text-slate-400 text-sm md:text-base">
-        Utiliza los deslizadores para estimar las ganancias no capturadas y el tiempo recuperado al sistematizar tu negocio con ERP+ Business.
-      </p>
+<!-- ORGANISMS: Comparativa de Ahorro Component (Pago Único vs Arriendo) -->
+<section class="py-16 px-4 max-w-7xl mx-auto" id="comparativa">
+  <h2 class="text-center font-heading text-2xl sm:text-4xl font-extrabold mb-4">
+    ¿Por qué elegir <span class="bg-gradient-to-r from-blue-500 to-purple-400 bg-clip-text text-transparent">ERP+ Business</span>?
+  </h2>
+  <p class="text-center text-slate-300 text-sm md:text-base max-w-2xl mx-auto mb-12">
+    Compare la tranquilidad de ser el dueño verdadero de su software frente a los programas tradicionales de suscripción.
+  </p>
 
-      <div class="flex flex-col gap-2">
-        <div class="flex justify-between items-center text-sm font-semibold text-slate-300">
-          <span>Ventas Mensuales Estimadas ($ COP)</span>
-          <span id="txtValVentas" class="text-cyan-400 font-bold">$5,000,000 COP</span>
-        </div>
-        <input type="range" id="inputVentas" min="1000000" max="30000000" step="500000" value="5000000" class="w-full h-2.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-500">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+    <!-- Programas Tradicionales -->
+    <div class="bg-slate-900/60 border border-rose-500/30 rounded-3xl p-8 flex flex-col justify-between relative overflow-hidden">
+      <div class="absolute top-0 right-0 bg-rose-500/20 text-rose-300 text-xs font-bold px-4 py-1 rounded-bl-xl border-b border-l border-rose-500/30">
+        Programas Tradicionales
       </div>
-
-      <div class="flex flex-col gap-2">
-        <div class="flex justify-between items-center text-sm font-semibold text-slate-300">
-          <span>Horas Gastadas por Semana en Cuentas</span>
-          <span id="txtValHoras" class="text-cyan-400 font-bold">10 hrs / semana</span>
-        </div>
-        <input type="range" id="inputHoras" min="2" max="30" step="1" value="10" class="w-full h-2.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-500">
+      <div>
+        <h3 class="text-2xl font-bold text-rose-400 mb-6">Suscripciones Costosas</h3>
+        <ul class="space-y-4 text-slate-300 text-sm">
+          <li class="flex items-start gap-3">
+            <span class="text-rose-500 font-bold text-lg">✕</span>
+            <span>Mensualidades eternas de $100.000 o $150.000 COP de por vida.</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-rose-500 font-bold text-lg">✕</span>
+            <span>Si un mes no paga, le bloquean el acceso a su propio negocio.</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-rose-500 font-bold text-lg">✕</span>
+            <span>Internet obligatorio: si falla la red, no puede cobrar ni vender.</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-rose-500 font-bold text-lg">✕</span>
+            <span>Soporte lento e impersonal por tickets.</span>
+          </li>
+        </ul>
+      </div>
+      <div class="mt-8 pt-6 border-t border-white/10 text-center">
+        <span class="text-xs text-slate-400 block">Costo estimado en 2 años:</span>
+        <span class="text-2xl font-bold text-rose-400">$2.400.000 COP a $3.600.000 COP</span>
       </div>
     </div>
 
-    <!-- ViewModel Bound Reactive Outputs -->
-    <div class="bg-slate-950/80 border border-purple-500/30 rounded-2xl p-8 text-center shadow-xl shadow-purple-950/40">
-      <span class="text-xs text-slate-400 font-bold tracking-wider">ESTIMACIÓN DE IMPACTO MENSUAL</span>
-      <div id="outDinero" class="font-heading text-3xl sm:text-4xl md:text-5xl font-extrabold text-emerald-400 my-4">$ 675,000 COP / mes</div>
-      <div id="outHoras" class="text-lg md:text-xl font-bold text-cyan-400 mb-4">Recuperas aprox. 21 horas libres al mes</div>
-      <p class="text-xs text-slate-500 leading-relaxed">
-        Basado en la reducción del 70% en tiempos operativos de cuadre y la prevención del 4.5% en pérdidas de stock.
-      </p>
+    <!-- ERP+ Business -->
+    <div class="bg-slate-900/95 border-2 border-emerald-500/50 rounded-3xl p-8 flex flex-col justify-between relative shadow-2xl shadow-emerald-950/40 transform md:-translate-y-2">
+      <div class="absolute top-0 right-0 bg-emerald-500 text-slate-950 text-xs font-extrabold px-4 py-1 rounded-bl-xl shadow-md">
+        Opción Recomendada
+      </div>
+      <div>
+        <h3 class="text-2xl font-bold text-emerald-400 mb-6">ERP+ Business</h3>
+        <ul class="space-y-4 text-slate-200 text-sm font-medium">
+          <li class="flex items-start gap-3">
+            <span class="text-emerald-400 font-bold text-lg">✓</span>
+            <span><strong>Un solo pago único:</strong> Licencia permanente vitalicia.</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-emerald-400 font-bold text-lg">✓</span>
+            <span><strong>100% Suyo:</strong> El programa funciona siempre en su computador.</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-emerald-400 font-bold text-lg">✓</span>
+            <span><strong>Cero Internet Requerido:</strong> Venda sin interrupciones.</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-emerald-400 font-bold text-lg">✓</span>
+            <span><strong>Soporte directo por WhatsApp:</strong> Asistencia personalizada.</span>
+          </li>
+        </ul>
+      </div>
+      <div class="mt-8 pt-6 border-t border-white/10 text-center">
+        <span class="text-xs text-emerald-300 block font-semibold">Costo total para toda la vida:</span>
+        <span class="text-3xl font-extrabold text-emerald-400">Pago Único Definitivo</span>
+      </div>
     </div>
   </div>
 </section>

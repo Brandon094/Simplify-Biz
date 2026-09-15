@@ -1,28 +1,44 @@
 <!-- ORGANISMS: Hero Section Component -->
-<section class="relative pt-28 md:pt-40 pb-16 px-4 max-w-7xl mx-auto flex flex-col items-center text-center z-10">
+<section class="relative pt-24 sm:pt-32 md:pt-36 pb-12 px-4 max-w-7xl mx-auto flex flex-col items-center text-center z-10">
   <!-- Atom: Badge -->
   <div data-include="components/atoms/hero-badge.html"></div>
 
+  <!-- Titular Principal Persuasivo para Comerciantes -->
   <h1 class="font-heading text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight max-w-4xl leading-tight mb-6">
-    Gestión Comercial de Alto Rendimiento para <span class="bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent">Pequeñas y Medianas Empresas</span>
+    Tome el control total de las ventas y el inventario de su negocio, <span class="bg-gradient-to-r from-blue-500 via-purple-400 to-emerald-400 bg-clip-text text-transparent">sin enredos de cuadernos ni mensualidades.</span>
   </h1>
 
-  <p class="text-slate-400 text-base md:text-xl max-w-3xl mb-8 leading-relaxed">
-    Plataforma de escritorio transaccional con arquitectura MVC, interfaz FlatLaf Cyberpunk 2D acelerada, motor de base de datos SQLite embebido (sin internet) e importación masiva desde Excel.
+  <!-- Subtítulo de Valor Comercial Práctico -->
+  <p class="text-slate-300 text-base md:text-xl max-w-3xl mb-8 leading-relaxed">
+    El programa para computador diseñado para que sepa exactamente cuánta plata entra a su caja, qué productos le dejan ganancia y qué mercancía se le está acabando. Rápido, seguro y funciona directo en su computador sin depender de internet.
   </p>
 
-  <!-- CTAs -->
-  <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mb-16">
-    <a href="#descarga" class="w-full sm:w-auto px-8 py-4 rounded-full font-semibold text-base bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-xl shadow-blue-500/30 hover:shadow-purple-500/50 transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-2">
-      <img src="assets/icons/boxes-stacked.svg" class="w-5 h-5" alt="Icon">
-      Obtener ERP+ Business
+  <!-- Botones de Acción Comercial (CTAs) -->
+  <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mb-8">
+    <a href="#descargar" class="w-full sm:w-auto px-8 py-4 rounded-full font-bold text-base bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-xl shadow-blue-500/30 hover:shadow-purple-500/50 transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-3">
+      <img src="assets/icons/rocket.svg" class="w-5 h-5 invert" alt="Descargar">
+      Descargar Prueba Gratis por 30 Días (Windows/PC)
     </a>
-    <a href="#preview" class="w-full sm:w-auto px-8 py-4 rounded-full font-semibold text-base bg-white/5 hover:bg-white/10 border border-white/15 text-slate-200 backdrop-blur-md transition-all duration-300 flex items-center justify-center gap-2">
-      <img src="assets/icons/chart-column.svg" class="w-5 h-5" alt="Icon">
-      Explorar Interfaz
+    
+    <a href="https://api.whatsapp.com/send?phone=573000000000&text=Hola,%20deseo%20comprar%20la%20licencia%20definitiva%20de%20ERP+%20Business" target="_blank" class="w-full sm:w-auto px-8 py-4 rounded-full font-bold text-base bg-emerald-600 hover:bg-emerald-500 text-white shadow-xl shadow-emerald-600/30 transition-all duration-300 flex items-center justify-center gap-2">
+      <img src="assets/icons/phone.svg" class="w-5 h-5 invert" alt="WhatsApp">
+      Comprar Licencia por WhatsApp
     </a>
   </div>
 
-  <!-- Molecule: App Preview Mockup -->
+  <!-- Garantías Visuales de Confianza -->
+  <div class="flex flex-wrap items-center justify-center gap-6 text-xs sm:text-sm text-slate-300 mb-12 font-medium">
+    <div class="flex items-center gap-1.5">
+      <span class="text-emerald-400 font-bold">✓</span> Sin cobros sorpresa
+    </div>
+    <div class="flex items-center gap-1.5">
+      <span class="text-emerald-400 font-bold">✓</span> No requiere internet para vender
+    </div>
+    <div class="flex items-center gap-1.5">
+      <span class="text-emerald-400 font-bold">✓</span> Instalación guiada
+    </div>
+  </div>
+
+  <!-- Molecule: Real Desktop Mockup Frame -->
   <div data-include="components/molecules/app-preview-mockup.html" class="w-full max-w-5xl"></div>
 </section>

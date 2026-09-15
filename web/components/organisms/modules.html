@@ -1,76 +1,76 @@
-<!-- ORGANISMS: Core Modules Grid Component -->
-<section class="py-16 px-4 max-w-7xl mx-auto" id="modulos">
-  <h2 class="text-center font-heading text-2xl md:text-4xl font-extrabold mb-3">
-    Funcionalidades Reales del <span class="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">Sistema ERP+</span>
+<!-- ORGANISMS: Core Business Benefits Component (Dolores Solucionados) -->
+<section class="py-16 px-4 max-w-7xl mx-auto" id="beneficios">
+  <h2 class="text-center font-heading text-2xl sm:text-4xl font-extrabold mb-4">
+    Todo lo que su negocio necesita para <span class="bg-gradient-to-r from-blue-500 to-purple-400 bg-clip-text text-transparent">crecer con tranquilidad</span>
   </h2>
-  <p class="text-center text-slate-400 text-sm md:text-base max-w-2xl mx-auto mb-12">
-    Módulos desacoplados en arquitectura MVC diseñados estrictamente para el control administrativo e inventario diario.
+  <p class="text-center text-slate-300 text-sm md:text-base max-w-2xl mx-auto mb-12">
+    Diseñado especialmente para ferreterías, droguerías, repuestos y comercios locales que buscan orden rápido sin complicaciones.
   </p>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <!-- Módulo 1: POS -->
+    <!-- Beneficio 1: POS Rápido -->
     <div class="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-purple-500/40 hover:-translate-y-1 transition-all duration-300 shadow-xl">
       <div class="w-12 h-12 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center mb-5">
-        <img src="assets/icons/cart-shopping.svg" class="w-6 h-6" alt="Icon">
+        <img src="assets/icons/cart-shopping.svg" class="w-6 h-6" alt="Icono">
       </div>
-      <h3 class="text-xl font-bold mb-2">Ventas POS Transaccional</h3>
-      <p class="text-slate-400 text-sm leading-relaxed">
-        Punto de venta integrado con `VentasController`, lectura de lector de código de barras, snapshot inmutable de precios de costo y emisión de tickets.
+      <h3 class="text-xl font-bold mb-2 text-white">Punto de Venta Rápido (POS)</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">
+        Atienda a sus clientes en segundos con lector de código de barras o búsqueda rápida. Calcule vueltas y descuentos sin equivocaciones.
       </p>
     </div>
 
-    <!-- Módulo 2: Inventario -->
+    <!-- Beneficio 2: Excel -->
     <div class="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-purple-500/40 hover:-translate-y-1 transition-all duration-300 shadow-xl">
       <div class="w-12 h-12 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center mb-5">
-        <img src="assets/icons/boxes-stacked.svg" class="w-6 h-6" alt="Icon">
+        <img src="assets/icons/excel.svg" class="w-6 h-6" alt="Icono">
       </div>
-      <h3 class="text-xl font-bold mb-2">Inventario & Stock Crítico</h3>
-      <p class="text-slate-400 text-sm leading-relaxed">
-        Controlador `ProductoController` con semáforo de existencias mínimas, valuación total del inventario a precio de costo y búsqueda filtrada.
+      <h3 class="text-xl font-bold mb-2 text-white">Inventario Inteligente con Excel</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">
+        ¿Tiene su inventario en un archivo de Excel? Cárguelo al sistema en minutos sin tener que digitar producto por producto.
       </p>
     </div>
 
-    <!-- Módulo 3: Cartera -->
+    <!-- Beneficio 3: Utilidad Real -->
     <div class="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-purple-500/40 hover:-translate-y-1 transition-all duration-300 shadow-xl">
       <div class="w-12 h-12 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mb-5">
-        <img src="assets/icons/wallet.svg" class="w-6 h-6" alt="Icon">
+        <img src="assets/icons/chart-line.svg" class="w-6 h-6" alt="Icono">
       </div>
-      <h3 class="text-xl font-bold mb-2">Cartera & Abonos CxC</h3>
-      <p class="text-slate-400 text-sm leading-relaxed">
-        Gestión de cuentas por cobrar vía `CarteraController`. Permite realizar abonos parciales, liquidación de saldo adeudado e historial de pagos.
+      <h3 class="text-xl font-bold mb-2 text-white">Cuentas Claras y Utilidad Real</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">
+        Sepa al centavo cuánto dinero tiene invertido en bodega y cuánta ganancia limpia le quedó al final del día.
       </p>
     </div>
 
-    <!-- Módulo 4: Compras -->
-    <div class="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-purple-500/40 hover:-translate-y-1 transition-all duration-300 shadow-xl">
-      <div class="w-12 h-12 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center mb-5">
-        <img src="assets/icons/suppliers.svg" class="w-6 h-6" alt="Icon">
-      </div>
-      <h3 class="text-xl font-bold mb-2">Compras a Proveedores</h3>
-      <p class="text-slate-400 text-sm leading-relaxed">
-        Gestión de facturas de abastecimiento con `ComprasController` que incrementa automáticamente el stock del producto e historial por proveedor.
-      </p>
-    </div>
-
-    <!-- Módulo 5: Importador Excel -->
-    <div class="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-purple-500/40 hover:-translate-y-1 transition-all duration-300 shadow-xl" id="importacion">
-      <div class="w-12 h-12 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center mb-5">
-        <img src="assets/icons/excel.svg" class="w-6 h-6" alt="Icon">
-      </div>
-      <h3 class="text-xl font-bold mb-2">Importación Excel/CSV Apache POI</h3>
-      <p class="text-slate-400 text-sm leading-relaxed">
-        Engine `ExcelSQLiteManager` con lectura de cabeceras en caliente, mapeo visual de columnas y estrategia Upsert inteligente por SKU.
-      </p>
-    </div>
-
-    <!-- Módulo 6: Analítica 2D -->
+    <!-- Beneficio 4: Alerta de Stock -->
     <div class="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-purple-500/40 hover:-translate-y-1 transition-all duration-300 shadow-xl">
       <div class="w-12 h-12 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center mb-5">
-        <img src="assets/icons/reports.svg" class="w-6 h-6" alt="Icon">
+        <img src="assets/icons/boxes-stacked.svg" class="w-6 h-6" alt="Icono">
       </div>
-      <h3 class="text-xl font-bold mb-2">Widgets Gráficos Vectoriales</h3>
-      <p class="text-slate-400 text-sm leading-relaxed">
-        Dashboard ejecutivo compuesto por componentes Java 2D personalizados (`NeonBarChart`, `NeonPieChart`, `NeonLineChart`) exportables a reporte.
+      <h3 class="text-xl font-bold mb-2 text-white">Alerta de Mercancía por Agotarse</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">
+        El sistema le avisa en rojo qué productos están por acabarse antes de que pierda una venta.
+      </p>
+    </div>
+
+    <!-- Beneficio 5: Ventas a Crédito -->
+    <div class="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-purple-500/40 hover:-translate-y-1 transition-all duration-300 shadow-xl">
+      <div class="w-12 h-12 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center mb-5">
+        <img src="assets/icons/wallet.svg" class="w-6 h-6" alt="Icono">
+      </div>
+      <h3 class="text-xl font-bold mb-2 text-white">Cuentas por Cobrar (Fiados)</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">
+        Lleve el registro exacto de quién le debe, anote abonos parciales y mantenga su cartera al día sin cuadernos perdidos.
+      </p>
+    </div>
+
+    <!-- Beneficio 6: Datos Locales Seguros -->
+    <div class="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-purple-500/40 hover:-translate-y-1 transition-all duration-300 shadow-xl">
+      <div class="w-12 h-12 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center mb-5">
+        <img src="assets/icons/lock.svg" class="w-6 h-6" alt="Icono">
+      </div>
+      <h3 class="text-xl font-bold mb-2 text-white">Su Información es Suya</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">
+        Todo queda guardado localmente en su equipo. Sus datos no dependen de que se caiga la nube o el internet del local.
       </p>
     </div>
   </div>

@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ERP+ Business | Plataforma de Gestión Comercial POS & Inventario Offline</title>
-  <meta name="description" content="Software de escritorio de alto rendimiento para PyMEs: Punto de Venta POS, Inventario con Kardex, Cartera CxC, Compras y Analítica en SQLite transaccional.">
-  <meta name="keywords" content="ERP, Punto de Venta, POS, Inventario, Gestión Comercial, Software Negocios, Cierre Z, Cartera, Colombia">
+  <title>ERP+ Business | Programa de Ventas e Inventario para Computador</title>
+  <meta name="description" content="Tome el control de las ventas y el inventario de su negocio sin mensualidades ni enredos. Funciona 100% en su computador sin depender de internet. Descargue su prueba gratis.">
+  <meta name="keywords" content="Programa de ventas, Control de inventarios, Sistema POS local, Software ferreterías, Software repuestos, Software droguerías, Colombia">
   
   <!-- TailwindCSS v3 CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -42,32 +42,40 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/images/app_icon.png">
 </head>
-<body class="bg-[#0B0F19] text-slate-100 font-sans antialiased selection:bg-purple-500 selection:text-white overflow-x-hidden">
+<body class="bg-[#0B0F19] text-slate-100 font-sans antialiased selection:bg-purple-500 selection:text-white overflow-x-hidden relative">
 
   <!-- Ambient Glowing Background Orbs -->
   <div class="fixed -top-24 -right-24 w-96 h-96 bg-purple-600/25 rounded-full blur-[120px] pointer-events-none z-0"></div>
   <div class="fixed top-96 -left-24 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px] pointer-events-none z-0"></div>
   <div class="fixed bottom-48 right-10 w-80 h-80 bg-emerald-500/15 rounded-full blur-[120px] pointer-events-none z-0"></div>
 
-  <!-- ATOMIC DESIGN COMPONENT INCLUSIONS (DRY & DESACOPLADO) -->
+  <!-- ATOMIC DESIGN COMPONENT INCLUSIONS (EMBUDO COMERCIAL ALTA CONVERSIÓN) -->
   
-  <!-- Organism 1: Navbar Header -->
+  <!-- Organism 1: Navbar Header (Con botón directo a WhatsApp) -->
   <div data-include="components/organisms/navbar.html"></div>
 
-  <!-- Organism 2: Hero Section & Interactive Mockup -->
+  <!-- Organism 2: Hero Section & Desktop Mockup Frame para Captura Real de PC -->
   <div data-include="components/organisms/hero.html"></div>
 
-  <!-- Organism 3: Core Modules Grid -->
+  <!-- Organism 3: Beneficios Reales (Dolores Solucionados) -->
   <div data-include="components/organisms/modules.html"></div>
 
-  <!-- Organism 4: MVVM Reactive ROI Calculator -->
+  <!-- Organism 4: Comparativa de Ahorro (Pago Único vs Arriendo) -->
   <div data-include="components/organisms/calculator.html"></div>
 
-  <!-- Organism 5: Native OS Downloads -->
+  <!-- Organism 5: Descarga de Prueba Gratis 30 Días para PC -->
   <div data-include="components/organisms/downloads.html"></div>
 
-  <!-- Organism 6: Footer -->
+  <!-- Organism 6: Footer Mobile-First Sobrio -->
   <div data-include="components/organisms/footer.html"></div>
+
+  <!-- BOTÓN FLOTANTE PERMANENTE DE WHATSAPP (Cierre Comercial) -->
+  <div class="fixed bottom-4 right-4 z-50">
+    <a href="https://api.whatsapp.com/send?phone=573000000000&text=Hola,%20deseo%20comprar%20la%20licencia%20definitiva%20de%20ERP+%20Business" target="_blank" aria-label="Contactar por WhatsApp" class="flex items-center gap-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-4 py-3 rounded-full shadow-2xl shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105 border border-emerald-300">
+      <img src="assets/icons/phone.svg" class="w-6 h-6" alt="WhatsApp">
+      <span class="hidden sm:inline text-xs sm:text-sm font-extrabold">Comprar por WhatsApp</span>
+    </a>
+  </div>
 
   <!-- JS Scripts (MVVM ViewModels & Atomic Component Loader) -->
   <script src="js/app-viewmodel.js"></script>
