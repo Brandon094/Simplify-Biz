@@ -5,24 +5,30 @@
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const includeElements = document.querySelectorAll('[data-include]');
-    
-    for (const el of includeElements) {
-        const file = el.getAttribute('data-include');
-        if (file) {
-            try {
-                const response = await fetch(file);
-                if (response.ok) {
-                    const htmlContent = await response.text();
-                    el.outerHTML = htmlContent;
-                } else {
-                    console.error(`Error al cargar el componente: ${file}`);
+    // Función para incluir elementos asíncronos
+    async function loadIncludes() {
+        const includeElements = document.querySelectorAll('[data-include]');
+        for (const el of includeElements) {
+            const file = el.getAttribute('data-include');
+            if (file) {
+                try {
+                    const response = await fetch(file);
+                    if (response.ok) {
+                        const htmlContent = await response.text();
+                        el.outerHTML = htmlContent;
+                    } else {
+                        console.error(`Error al cargar el componente: ${file}`);
+                    }
+                } catch (err) {
+                    console.error(`Excepción al obtener el componente ${file}:`, err);
                 }
-            } catch (err) {
-                console.error(`Excepción al obtener el componente ${file}:`, err);
             }
         }
     }
+
+    // Ejecución de carga en primer y segundo nivel (sub-componentes anidados)
+    await loadIncludes();
+    await loadIncludes();
 
     // Una vez cargados e inyectados todos los componentes en el DOM, inicializar el ViewModel
     if (typeof AppViewModel !== 'undefined') {
