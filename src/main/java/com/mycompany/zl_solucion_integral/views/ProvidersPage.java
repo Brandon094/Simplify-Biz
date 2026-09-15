@@ -22,27 +22,7 @@ public class ProvidersPage extends JPanel {
     public ProvidersPage() {
         setOpaque(false);
         setLayout(new BorderLayout(20, 20));
-        setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-
-        // Header (microcopy de contexto)
-        JPanel headerPanel = new JPanel();
-        headerPanel.setOpaque(false);
-        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
-
-        JLabel title = new JLabel("Gestión de proveedores", createIcon("icons/providers.svg", ThemeConstants.NEON_CYAN, 24, 24), SwingConstants.LEFT);
-        title.setForeground(ThemeConstants.TEXT_PRIMARY);
-        title.setFont(ThemeConstants.FONT_TITLE);
-        title.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JTextArea subtitle = UIUtils.createWrappingLabel(
-                "Vincula a tus proveedores y mantén a la mano sus datos de contacto",
-                ThemeConstants.FONT_SMALL, ThemeConstants.TEXT_SECONDARY);
-        subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        headerPanel.add(title);
-        headerPanel.add(Box.createVerticalStrut(4));
-        headerPanel.add(subtitle);
-        add(headerPanel, BorderLayout.NORTH);
+        setBorder(BorderFactory.createEmptyBorder(10, 20, 15, 20));
 
         // Contenido Principal
         mainContent = new JPanel(new BorderLayout(25, 0));
@@ -174,7 +154,7 @@ public class ProvidersPage extends JPanel {
         tbProviders.setShowGrid(false);
         tbProviders.setFillsViewportHeight(true);
         tbProviders.setFont(ThemeConstants.FONT_SMALL);
-        tbProviders.setSelectionBackground(new Color(6, 182, 212, 70));
+        tbProviders.setSelectionBackground(ThemeConstants.SELECTION_CYAN);
         tbProviders.setSelectionForeground(ThemeConstants.TEXT_PRIMARY);
 
         JScrollPane scroll = new JScrollPane(tbProviders);
@@ -196,7 +176,7 @@ public class ProvidersPage extends JPanel {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 if (isSelected) {
-                    c.setBackground(new Color(6, 182, 212, 40));
+                    c.setBackground(ThemeConstants.withAlpha(ThemeConstants.NEON_CYAN, 40));
                 } else {
                     c.setBackground(row % 2 == 0
                             ? ThemeConstants.CARD_BACKGROUND

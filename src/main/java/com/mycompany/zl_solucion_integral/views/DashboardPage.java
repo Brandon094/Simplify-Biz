@@ -44,47 +44,57 @@ public class DashboardPage extends JPanel {
     private JPanel chartsRow;
     private final java.util.List<MetricCard> metricCards = new java.util.ArrayList<>();
 
+    private String periodoSeleccionado = "Histórico Total";
+    private JComboBox<String> cbPeriodo;
+    private JPanel mainContainer;
+
     public DashboardPage() {
         setOpaque(false);
         setLayout(new BorderLayout(18, 18));
-        setBorder(BorderFactory.createEmptyBorder(24, 28, 24, 28));
+        JPanel topHeaderRow = new JPanel(new BorderLayout(12, 0));
+        topHeaderRow.setOpaque(false);
 
-        // Header (microcopy de contexto)
-        JPanel headerPanel = new JPanel();
-        headerPanel.setOpaque(false);
-        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+        cbPeriodo = new JComboBox<>(new String[]{"Histórico Total", "Hoy", "Últimos 7 Días", "Este Mes"});
+        cbPeriodo.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
+        cbPeriodo.setFocusable(false);
+        cbPeriodo.setSelectedItem(periodoSeleccionado);
+        cbPeriodo.addActionListener(e -> {
+            String nuevoPeriodo = (String) cbPeriodo.getSelectedItem();
+            if (nuevoPeriodo != null && !nuevoPeriodo.equals(periodoSeleccionado)) {
+                periodoSeleccionado = nuevoPeriodo;
+                cargarDatosYRefrescar();
+            }
+        });
 
-        JLabel title = new JLabel("Resumen general del negocio");
-        title.setForeground(ThemeConstants.TEXT_PRIMARY);
-        title.setFont(ThemeConstants.FONT_TITLE);
-        title.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JPanel filterWrap = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        filterWrap.setOpaque(false);
+        JLabel lblFiltro = new JLabel("Período: ");
+        lblFiltro.setForeground(ThemeConstants.TEXT_SECONDARY);
+        lblFiltro.setFont(ThemeConstants.FONT_SMALL);
+        filterWrap.add(lblFiltro);
+        filterWrap.add(cbPeriodo);
 
-        JTextArea subtitle = UIUtils.createWrappingLabel(
-                "Visión rápida del rendimiento, utilidad neta e inversión en inventario de tu negocio",
-                ThemeConstants.FONT_SMALL, ThemeConstants.TEXT_SECONDARY);
-        subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        topHeaderRow.add(filterWrap, BorderLayout.EAST);
 
-        headerPanel.add(title);
-        headerPanel.add(Box.createVerticalStrut(4));
-        headerPanel.add(subtitle);
-
-        // Cabecera fija; las métricas se añaden después de la carga asíncrona.
         northWrap.setOpaque(false);
-        northWrap.add(headerPanel, BorderLayout.NORTH);
+        northWrap.add(topHeaderRow, BorderLayout.NORTH);
         add(northWrap, BorderLayout.NORTH);
 
-        // Estado de carga: skeleton mientras los datos llegan de SQLite.
+        // Estado de carga inicial
         JPanel loadingWrap = new JPanel(new BorderLayout());
         loadingWrap.setOpaque(false);
         loadingWrap.add(new ShimmerSkeleton(), BorderLayout.CENTER);
         add(loadingWrap, BorderLayout.CENTER);
 
-        // Carga asíncrona: las consultas a SQLite corren fuera del EDT (Tarea 6 Fase 1).
+        cargarDatosAsincronos(loadingWrap);
+    }
+
+    private void cargarDatosAsincronos(JPanel loadingWrap) {
         new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() {
-                totalVentas = ventasCtrl.obtenerVentasTotales();
-                utilidadNeta = ventasCtrl.obtenerUtilidadTotal();
+                totalVentas = ventasCtrl.obtenerVentasTotalesPorPeriodo(periodoSeleccionado);
+                utilidadNeta = ventasCtrl.obtenerUtilidadTotalPorPeriodo(periodoSeleccionado);
                 inversionInventario = productoCtrl.obtenerInversionTotalInventario();
                 stockCritico = productoCtrl.obtenerCantidadStockCritico(5);
                 ventasRecientes = ventasCtrl.obtenerUltimasVentas(5);
@@ -95,7 +105,35 @@ public class DashboardPage extends JPanel {
 
             @Override
             protected void done() {
-                remove(loadingWrap);
+                if (loadingWrap != null) {
+                    remove(loadingWrap);
+                }
+                construirVista();
+                revalidate();
+                repaint();
+            }
+        }.execute();
+    }
+
+    private void cargarDatosYRefrescar() {
+        new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() {
+                totalVentas = ventasCtrl.obtenerVentasTotalesPorPeriodo(periodoSeleccionado);
+                utilidadNeta = ventasCtrl.obtenerUtilidadTotalPorPeriodo(periodoSeleccionado);
+                inversionInventario = productoCtrl.obtenerInversionTotalInventario();
+                stockCritico = productoCtrl.obtenerCantidadStockCritico(5);
+                ventasRecientes = ventasCtrl.obtenerUltimasVentas(5);
+                ventas7Dias = ventasCtrl.obtenerVentasUltimos7Dias();
+                distribucionCategorias = productoCtrl.obtenerDistribucionCategorias();
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                if (mainContainer != null) {
+                    remove(mainContainer);
+                }
                 construirVista();
                 revalidate();
                 repaint();
@@ -114,8 +152,8 @@ public class DashboardPage extends JPanel {
         
         double porcentajeMargen = totalVentas > 0 ? (utilidadNeta / totalVentas) * 100.0 : 0.0;
         MetricCard cardUtilidad = new MetricCard("Utilidad Neta", cur.format(utilidadNeta), String.format("Margen real: %.1f%%", porcentajeMargen), ThemeConstants.NEON_CYAN, "icons/check-double.svg");
-        MetricCard cardInversion = new MetricCard("Inversión Inventario", cur.format(inversionInventario), "Valor costo en bodega", ThemeConstants.NEON_PURPLE, "icons/products.svg");
-        MetricCard cardStock = new MetricCard("Stock Crítico", stockCritico + " ítems", "Menos de 5 unidades", ThemeConstants.NEON_RED, "icons/reports.svg");
+        MetricCard cardInversion = new MetricCard("Inversión Inventario", cur.format(inversionInventario), "Valor costo en bodega", ThemeConstants.NEON_PURPLE, "icons/boxes-stacked.svg");
+        MetricCard cardStock = new MetricCard("Stock Crítico", stockCritico + " ítems", "Menos de 5 unidades", ThemeConstants.NEON_RED, "icons/triangle-exclamation.svg");
         
         metricCards.clear();
         metricCards.add(cardVentas);
@@ -129,17 +167,17 @@ public class DashboardPage extends JPanel {
         northWrap.add(metricsPanel, BorderLayout.CENTER);
 
         // Contenedor Central
-        JPanel mainContainer = new JPanel(new GridLayout(2, 1, 0, 14));
+        mainContainer = new JPanel(new GridLayout(2, 1, 0, 14));
         mainContainer.setOpaque(false);
 
         // FILA 1: Gráficos de Alto Valor Visual y Ejecutivo (Arriba)
         RoundedPanel lineChartCard = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
         lineChartCard.setLayout(new BorderLayout());
-        lineChartCard.add(new NeonLineChart("Ventas Últimos 7 Días ($)", ventas7Dias), BorderLayout.CENTER);
+        lineChartCard.add(new NeonLineChart("Ventas Últimos 7 Días ($)", "icons/chart-line.svg", ventas7Dias), BorderLayout.CENTER);
 
         RoundedPanel pieChartCard = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
         pieChartCard.setLayout(new BorderLayout());
-        pieChartCard.add(new NeonPieChart("Distribución de Inventario", distribucionCategorias), BorderLayout.CENTER);
+        pieChartCard.add(new NeonPieChart("Distribución de Inventario", "icons/chart-pie.svg", distribucionCategorias), BorderLayout.CENTER);
 
         chartsRow = new JPanel(new GridLayout(1, 2, 18, 0));
         chartsRow.setOpaque(false);
@@ -150,7 +188,7 @@ public class DashboardPage extends JPanel {
         // FILA 2: Balance Financiero Comparativo y Widget de Salud del Sistema (Abajo)
         RoundedPanel barChartCard = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
         barChartCard.setLayout(new BorderLayout());
-        barChartCard.add(new NeonBarChart("Balance Financiero Comparativo ($)", totalVentas, utilidadNeta, inversionInventario), BorderLayout.CENTER);
+        barChartCard.add(new NeonBarChart("Balance Financiero Comparativo ($)", "icons/chart-column.svg", totalVentas, utilidadNeta, inversionInventario), BorderLayout.CENTER);
 
         JPanel statusWidgetCard = createSystemStatusWidget();
 
@@ -187,13 +225,19 @@ public class DashboardPage extends JPanel {
         card.setLayout(new BorderLayout(0, 12));
         card.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
 
-        // Encabezado: Título + Badge de estado en vivo (ONLINE)
+        // Encabezado: Icono + Título + Badge de estado en vivo (ONLINE)
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
 
         JLabel lblTitle = new JLabel("Salud del Sistema");
         lblTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
-        lblTitle.setFont(ThemeConstants.FONT_SUBTITLE);
+        lblTitle.setFont(ThemeConstants.FONT_SUBTITLE.deriveFont(Font.BOLD, 14f));
+        lblTitle.setIconTextGap(8);
+        try {
+            FlatSVGIcon iconSalud = new FlatSVGIcon("icons/shield-heart.svg", 18, 18);
+            iconSalud.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, ThemeConstants.NEON_GREEN));
+            lblTitle.setIcon(iconSalud);
+        } catch (Exception ignored) {}
 
         JLabel lblLive = createStatusPill("● ONLINE", ThemeConstants.NEON_GREEN);
         
@@ -201,25 +245,35 @@ public class DashboardPage extends JPanel {
         header.add(lblLive, BorderLayout.EAST);
         card.add(header, BorderLayout.NORTH);
 
-        // Contenido: 4 filas horizontales con badges neón
-        JPanel content = new JPanel(new GridLayout(4, 1, 0, 6));
+        // Contenido: 5 filas horizontales con badges neón
+        JPanel content = new JPanel(new GridLayout(5, 1, 0, 4));
         content.setOpaque(false);
 
         // 1. Base de Datos
         content.add(createStatusRow("Base de Datos", "icons/check-double.svg", "SQLite WAL", ThemeConstants.NEON_GREEN));
 
-        // 2. Stock Crítico
+        // 2. Licencia y Estado
+        com.mycompany.zl_solucion_integral.config.LicenciaManager.InfoLicencia licInfo =
+                com.mycompany.zl_solucion_integral.config.LicenciaManager.obtenerInfoLicencia();
+        String licBadge = licInfo.getEstado() == com.mycompany.zl_solucion_integral.config.LicenciaManager.EstadoLicencia.PRO_ACTIVA
+                ? "PRO Activa"
+                : "Demo (" + licInfo.getDiasRestantes() + "d)";
+        Color licColor = licInfo.getEstado() == com.mycompany.zl_solucion_integral.config.LicenciaManager.EstadoLicencia.PRO_ACTIVA
+                ? ThemeConstants.NEON_GREEN : ThemeConstants.NEON_BLUE;
+        content.add(createStatusRow("Licencia ERP+", "icons/license.svg", licBadge, licColor));
+
+        // 3. Stock Crítico
         String stockBadge = stockCritico > 0 ? stockCritico + " requeridos" : "Óptimo";
         Color stockColor = stockCritico > 0 ? ThemeConstants.NEON_RED : ThemeConstants.NEON_GREEN;
         content.add(createStatusRow("Stock & Reposición", "icons/reports.svg", stockBadge, stockColor));
 
-        // 3. Sesión Activa
+        // 4. Sesión Activa
         String usuario = com.mycompany.zl_solucion_integral.models.Sesion.getUsuarioLogueado() != null
                 ? com.mycompany.zl_solucion_integral.models.Sesion.getUsuarioLogueado()
                 : "Administrador";
         content.add(createStatusRow("Sesión Activa", "icons/clients.svg", usuario, ThemeConstants.NEON_CYAN));
 
-        // 4. Versión del Sistema
+        // 5. Versión del Sistema
         content.add(createStatusRow("Motor ERP+", "icons/settings.svg", "v1.3.0 Activo", ThemeConstants.NEON_PURPLE));
 
         card.add(content, BorderLayout.CENTER);

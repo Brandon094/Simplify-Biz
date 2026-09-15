@@ -1,5 +1,6 @@
 package com.mycompany.zl_solucion_integral.views.components.atoms;
 
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
 import javax.swing.*;
 import java.awt.*;
@@ -14,6 +15,8 @@ import java.util.Locale;
  */
 public class NeonBarChart extends JPanel {
     private final String title;
+    private final String iconPath;
+    private FlatSVGIcon svgIcon;
     private final String[] labels = {"Ventas Totales", "Utilidad Neta", "Inversión Bodega"};
     private final double[] values = new double[3];
     private final Color[] barColors = {
@@ -25,11 +28,24 @@ public class NeonBarChart extends JPanel {
     private int hoverIndex = -1;
 
     public NeonBarChart(String title, double ventasTotales, double utilidadNeta, double inversionBodega) {
+        this(title, "icons/chart-column.svg", ventasTotales, utilidadNeta, inversionBodega);
+    }
+
+    public NeonBarChart(String title, String iconPath, double ventasTotales, double utilidadNeta, double inversionBodega) {
         this.title = title;
+        this.iconPath = iconPath;
         this.values[0] = Math.max(0, ventasTotales);
         this.values[1] = Math.max(0, utilidadNeta);
         this.values[2] = Math.max(0, inversionBodega);
         setOpaque(false);
+        if (iconPath != null && !iconPath.isEmpty()) {
+            try {
+                svgIcon = new FlatSVGIcon(iconPath, 18, 18);
+                svgIcon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, ThemeConstants.NEON_CYAN));
+            } catch (Exception e) {
+                svgIcon = null;
+            }
+        }
 
         MouseAdapter adapter = new MouseAdapter() {
             @Override
@@ -94,9 +110,14 @@ public class NeonBarChart extends JPanel {
         int padding = 16;
 
         // 1. Título del gráfico
+        int titleX = padding;
+        if (svgIcon != null) {
+            svgIcon.paintIcon(this, g2, padding, 6);
+            titleX = padding + 26;
+        }
         g2.setColor(ThemeConstants.TEXT_PRIMARY);
-        g2.setFont(ThemeConstants.FONT_SUBTITLE);
-        g2.drawString(title, padding, padding + 10);
+        g2.setFont(ThemeConstants.FONT_SUBTITLE.deriveFont(Font.BOLD, 14f));
+        g2.drawString(title, titleX, 20);
 
         int topMargin = 42;
         int bottomMargin = 30;

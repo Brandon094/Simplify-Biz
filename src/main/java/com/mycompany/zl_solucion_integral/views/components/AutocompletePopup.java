@@ -1,6 +1,8 @@
 package com.mycompany.zl_solucion_integral.views.components;
 
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -9,7 +11,9 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -69,9 +73,23 @@ public class AutocompletePopup<T> {
         list.setFont(ThemeConstants.FONT_SMALL);
         list.setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
         list.setForeground(ThemeConstants.TEXT_PRIMARY);
-        list.setSelectionBackground(new Color(6, 182, 212, 70));
+        list.setSelectionBackground(ThemeConstants.SELECTION_CYAN);
         list.setSelectionForeground(ThemeConstants.NEON_CYAN);
         list.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+
+        FlatSVGIcon ideaIcon = new FlatSVGIcon("icons/idea.svg", 14, 14);
+        ideaIcon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, ThemeConstants.NEON_CYAN));
+
+        list.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                JLabel lbl = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                lbl.setIcon(ideaIcon);
+                lbl.setIconTextGap(8);
+                lbl.setBorder(BorderFactory.createEmptyBorder(3, 6, 3, 6));
+                return lbl;
+            }
+        });
 
         JScrollPane scroll = new JScrollPane(list);
         scroll.setBorder(BorderFactory.createEmptyBorder());
@@ -156,9 +174,13 @@ public class AutocompletePopup<T> {
                 listModel.addElement(formatter.format(item));
             }
             list.setSelectedIndex(0);
-            popup.setPopupSize(new Dimension(Math.max(textField.getWidth(), 250), 180));
-            popup.show(textField, 0, textField.getHeight());
-            textField.requestFocusInWindow();
+            if (textField.isShowing()) {
+                popup.setPopupSize(new Dimension(Math.max(textField.getWidth(), 250), 180));
+                popup.show(textField, 0, textField.getHeight());
+                textField.requestFocusInWindow();
+            } else {
+                popup.setVisible(false);
+            }
         }
     }
 

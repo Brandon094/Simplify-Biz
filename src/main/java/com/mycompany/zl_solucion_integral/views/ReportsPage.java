@@ -9,51 +9,48 @@ import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.JTableHeader;
 import java.awt.*;
+import java.text.MessageFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 
 public class ReportsPage extends JPanel {
     private final VentasController ventasCtrl = new VentasController();
     private JTable tbReports;
     private JScrollPane reportsScroll;
     private JTextField txtStartDate, txtEndDate;
-    private JPanel filterPanel, exportPanel;
+    private JPanel filterPanel, summaryPanel, exportPanel;
     private NeonButton btnFilter, btnExcel, btnPDF;
     private GridBagLayout filtroGrid;
+
+    // Métricas del Resumen Ejecutivo
+    private JLabel lblValTotalFacturado, lblValCostoCOGS, lblValGananciaNeta, lblValMetodosPago;
 
     public ReportsPage() {
         setOpaque(false);
         setLayout(new BorderLayout(20, 20));
-        setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-
-        // Header (microcopy de contexto) con subtítulo que envuelve al ancho.
-        JPanel headerPanel = new JPanel();
-        headerPanel.setOpaque(false);
-        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
-
-        JLabel title = new JLabel("Centro de reportes", createIcon("icons/reports.svg", ThemeConstants.NEON_PURPLE, 24, 24), SwingConstants.LEFT);
-        title.setForeground(ThemeConstants.TEXT_PRIMARY);
-        title.setFont(ThemeConstants.FONT_TITLE);
-        title.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JTextArea subtitle = UIUtils.createWrappingLabel(
-                "Filtra tus ventas por rango de fechas y exporta la información que necesitas",
-                ThemeConstants.FONT_SMALL, ThemeConstants.TEXT_SECONDARY);
-        subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        headerPanel.add(title);
-        headerPanel.add(Box.createVerticalStrut(4));
-        headerPanel.add(subtitle);
-        add(headerPanel, BorderLayout.NORTH);
+        setBorder(BorderFactory.createEmptyBorder(10, 20, 15, 20));
 
         // Contenido Principal
-        JPanel mainContent = new JPanel(new BorderLayout(25, 25));
+        JPanel mainContent = new JPanel(new BorderLayout(20, 20));
         mainContent.setOpaque(false);
 
-        // Filtros (Arriba)
+        // Contenedor Norte: Filtros + Tarjetas de Resumen Ejecutivo
+        JPanel topContainer = new JPanel();
+        topContainer.setOpaque(false);
+        topContainer.setLayout(new BoxLayout(topContainer, BoxLayout.Y_AXIS));
+
         filterPanel = createFilterPanel();
-        mainContent.add(filterPanel, BorderLayout.NORTH);
+        summaryPanel = createExecutiveSummaryPanel();
+
+        topContainer.add(filterPanel);
+        topContainer.add(Box.createVerticalStrut(15));
+        topContainer.add(summaryPanel);
+
+        mainContent.add(topContainer, BorderLayout.NORTH);
 
         // Tabla de Resultados (Centro)
         mainContent.add(createTablePanel(), BorderLayout.CENTER);
@@ -64,13 +61,13 @@ public class ReportsPage extends JPanel {
 
         add(mainContent, BorderLayout.CENTER);
 
-        // Adaptabilidad: en móvil el filtro y las acciones se apilan.
+        // Adaptabilidad: en móvil el filtro, resumen y acciones se apilan.
         LayoutResponsive.listenWidth(this, (bp, ancho) -> aplicarBreakpoint(bp));
 
         refreshData();
     }
 
-    /** En móvil los filtros y los botones de exportar se apilan en vertical. */
+    /** En móvil los filtros, métricas resumen y botones de exportar se adaptan. */
     private void aplicarBreakpoint(LayoutResponsive.Breakpoint bp) {
         boolean movil = LayoutResponsive.esColumnaUnica(bp);
         if (filterPanel != null && txtStartDate != null) {
@@ -78,6 +75,11 @@ public class ReportsPage extends JPanel {
             txtStartDate.setPreferredSize(new Dimension(anchoCampo, ThemeConstants.TOUCH_TARGET_MIN));
             txtEndDate.setPreferredSize(new Dimension(anchoCampo, ThemeConstants.TOUCH_TARGET_MIN));
             acomodarFiltro(filterPanel, movil);
+        }
+        if (summaryPanel != null) {
+            summaryPanel.setLayout(movil ? new GridLayout(2, 2, 10, 10) : new GridLayout(1, 4, 15, 15));
+            summaryPanel.revalidate();
+            summaryPanel.repaint();
         }
         if (exportPanel != null) {
             exportPanel.setLayout(movil
@@ -114,13 +116,59 @@ public class ReportsPage extends JPanel {
         btnFilter.setToolTipText("Filtra las ventas entre la fecha de inicio y fin (formato DD/MM/YYYY)");
         btnFilter.addActionListener(e -> applyFilter());
 
-        // Se colocan los componentes; la posicion (horizontal/vertical) la
-        // decide aplicarBreakpoint() segun el ancho.
         acomodarFiltro(p, false);
         return p;
     }
 
-    /** Coloca los componentes del filtro en una fila (escritorio) o en columna (movil). */
+    private JPanel createExecutiveSummaryPanel() {
+        JPanel container = new GridLayout(1, 4, 15, 15) != null ? new JPanel(new GridLayout(1, 4, 15, 15)) : new JPanel();
+        container.setOpaque(false);
+
+        // Card 1: Facturado
+        lblValTotalFacturado = new JLabel("$0");
+        container.add(createSummaryCard("TOTAL FACTURADO", lblValTotalFacturado, ThemeConstants.NEON_BLUE, "icons/sales.svg"));
+
+        // Card 2: Costo COGS
+        lblValCostoCOGS = new JLabel("$0");
+        container.add(createSummaryCard("COSTO MERCANCÍA (COGS)", lblValCostoCOGS, ThemeConstants.NEON_AMBER, "icons/boxes-stacked.svg"));
+
+        // Card 3: Utilidad Neta & Margen
+        lblValGananciaNeta = new JLabel("$0 (0.0%)");
+        container.add(createSummaryCard("UTILIDAD NETA & MARGEN", lblValGananciaNeta, ThemeConstants.NEON_GREEN, "icons/chart-line.svg"));
+
+        // Card 4: Métodos de Pago
+        lblValMetodosPago = new JLabel("Ef: $0 | Tr: $0 | Cr: $0");
+        lblValMetodosPago.setFont(ThemeConstants.FONT_SMALL);
+        container.add(createSummaryCard("MÉTODOS DE PAGO", lblValMetodosPago, ThemeConstants.NEON_PURPLE, "icons/wallet.svg"));
+
+        return container;
+    }
+
+    private JPanel createSummaryCard(String titleText, JLabel valLabel, Color accentColor, String iconPath) {
+        RoundedPanel card = new RoundedPanel(18, ThemeConstants.CARD_BACKGROUND);
+        card.setLayout(new BorderLayout(10, 8));
+        card.setBorder(BorderFactory.createEmptyBorder(12, 14, 12, 14));
+
+        JPanel top = new JPanel(new BorderLayout());
+        top.setOpaque(false);
+
+        JLabel title = new JLabel(titleText.toUpperCase());
+        title.setForeground(ThemeConstants.TEXT_SECONDARY);
+        title.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD, 10f));
+
+        JLabel iconLbl = new JLabel(createIcon(iconPath, accentColor, 18, 18));
+        top.add(title, BorderLayout.CENTER);
+        top.add(iconLbl, BorderLayout.EAST);
+
+        valLabel.setForeground(ThemeConstants.TEXT_PRIMARY);
+        valLabel.setFont(ThemeConstants.FONT_TITLE.deriveFont(Font.BOLD, 16f));
+
+        card.add(top, BorderLayout.NORTH);
+        card.add(valLabel, BorderLayout.CENTER);
+
+        return card;
+    }
+
     private void acomodarFiltro(JPanel p, boolean movil) {
         p.removeAll();
         GridBagConstraints gbc = new GridBagConstraints();
@@ -128,7 +176,6 @@ public class ReportsPage extends JPanel {
         gbc.insets = new Insets(4, 4, 4, 4);
 
         if (movil) {
-            // Una sola columna: etiqueta, campo, etiqueta, campo, boton.
             gbc.gridx = 0; gbc.weightx = 1.0;
             int fila = 0;
             gbc.gridy = fila++; p.add(createLabel("FECHA INICIO"), gbc);
@@ -137,7 +184,6 @@ public class ReportsPage extends JPanel {
             gbc.gridy = fila++; p.add(txtEndDate, gbc);
             gbc.gridy = fila++; p.add(btnFilter, gbc);
         } else {
-            // Una fila: [label campo] [label campo] [boton].
             gbc.gridy = 0;
             gbc.gridx = 0; gbc.weightx = 0; p.add(createLabel("FECHA INICIO"), gbc);
             gbc.gridx = 1; gbc.weightx = 1.0; p.add(txtStartDate, gbc);
@@ -154,7 +200,8 @@ public class ReportsPage extends JPanel {
         p.setLayout(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        JLabel tableTitle = new JLabel("Ventas registradas");
+        JLabel tableTitle = new JLabel("Ventas registradas", createIcon("icons/reports.svg", ThemeConstants.NEON_PURPLE, 20, 20), SwingConstants.LEFT);
+        tableTitle.setIconTextGap(8);
         tableTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
         tableTitle.setFont(ThemeConstants.FONT_SUBTITLE);
         tableTitle.setBorder(BorderFactory.createEmptyBorder(0, 8, 12, 8));
@@ -167,7 +214,7 @@ public class ReportsPage extends JPanel {
         tbReports.setShowGrid(false);
         tbReports.setFillsViewportHeight(true);
         tbReports.setFont(ThemeConstants.FONT_SMALL);
-        tbReports.setSelectionBackground(new Color(168, 85, 247, 70));
+        tbReports.setSelectionBackground(ThemeConstants.SELECTION_PURPLE);
         tbReports.setSelectionForeground(ThemeConstants.TEXT_PRIMARY);
 
         reportsScroll = new JScrollPane(tbReports);
@@ -180,7 +227,6 @@ public class ReportsPage extends JPanel {
     }
 
     private JPanel createExportPanel() {
-        // GridBalanced de 2 botones que se reparten el ancho (2x1 en escritorio, 1x2 en movil).
         JPanel p = new JPanel(new GridLayout(1, 2, 20, 0));
         p.setOpaque(false);
 
@@ -190,19 +236,19 @@ public class ReportsPage extends JPanel {
         btnExcel.setIconTextGap(8);
         btnExcel.setMinimumSize(new Dimension(0, ThemeConstants.TOUCH_TARGET_MIN));
         btnExcel.addActionListener(e -> exportToExcel());
-        btnExcel.setToolTipText("Exporta el reporte actual a un archivo de Excel");
+        btnExcel.setToolTipText("Exporta el reporte actual a un archivo de Excel con formato ejecutivo");
 
         btnPDF = new NeonButton("Generar PDF");
         btnPDF.setNeonColor(ThemeConstants.NEON_PURPLE);
         btnPDF.setIcon(createIcon("icons/pdf.svg", ThemeConstants.NEON_PURPLE, 17, 17));
         btnPDF.setIconTextGap(8);
         btnPDF.setMinimumSize(new Dimension(0, ThemeConstants.TOUCH_TARGET_MIN));
-        btnPDF.setToolTipText("Genera un PDF con las ventas del periodo filtrado");
+        btnPDF.setToolTipText("Imprime o genera un PDF oficial con las ventas del periodo filtrado");
         btnPDF.addActionListener(e -> exportToPDF());
-        
+
         p.add(btnPDF);
         p.add(btnExcel);
-        
+
         return p;
     }
 
@@ -231,7 +277,12 @@ public class ReportsPage extends JPanel {
             if (!path.endsWith(".xlsx")) {
                 path += ".xlsx";
             }
-            UIUtils.showSuccess(this, "Reporte exportado exitosamente a:\n" + path);
+            try {
+                ventasCtrl.exportarDatosTablaAExcel(tbReports, path);
+                UIUtils.showSuccess(this, "Reporte exportado exitosamente a:\n" + path);
+            } catch (Exception ex) {
+                UIUtils.showError(this, "Error al exportar reporte a Excel:\n" + ex.getMessage());
+            }
         }
     }
 
@@ -240,16 +291,15 @@ public class ReportsPage extends JPanel {
             UIUtils.showWarning(this, "No hay datos de ventas en la tabla para generar PDF.");
             return;
         }
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Guardar reporte en PDF");
-        fileChooser.setSelectedFile(new java.io.File("Reporte_Ventas_" + System.currentTimeMillis() + ".pdf"));
-        int userSelection = fileChooser.showSaveDialog(this);
-        if (userSelection == JFileChooser.APPROVE_OPTION) {
-            String path = fileChooser.getSelectedFile().getAbsolutePath();
-            if (!path.endsWith(".pdf")) {
-                path += ".pdf";
+        try {
+            MessageFormat header = new MessageFormat("Reporte Ejecutivo de Ventas - Simplify-Biz");
+            MessageFormat footer = new MessageFormat("Página {0}");
+            boolean complete = tbReports.print(JTable.PrintMode.FIT_WIDTH, header, footer, true, null, true);
+            if (complete) {
+                UIUtils.showSuccess(this, "Documento impreso / exportado a PDF correctamente.");
             }
-            UIUtils.showSuccess(this, "Documento PDF generado exitosamente en:\n" + path);
+        } catch (Exception ex) {
+            UIUtils.showError(this, "Error al generar PDF / impresión:\n" + ex.getMessage());
         }
     }
 
@@ -260,8 +310,77 @@ public class ReportsPage extends JPanel {
 
     private void estilizarTabla() {
         UIUtils.applyTableStyling(tbReports);
+        actualizarResumenEjecutivo();
         actualizarEstadoVacio();
     }
+
+    private void actualizarResumenEjecutivo() {
+        if (tbReports == null || tbReports.getModel() == null || tbReports.getModel().getRowCount() == 0) {
+            if (lblValTotalFacturado != null) lblValTotalFacturado.setText("$0");
+            if (lblValCostoCOGS != null) lblValCostoCOGS.setText("$0");
+            if (lblValGananciaNeta != null) lblValGananciaNeta.setText("$0 (0.0%)");
+            if (lblValMetodosPago != null) lblValMetodosPago.setText("Ef: $0 | Tr: $0 | Cr: $0");
+            return;
+        }
+
+        javax.swing.table.TableModel model = tbReports.getModel();
+        double totalFacturado = 0;
+        double totalEfectivo = 0, totalTransf = 0, totalCredito = 0;
+        Set<Integer> uniqueVentaIds = new HashSet<>();
+
+        for (int i = 0; i < model.getRowCount(); i++) {
+            try {
+                Object idObj = model.getValueAt(i, 0);
+                if (idObj != null) {
+                    uniqueVentaIds.add(Integer.parseInt(idObj.toString()));
+                }
+
+                Object totalObj = model.getValueAt(i, 11);
+                double rowTotal = 0.0;
+                if (totalObj instanceof Number) {
+                    rowTotal = ((Number) totalObj).doubleValue();
+                } else if (totalObj != null) {
+                    rowTotal = Double.parseDouble(totalObj.toString().replace("$", "").replace(".", "").replace(",", ".").trim());
+                }
+                totalFacturado += rowTotal;
+
+                Object metodoObj = model.getValueAt(i, 7);
+                String metodo = metodoObj != null ? metodoObj.toString().toLowerCase() : "";
+                if (metodo.contains("efectivo")) {
+                    totalEfectivo += rowTotal;
+                } else if (metodo.contains("transferencia")) {
+                    totalTransf += rowTotal;
+                } else {
+                    totalCredito += rowTotal;
+                }
+            } catch (Exception ex) {
+                // Continuar si hay algún valor inesperado
+            }
+        }
+
+        double cogs = ventasCtrl.obtenerCogsPorVentaIds(new ArrayList<>(uniqueVentaIds));
+        double gananciaNeta = totalFacturado - cogs;
+        double margenPct = totalFacturado > 0 ? (gananciaNeta / totalFacturado) * 100.0 : 0.0;
+
+        NumberFormat fmt = NumberFormat.getCurrencyInstance(new Locale("es", "CO"));
+        fmt.setMaximumFractionDigits(0);
+
+        if (lblValTotalFacturado != null) lblValTotalFacturado.setText(fmt.format(totalFacturado));
+        if (lblValCostoCOGS != null) lblValCostoCOGS.setText(fmt.format(cogs));
+        if (lblValGananciaNeta != null) {
+            lblValGananciaNeta.setText(String.format("%s (%.1f%%)", fmt.format(gananciaNeta), margenPct));
+        }
+        if (lblValMetodosPago != null) {
+            lblValMetodosPago.setText(String.format(
+                    "<html><div style='line-height:1.25; font-size:11px; color:#F8FAFC;'>" +
+                    "<b>Efectivo:</b> %s &nbsp;|&nbsp; <b>Transf:</b> %s<br>" +
+                    "<span style='color:#A855F7;'><b>Crédito (Deudor):</b> %s</span>" +
+                    "</div></html>",
+                    fmt.format(totalEfectivo), fmt.format(totalTransf), fmt.format(totalCredito)));
+        }
+
+    }
+
 
     private void actualizarEstadoVacio() {
         if (tbReports.getRowCount() == 0) {

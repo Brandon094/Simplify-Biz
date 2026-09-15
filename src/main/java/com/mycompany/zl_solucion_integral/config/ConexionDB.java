@@ -61,9 +61,10 @@ public class ConexionDB {
                 + "total REAL NOT NULL,"
                 + "FOREIGN KEY (venta_id) REFERENCES ventas(id));", "detalles_venta");
 
-        // Migración limpia para instalaciones previas que no tenían la columna precio_costo
+        // Migración limpia para instalaciones previas que no tenían la columna precio_costo o descuento
         migrarColumnaSegura(conn, "productos", "precio_costo", "REAL DEFAULT 0.0");
         migrarColumnaSegura(conn, "detalles_venta", "precio_costo", "REAL DEFAULT 0.0");
+        migrarColumnaSegura(conn, "detalles_venta", "descuento", "REAL DEFAULT 0.0");
 
         crearTabla(conn, "CREATE TABLE IF NOT EXISTS configuracion ("
                 + "id INTEGER PRIMARY KEY,"
@@ -72,6 +73,44 @@ public class ConexionDB {
         crearTabla(conn, "CREATE TABLE IF NOT EXISTS categorias ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "nombre TEXT UNIQUE NOT NULL);", "categorias");
+
+        crearTabla(conn, "CREATE TABLE IF NOT EXISTS abonos_cartera ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "venta_id INTEGER NOT NULL,"
+                + "monto REAL NOT NULL,"
+                + "fecha DATE NOT NULL,"
+                + "metodo_pago TEXT NOT NULL,"
+                + "observacion TEXT,"
+                + "FOREIGN KEY (venta_id) REFERENCES ventas(id) ON DELETE CASCADE);", "abonos_cartera");
+
+        crearTabla(conn, "CREATE TABLE IF NOT EXISTS proveedores ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "nombre TEXT NOT NULL,"
+                + "nit TEXT UNIQUE NOT NULL,"
+                + "telefono TEXT,"
+                + "email TEXT,"
+                + "direccion TEXT);", "proveedores");
+
+        crearTabla(conn, "CREATE TABLE IF NOT EXISTS compras ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "proveedor_id INTEGER,"
+                + "proveedor_nombre TEXT NOT NULL,"
+                + "proveedor_nit TEXT NOT NULL,"
+                + "num_factura TEXT NOT NULL,"
+                + "usuario_registro TEXT NOT NULL,"
+                + "fecha DATE NOT NULL,"
+                + "total REAL NOT NULL,"
+                + "FOREIGN KEY (proveedor_id) REFERENCES proveedores(id) ON DELETE SET NULL);", "compras");
+
+        crearTabla(conn, "CREATE TABLE IF NOT EXISTS detalles_compra ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "compra_id INTEGER NOT NULL,"
+                + "producto TEXT NOT NULL,"
+                + "codigo TEXT NOT NULL,"
+                + "cantidad INTEGER NOT NULL,"
+                + "precio_costo REAL NOT NULL,"
+                + "subtotal REAL NOT NULL,"
+                + "FOREIGN KEY (compra_id) REFERENCES compras(id) ON DELETE CASCADE);", "detalles_compra");
 
         insertarValorInicialConfiguracion(conn);
         sincronizarCategoriasIniciales(conn);

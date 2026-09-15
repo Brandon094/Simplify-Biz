@@ -12,10 +12,16 @@ import java.util.Locale;
 
 public class NeonLineChart extends JPanel {
     private List<Double> data = new ArrayList<>();
-    private String title;
+    private final String title;
+    private final String iconPath;
 
     public NeonLineChart(String title, List<Double> data) {
+        this(title, "icons/chart-line.svg", data);
+    }
+
+    public NeonLineChart(String title, String iconPath, List<Double> data) {
         this.title = title;
+        this.iconPath = iconPath;
         this.data = data;
         setOpaque(false);
     }
@@ -35,10 +41,19 @@ public class NeonLineChart extends JPanel {
         int chartWidth = Math.max(1, width - left - right);
         int chartHeight = Math.max(1, height - top - bottom);
 
-        // Draw Title
-        g2.setColor(ThemeConstants.TEXT_SECONDARY);
-        g2.setFont(ThemeConstants.FONT_SMALL);
-        g2.drawString(title, left, 20);
+        // Draw Title with SVG Icon (Align left at 16px padding)
+        int padding = 16;
+        int titleX = padding;
+        if (iconPath != null) {
+            FlatSVGIcon icon = new FlatSVGIcon(iconPath, 18, 18);
+            icon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, ThemeConstants.NEON_PURPLE));
+            icon.paintIcon(this, g2, padding, 6);
+            titleX = padding + 26;
+        }
+
+        g2.setColor(ThemeConstants.TEXT_PRIMARY);
+        g2.setFont(ThemeConstants.FONT_SUBTITLE.deriveFont(Font.BOLD, 14f));
+        g2.drawString(title, titleX, 20);
 
         boolean tieneAlMenosUnaVenta = data != null && data.stream().anyMatch(value -> value != null && value > 0);
         if (data == null || data.size() < 2 || !tieneAlMenosUnaVenta) {
@@ -90,7 +105,6 @@ public class NeonLineChart extends JPanel {
             } else {
                 path.lineTo(x, y);
             }
-            
         }
         
         g2.draw(path);

@@ -1,11 +1,11 @@
 package com.mycompany.zl_solucion_integral.views;
 
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.mycompany.zl_solucion_integral.Main;
 import com.mycompany.zl_solucion_integral.views.components.LayoutResponsive;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonButton;
 import com.mycompany.zl_solucion_integral.views.components.organisms.ModernSidebar;
-import com.formdev.flatlaf.extras.FlatSVGIcon;
 import javax.swing.*;
 import java.awt.*;
 
@@ -17,14 +17,19 @@ public class MainTemplate extends JFrame {
     private JPanel sidebarHost;
     private NeonButton btnHamburger;
 
+    private JLabel lblHeaderTitle;
+    private JLabel lblHeaderSubtitle;
+    private FlatSVGIcon headerSvgIcon;
+
     public MainTemplate(String role) {
         this.userRole = role;
         setTitle("ERP+ Business - " + (role.equals("1") ? "Panel Administrativo" : "Punto de Venta"));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        try {
+            setIconImage(new ImageIcon(getClass().getResource("/icons/app_icon.png")).getImage());
+        } catch (Exception ignored) {}
 
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-        // Tamaño mínimo pensado para portátiles 1366x768: deja "respiro visual"
-        // sin recortar el contenido en resoluciones pequeñas.
         setMinimumSize(new Dimension(1120, 700));
         setLocationRelativeTo(null);
 
@@ -32,15 +37,14 @@ public class MainTemplate extends JFrame {
         setLayout(new BorderLayout(20, 0));
 
         sidebar = new ModernSidebar();
-        // Host del sidebar: permite ocultarlo por completo (drawer) en móvil.
         sidebarHost = new JPanel(new BorderLayout());
         sidebarHost.setOpaque(false);
         sidebarHost.add(sidebar, BorderLayout.CENTER);
         add(sidebarHost, BorderLayout.WEST);
 
-        JPanel contentArea = new JPanel(new BorderLayout(0, 18));
+        JPanel contentArea = new JPanel(new BorderLayout(0, 14));
         contentArea.setOpaque(false);
-        contentArea.setBorder(BorderFactory.createEmptyBorder(18, 0, 18, 18));
+        contentArea.setBorder(BorderFactory.createEmptyBorder(14, 0, 14, 18));
         add(contentArea, BorderLayout.CENTER);
 
         JPanel topHeader = createTopHeader(role);
@@ -54,14 +58,20 @@ public class MainTemplate extends JFrame {
         initNavigation();
 
         if (role.equals("1")) {
-            showPage(pageContainer, new DashboardPage());
+            navegar(new DashboardPage(), "Resumen general del negocio", "Visión rápida del rendimiento, utilidad neta e inversión en inventario", "icons/dashboard.svg", ThemeConstants.NEON_PURPLE);
         } else {
-            showPage(pageContainer, new SalesPage());
+            navegar(new SalesPage(), "Punto de venta", "Registra ventas ágiles: busca productos, arma el carrito y cobra en segundos", "icons/cart-shopping.svg", ThemeConstants.NEON_GREEN);
         }
 
-        // Adaptabilidad: en móvil/tablet el sidebar se oculta (drawer) y se
-        // controla con el botón hamburguesa del header.
         LayoutResponsive.listen(this, this::applyBreakpoint);
+
+        // Si es la primera vez que el usuario abre la app, mostrar la guía interactiva automáticamente
+        SwingUtilities.invokeLater(() -> {
+            if (!com.mycompany.zl_solucion_integral.config.SelecionRuta.cargarPrimerUsoVisto()) {
+                com.mycompany.zl_solucion_integral.config.SelecionRuta.guardarPrimerUsoVisto(true);
+                new com.mycompany.zl_solucion_integral.views.components.dialogs.ManualUsuarioDialog(this, role).setVisible(true);
+            }
+        });
     }
 
     private JPanel createTopHeader(String role) {
@@ -73,18 +83,20 @@ public class MainTemplate extends JFrame {
         leftContent.setOpaque(false);
         leftContent.setLayout(new BoxLayout(leftContent, BoxLayout.Y_AXIS));
 
-        String roleName = role.equals("1") ? "Administrador" : "Vendedor";
-        JLabel lblTitle = new JLabel(role.equals("1") ? "Panel general" : "Punto de venta");
-        lblTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
-        lblTitle.setFont(ThemeConstants.FONT_TITLE);
-        lblTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        headerSvgIcon = new FlatSVGIcon("icons/dashboard.svg", 22, 22);
+        headerSvgIcon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, ThemeConstants.NEON_PURPLE));
 
-        JLabel lblSubtitle = new JLabel("Bienvenido/a, " + com.mycompany.zl_solucion_integral.models.Sesion.getUsuarioLogueado() + " • " + roleName);
-        lblSubtitle.setForeground(ThemeConstants.TEXT_SECONDARY);
-        lblSubtitle.setFont(ThemeConstants.FONT_SMALL);
-        lblSubtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        lblHeaderTitle = new JLabel(role.equals("1") ? "Resumen general del negocio" : "Punto de venta", headerSvgIcon, SwingConstants.LEFT);
+        lblHeaderTitle.setIconTextGap(10);
+        lblHeaderTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
+        lblHeaderTitle.setFont(ThemeConstants.FONT_TITLE);
+        lblHeaderTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Botón hamburguesa (solo visible en móvil/tablet) para el drawer.
+        lblHeaderSubtitle = new JLabel("Bienvenido/a, " + com.mycompany.zl_solucion_integral.models.Sesion.getUsuarioLogueado());
+        lblHeaderSubtitle.setForeground(ThemeConstants.TEXT_SECONDARY);
+        lblHeaderSubtitle.setFont(ThemeConstants.FONT_SMALL);
+        lblHeaderSubtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+
         btnHamburger = new NeonButton("");
         btnHamburger.setNeonColor(ThemeConstants.NEON_PURPLE);
         btnHamburger.setIcon(createIcon("icons/dashboard.svg"));
@@ -100,9 +112,9 @@ public class MainTemplate extends JFrame {
         JPanel titleText = new JPanel();
         titleText.setOpaque(false);
         titleText.setLayout(new BoxLayout(titleText, BoxLayout.Y_AXIS));
-        titleText.add(lblTitle);
-        titleText.add(Box.createVerticalStrut(6));
-        titleText.add(lblSubtitle);
+        titleText.add(lblHeaderTitle);
+        titleText.add(Box.createVerticalStrut(4));
+        titleText.add(lblHeaderSubtitle);
         titleRow.add(titleText);
 
         leftContent.add(titleRow);
@@ -125,19 +137,26 @@ public class MainTemplate extends JFrame {
         lblUser.setIconTextGap(8);
         lblUser.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
 
+        NeonButton btnHelp = new NeonButton("Manual");
+        btnHelp.setNeonColor(ThemeConstants.NEON_PURPLE);
+        btnHelp.setIcon(createIcon("icons/manual.svg"));
+        btnHelp.setToolTipText("Abrir el Manual de Usuario y Centro de Ayuda");
+        btnHelp.setPreferredSize(new Dimension(105, 36));
+        btnHelp.addActionListener(e -> {
+            com.mycompany.zl_solucion_integral.views.components.dialogs.ManualUsuarioDialog dialog =
+                    new com.mycompany.zl_solucion_integral.views.components.dialogs.ManualUsuarioDialog(this, this.userRole);
+            dialog.setVisible(true);
+        });
+
         rightContent.add(lblDate);
         rightContent.add(lblUser);
+        rightContent.add(btnHelp);
 
         topHeader.add(leftContent, BorderLayout.WEST);
         topHeader.add(rightContent, BorderLayout.EAST);
         return topHeader;
     }
 
-    /**
-     * Aplica el comportamiento adaptable según el breakpoint vigente.
-     * En móvil el sidebar se oculta (drawer) y se muestra el botón hamburguesa;
-     * en tablet/escritorio el sidebar queda fijo y visible.
-     */
     private void applyBreakpoint(LayoutResponsive.Breakpoint bp) {
         this.breakpoint = bp;
         boolean compacto = bp != LayoutResponsive.Breakpoint.ESCRITORIO;
@@ -150,7 +169,6 @@ public class MainTemplate extends JFrame {
         repaint();
     }
 
-    /** Muestra u oculta el sidebar (drawer) en modo compacto. */
     private void toggleSidebar() {
         setSidebarVisible(!sidebarHost.isVisible());
     }
@@ -163,32 +181,59 @@ public class MainTemplate extends JFrame {
         }
     }
 
-    /** En modo compacto, oculta el drawer tras navegar para dar más espacio. */
     private void autoOcultarSidebarEnCompacto() {
         if (breakpoint != LayoutResponsive.Breakpoint.ESCRITORIO) {
             setSidebarVisible(false);
         }
     }
 
-    /** Navega a una página y, en modo compacto, cierra el drawer para dar espacio. */
-    private void navegar(JPanel page) {
+    private void navegar(JPanel page, String titulo, String subtitulo, String iconPath, Color accentColor) {
+        if (lblHeaderTitle != null && titulo != null) {
+            lblHeaderTitle.setText(titulo);
+            if (iconPath != null) {
+                FlatSVGIcon newIcon = new FlatSVGIcon(iconPath, 22, 22);
+                Color iconColor = accentColor != null ? accentColor : ThemeConstants.NEON_PURPLE;
+                newIcon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, iconColor));
+                lblHeaderTitle.setIcon(newIcon);
+            }
+        }
+        if (lblHeaderSubtitle != null && subtitulo != null) {
+            lblHeaderSubtitle.setText(subtitulo);
+        }
         showPage(pageContainer, page);
         autoOcultarSidebarEnCompacto();
     }
 
     private void initNavigation() {
         if (userRole.equals("1")) {
-            sidebar.addItem("Resumen", "icons/dashboard.svg", () -> navegar(new DashboardPage()));
-            sidebar.addItem("Ventas", "icons/sales.svg", () -> navegar(new SalesPage()));
-            sidebar.addItem("Productos", "icons/products.svg", () -> navegar(new ProductPage()));
-            sidebar.addItem("Clientes", "icons/clients.svg", () -> navegar(new ClientsPage()));
-            sidebar.addItem("Empleados", "icons/staff.svg", () -> navegar(new SellersPage()));
-            sidebar.addItem("Reportes", "icons/reports.svg", () -> navegar(new ReportsPage()));
-            sidebar.addItem("Configuración", "icons/settings.svg", () -> navegar(new ConfigPage()));
+            sidebar.addRootItem("Resumen", "icons/dashboard.svg", () -> navegar(new DashboardPage(), "Resumen general del negocio", "Visión rápida del rendimiento, utilidad neta e inversión en inventario", "icons/dashboard.svg", ThemeConstants.NEON_PURPLE));
+
+            sidebar.addSection("Operaciones", "operaciones", "icons/bolt.svg");
+            sidebar.addItem("Ventas", "icons/cart-shopping.svg", () -> navegar(new SalesPage(), "Punto de venta", "Registra ventas ágiles: busca productos, arma el carrito y cobra en segundos", "icons/cart-shopping.svg", ThemeConstants.NEON_CYAN));
+            sidebar.addItem("Cartera", "icons/wallet.svg", () -> navegar(new CarteraPage(), "Cartera de clientes", "Control de ventas a crédito, seguimiento de deudores y registro de abonos", "icons/wallet.svg", ThemeConstants.NEON_PURPLE));
+            sidebar.endSection();
+
+            sidebar.addSection("INVENTARIO Y COMPRAS", "inv", "icons/boxes-stacked.svg");
+            sidebar.addItem("Inventario", "icons/boxes-stacked.svg", () -> navegar(new ProductPage(), "Gestión de inventario", "Administra productos, precios de costo, existencias en bodega y categorías", "icons/boxes-stacked.svg", ThemeConstants.NEON_GREEN));
+            sidebar.addItem("Compras", "icons/suppliers.svg", () -> navegar(new ComprasPage(), "Compras a proveedores", "Registra entradas de almacén y actualización automática de stock de mercancía", "icons/suppliers.svg", ThemeConstants.NEON_CYAN));
+            sidebar.endSection();
+
+            sidebar.addSection("GESTIÓN", "gestion", "icons/settings.svg");
+            sidebar.addItem("Clientes", "icons/clients.svg", () -> navegar(new ClientsPage(), "Directorio de clientes", "Gestión de clientes, información de contacto e historial de compras facturadas", "icons/clients.svg", ThemeConstants.NEON_PURPLE));
+            sidebar.addItem("Empleados", "icons/staff.svg", () -> navegar(new SellersPage(), "Gestión de empleados", "Administración de usuarios vendedores y permisos de acceso a la plataforma", "icons/staff.svg", ThemeConstants.NEON_CYAN));
+            sidebar.addItem("Reportes", "icons/reports.svg", () -> navegar(new ReportsPage(), "Centro de reportes", "Informes ejecutivos de ventas, utilidades, balance contable y exportación Excel/PDF", "icons/reports.svg", ThemeConstants.NEON_GREEN));
+            sidebar.addItem("Configuración", "icons/settings.svg", () -> navegar(new ConfigPage(), "Configuración del sistema", "Ajustes de base de datos local SQLite, estado de licencia y preferencia de tema", "icons/settings.svg", ThemeConstants.NEON_PURPLE));
+            sidebar.endSection();
         } else {
-            sidebar.addItem("Ventas", "icons/sales.svg", () -> navegar(new SalesPage()));
-            sidebar.addItem("Productos", "icons/products.svg", () -> navegar(new ProductPage()));
+            sidebar.addSection("OPERACIONES", "ops", "icons/sales.svg");
+            sidebar.addItem("Ventas", "icons/cart-shopping.svg", () -> navegar(new SalesPage(), "Punto de venta", "Registra ventas ágiles: busca productos, arma el carrito y cobra en segundos", "icons/cart-shopping.svg", ThemeConstants.NEON_CYAN));
+            sidebar.addItem("Cartera", "icons/wallet.svg", () -> navegar(new CarteraPage(), "Cartera de clientes", "Control de ventas a crédito, seguimiento de deudores y registro de abonos", "icons/wallet.svg", ThemeConstants.NEON_PURPLE));
+
+            sidebar.addSection("Inventario", "inventario", "icons/boxes-stacked.svg");
+            sidebar.addItem("Inventario", "icons/boxes-stacked.svg", () -> navegar(new ProductPage(), "Gestión de inventario", "Consulta existencias de productos y catálogo en bodega", "icons/boxes-stacked.svg", ThemeConstants.NEON_GREEN));
+            sidebar.addItem("Compras", "icons/cart-shopping.svg", () -> navegar(new ComprasPage(), "Entradas de almacén", "Registro de compras y recepciones de mercancía", "icons/suppliers.svg", ThemeConstants.NEON_CYAN));
         }
+
 
         // Ítem compartido por todos: Cerrar Sesión
         sidebar.addLogoutItem(() -> {

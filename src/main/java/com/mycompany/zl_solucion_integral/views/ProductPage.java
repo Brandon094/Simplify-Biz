@@ -33,13 +33,7 @@ public class ProductPage extends JPanel {
     public ProductPage() {
         setOpaque(false);
         setLayout(new BorderLayout(20, 20));
-        setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-
-        // Header (microcopy de contexto usando UIUtils)
-        header = UIUtils.createHeader("icons/products.svg", ThemeConstants.NEON_PURPLE,
-                "Gestión de inventario",
-                "Administra tu catálogo y mantén el control de tu stock en tiempo real");
-        add(header, BorderLayout.NORTH);
+        setBorder(BorderFactory.createEmptyBorder(10, 20, 15, 20));
 
         // Contenido Principal (Formulario + Tabla)
         centerPanel = new JPanel(new BorderLayout(25, 25));
@@ -53,18 +47,10 @@ public class ProductPage extends JPanel {
         formScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         formScroll.setPreferredSize(new Dimension(360, 0));
 
-        // Contenedor para Tabla y Gráfico (Derecha)
-        rightPanel = new JPanel(new BorderLayout(0, 20));
+        // Contenedor para Tabla (Derecha)
+        rightPanel = new JPanel(new BorderLayout(0, 0));
         rightPanel.setOpaque(false);
-
         rightPanel.add(createTablePanel(), BorderLayout.CENTER);
-
-        // Gráfico de Distribución (Abajo de la tabla, formato compacto)
-        chartContainer = new JPanel(new BorderLayout());
-        chartContainer.setOpaque(false);
-        chartContainer.setPreferredSize(new Dimension(0, 190));
-        updateChart();
-        rightPanel.add(chartContainer, BorderLayout.SOUTH);
 
         formPanel = new JPanel(new BorderLayout());
         formPanel.setOpaque(false);
@@ -116,7 +102,8 @@ public class ProductPage extends JPanel {
         gbc.gridx = 0;
 
         gbc.gridy = 0; gbc.insets = new Insets(0, 0, 16, 0);
-        JLabel formTitle = new JLabel("Registrar producto");
+        JLabel formTitle = new JLabel("Registrar producto", createIcon("icons/products.svg", ThemeConstants.NEON_PURPLE, 20, 20), SwingConstants.LEFT);
+        formTitle.setIconTextGap(8);
         formTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
         formTitle.setFont(ThemeConstants.FONT_SUBTITLE);
         p.add(formTitle, gbc);
@@ -131,7 +118,7 @@ public class ProductPage extends JPanel {
         gbc.gridy = 3; gbc.insets = new Insets(0, 0, 4, 0);
         p.add(createLabel("CÓDIGO / SKU"), gbc);
         txtCodigo = createTextField("Ej: SKU-001");
-        setupFieldIcon(txtCodigo, "icons/reports.svg");
+        setupFieldIcon(txtCodigo, "icons/barcode.svg");
         gbc.gridy = 4; gbc.insets = new Insets(0, 0, 12, 0);
         p.add(UIUtils.createFieldWithHelper(txtCodigo, "Ej: SKU-001 — código único del producto"), gbc);
 
@@ -159,14 +146,14 @@ public class ProductPage extends JPanel {
         JPanel pCosto = new JPanel(new BorderLayout(0, 4)); pCosto.setOpaque(false);
         pCosto.add(createLabel("P. COSTO"), BorderLayout.NORTH);
         txtPrecioCosto = createTextField("0.00");
-        setupFieldIcon(txtPrecioCosto, "icons/reports.svg");
+        setupFieldIcon(txtPrecioCosto, "icons/wallet.svg");
         pCosto.add(txtPrecioCosto, BorderLayout.CENTER);
         pCosto.add(UIUtils.createHelperLabel("Ej: 1800"), BorderLayout.SOUTH);
 
         JPanel p2 = new JPanel(new BorderLayout(0, 4)); p2.setOpaque(false);
         p2.add(createLabel("STOCK"), BorderLayout.NORTH);
         txtCantidad = createTextField("0"); 
-        setupFieldIcon(txtCantidad, "icons/dashboard.svg");
+        setupFieldIcon(txtCantidad, "icons/boxes-stacked.svg");
         p2.add(txtCantidad, BorderLayout.CENTER);
         p2.add(UIUtils.createHelperLabel("Ej: 50"), BorderLayout.SOUTH);
         
@@ -188,7 +175,7 @@ public class ProductPage extends JPanel {
 
         NeonButton btnClear = new NeonButton("Limpiar");
         btnClear.setNeonColor(ThemeConstants.NEON_BLUE);
-        btnClear.setIcon(createIcon("icons/settings.svg", ThemeConstants.NEON_BLUE, 16, 16));
+        btnClear.setIcon(createIcon("icons/update.svg", ThemeConstants.NEON_BLUE, 16, 16));
         btnClear.setIconTextGap(6);
         btnClear.setPreferredSize(new Dimension(0, 42));
         btnClear.addActionListener(e -> clearFields());
@@ -208,17 +195,34 @@ public class ProductPage extends JPanel {
         p.setLayout(new BorderLayout(0, 10));
         p.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        JPanel headerPanel = new JPanel(new BorderLayout());
+        JPanel headerPanel = new JPanel(new BorderLayout(0, 10));
         headerPanel.setOpaque(false);
 
-        JLabel tableTitle = new JLabel("Productos registrados");
+        JLabel tableTitle = new JLabel("Productos registrados", createIcon("icons/boxes-stacked.svg", ThemeConstants.NEON_PURPLE, 20, 20), SwingConstants.LEFT);
+        tableTitle.setIconTextGap(8);
         tableTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
         tableTitle.setFont(ThemeConstants.FONT_SUBTITLE);
-        headerPanel.add(tableTitle, BorderLayout.WEST);
+        headerPanel.add(tableTitle, BorderLayout.NORTH);
 
-        // Acciones por registro (Actualizar y Eliminar)
-        JPanel actionRow = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        // Acciones por registro y de importación Excel ubicadas debajo del título (UX optimizado)
+        JPanel actionRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         actionRow.setOpaque(false);
+
+        NeonButton btnImportExcel = new NeonButton("Importar Excel");
+        btnImportExcel.setNeonColor(ThemeConstants.NEON_GREEN);
+        btnImportExcel.setIcon(createIcon("icons/excel.svg", ThemeConstants.NEON_GREEN, 16, 16));
+        btnImportExcel.setIconTextGap(6);
+        btnImportExcel.setPreferredSize(new Dimension(140, 34));
+        btnImportExcel.addActionListener(e -> abrirImportadorExcel());
+        btnImportExcel.setToolTipText("Abre el asistente inteligente para importar productos desde cualquier Excel/CSV");
+
+        NeonButton btnTemplate = new NeonButton("Plantilla");
+        btnTemplate.setNeonColor(ThemeConstants.NEON_BLUE);
+        btnTemplate.setIcon(createIcon("icons/info.svg", ThemeConstants.NEON_BLUE, 16, 16));
+        btnTemplate.setIconTextGap(6);
+        btnTemplate.setPreferredSize(new Dimension(110, 34));
+        btnTemplate.addActionListener(e -> descargarPlantillaExcel());
+        btnTemplate.setToolTipText("Descarga la plantilla Excel modelo de ERP+");
 
         NeonButton btnUpdate = new NeonButton("Actualizar");
         btnUpdate.setNeonColor(ThemeConstants.NEON_BLUE);
@@ -236,9 +240,11 @@ public class ProductPage extends JPanel {
         btnDelete.addActionListener(e -> deleteProduct());
         btnDelete.setToolTipText("Elimina el registro seleccionado de la tabla");
 
+        actionRow.add(btnImportExcel);
+        actionRow.add(btnTemplate);
         actionRow.add(btnUpdate);
         actionRow.add(btnDelete);
-        headerPanel.add(actionRow, BorderLayout.EAST);
+        headerPanel.add(actionRow, BorderLayout.SOUTH);
 
         p.add(headerPanel, BorderLayout.NORTH);
 
@@ -250,7 +256,7 @@ public class ProductPage extends JPanel {
         tbProductos.setIntercellSpacing(new Dimension(0, 0));
         tbProductos.setFillsViewportHeight(true);
         tbProductos.setFont(ThemeConstants.FONT_SMALL);
-        tbProductos.setSelectionBackground(new Color(59, 130, 246, 70));
+        tbProductos.setSelectionBackground(ThemeConstants.SELECTION_BLUE);
         tbProductos.setSelectionForeground(ThemeConstants.TEXT_PRIMARY);
         
         tbProductos.getSelectionModel().addListSelectionListener(e -> {
@@ -340,17 +346,6 @@ public class ProductPage extends JPanel {
         }
     }
 
-    private void updateChart() {
-        chartContainer.removeAll();
-        Map<String, Double> dist = productoCtrl.obtenerDistribucionCategorias();
-        RoundedPanel card = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
-        card.setLayout(new BorderLayout());
-        card.add(new NeonPieChart("Distribución por Categorías", dist), BorderLayout.CENTER);
-        chartContainer.add(card, BorderLayout.CENTER);
-        chartContainer.revalidate();
-        chartContainer.repaint();
-    }
-
     private void saveProduct() {
         String name = txtNombre.getText().trim();
         String code = txtCodigo.getText().trim();
@@ -422,7 +417,6 @@ public class ProductPage extends JPanel {
         productoCtrl.mostrarProductos(tbProductos);
         estilizarTabla();
         cargarCategorias();
-        updateChart();
     }
 
     private void clearFields() {
@@ -511,7 +505,7 @@ public class ProductPage extends JPanel {
         com.mycompany.zl_solucion_integral.views.components.AutocompletePopup.attach(
             txtNombre,
             query -> productoCtrl.buscarProductosSugeridos(query),
-            p -> String.format("[%s] %s - $%.2f (Stock: %d)", p.getCodigo(), p.getProducto(), p.getPrecio(), p.getCantidad()),
+            p -> p.getCodigo() + " - " + p.getProducto() + " ($" + p.getPrecio() + ")",
             onProductSelect
         );
 
@@ -519,8 +513,36 @@ public class ProductPage extends JPanel {
         com.mycompany.zl_solucion_integral.views.components.AutocompletePopup.attach(
             txtCodigo,
             query -> productoCtrl.buscarProductosSugeridos(query),
-            p -> String.format("[%s] %s - $%.2f (Stock: %d)", p.getCodigo(), p.getProducto(), p.getPrecio(), p.getCantidad()),
+            p -> p.getCodigo() + " - " + p.getProducto() + " ($" + p.getPrecio() + ")",
             onProductSelect
         );
+    }
+
+    private void abrirImportadorExcel() {
+        Window owner = SwingUtilities.getWindowAncestor(this);
+        com.mycompany.zl_solucion_integral.views.dialogs.ImportarProductosDialog dlg = 
+            new com.mycompany.zl_solucion_integral.views.dialogs.ImportarProductosDialog(owner, this::refreshData);
+        dlg.setVisible(true);
+    }
+
+    private void descargarPlantillaExcel() {
+        JFileChooser fc = new JFileChooser();
+        fc.setDialogTitle("Guardar Plantilla Modelo Excel ERP+");
+        fc.setSelectedFile(new java.io.File("Plantilla_Productos_ERP.xlsx"));
+
+        if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            java.io.File dest = fc.getSelectedFile();
+            if (!dest.getName().endsWith(".xlsx")) {
+                dest = new java.io.File(dest.getAbsolutePath() + ".xlsx");
+            }
+            com.mycompany.zl_solucion_integral.config.ResultadoOperacion res = 
+                com.mycompany.zl_solucion_integral.config.ExcelSQLiteManager.generarPlantillaModelo(dest);
+
+            if (res.esExito()) {
+                JOptionPane.showMessageDialog(this, res.getMensaje(), UIMessages.TITULO_EXITO, JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, res.getMensaje(), UIMessages.TITULO_ERROR, JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 }

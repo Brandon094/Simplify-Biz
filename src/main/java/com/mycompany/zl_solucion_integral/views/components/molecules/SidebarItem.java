@@ -21,7 +21,7 @@ public class SidebarItem extends JPanel {
     private Runnable onClick;
 
     public SidebarItem(String text, String iconCode) {
-        setLayout(new FlowLayout(FlowLayout.LEFT, 18, 14));
+        setLayout(new FlowLayout(FlowLayout.LEFT, 14, 8));
         setOpaque(false);
         setCursor(new Cursor(Cursor.HAND_CURSOR));
 
@@ -170,5 +170,16 @@ public class SidebarItem extends JPanel {
 
     public void setOnClick(Runnable onClick) {
         this.onClick = onClick;
+    }
+
+    public void setCollapsed(boolean collapsed) {
+        label.setVisible(!collapsed);
+        if (collapsed) {
+            setLayout(new FlowLayout(FlowLayout.CENTER, 0, 8));
+        } else {
+            setLayout(new FlowLayout(FlowLayout.LEFT, 14, 8));
+        }
+        revalidate();
+        repaint();
     }
 }

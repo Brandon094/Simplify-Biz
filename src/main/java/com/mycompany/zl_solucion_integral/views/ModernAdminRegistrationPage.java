@@ -151,7 +151,7 @@ public class ModernAdminRegistrationPage extends JFrame {
 
     private JLabel createHelperLabel(String text) {
         JLabel l = new JLabel(text);
-        l.setForeground(new Color(ThemeConstants.NEON_BLUE.getRed(), ThemeConstants.NEON_BLUE.getGreen(), ThemeConstants.NEON_BLUE.getBlue(), 180));
+        l.setForeground(ThemeConstants.withAlpha(ThemeConstants.NEON_BLUE, 180));
         l.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.ITALIC));
         return l;
     }

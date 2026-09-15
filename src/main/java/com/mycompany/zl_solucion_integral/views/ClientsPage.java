@@ -4,44 +4,26 @@ import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
 import com.mycompany.zl_solucion_integral.views.components.UIUtils;
+import com.mycompany.zl_solucion_integral.views.components.atoms.NeonButton;
 import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
+import com.mycompany.zl_solucion_integral.views.components.dialogs.HistorialComprasClienteDialog;
+
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class ClientsPage extends JPanel {
     private final UsuarioController usuarioCtrl = new UsuarioController();
     private JTable tbClientes;
     private JScrollPane clientsScroll;
+    private NeonButton btnHistorial;
 
     public ClientsPage() {
         setOpaque(false);
         setLayout(new BorderLayout(20, 20));
-        setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-
-        // Header (microcopy de contexto)
-        JPanel headerPanel = new JPanel();
-        headerPanel.setOpaque(false);
-        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
-
-        JLabel title = new JLabel("Consulta de clientes",
-                createIcon("icons/clients.svg", ThemeConstants.NEON_PURPLE, 24, 24),
-                SwingConstants.LEFT);
-        title.setForeground(ThemeConstants.TEXT_PRIMARY);
-        title.setFont(ThemeConstants.FONT_TITLE);
-        title.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JTextArea subtitle = UIUtils.createWrappingLabel(
-                "Consulta la información de contacto de todos tus clientes registrados",
-                ThemeConstants.FONT_SMALL, ThemeConstants.TEXT_SECONDARY);
-        subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        headerPanel.add(title);
-        headerPanel.add(Box.createVerticalStrut(4));
-        headerPanel.add(subtitle);
-        add(headerPanel, BorderLayout.NORTH);
+        setBorder(BorderFactory.createEmptyBorder(10, 20, 15, 20));
 
         add(createTablePanel(), BorderLayout.CENTER);
         refreshData();
@@ -52,23 +34,51 @@ public class ClientsPage extends JPanel {
         panel.setLayout(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        JLabel tableTitle = new JLabel("Clientes registrados");
+        JPanel topBar = new JPanel(new BorderLayout());
+        topBar.setOpaque(false);
+        topBar.setBorder(BorderFactory.createEmptyBorder(0, 8, 12, 8));
+
+        JLabel tableTitle = new JLabel("Clientes registrados", createIcon("icons/clients.svg", ThemeConstants.NEON_PURPLE, 20, 20), SwingConstants.LEFT);
+        tableTitle.setIconTextGap(8);
         tableTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
         tableTitle.setFont(ThemeConstants.FONT_SUBTITLE);
-        tableTitle.setBorder(BorderFactory.createEmptyBorder(0, 8, 12, 8));
-        panel.add(tableTitle, BorderLayout.NORTH);
+
+        btnHistorial = new NeonButton("Ver Historial de Compras");
+        btnHistorial.setNeonColor(ThemeConstants.NEON_PURPLE);
+        btnHistorial.setIcon(createIcon("icons/history.svg", ThemeConstants.NEON_PURPLE, 16, 16));
+        btnHistorial.setPreferredSize(new Dimension(210, 36));
+        btnHistorial.setToolTipText("Ver todas las ventas y productos comprados por el cliente seleccionado");
+        btnHistorial.addActionListener(e -> abrirHistorialCliente());
+
+        topBar.add(tableTitle, BorderLayout.WEST);
+        topBar.add(btnHistorial, BorderLayout.EAST);
+        panel.add(topBar, BorderLayout.NORTH);
 
         tbClientes = new JTable();
         tbClientes.setModel(new DefaultTableModel(
-            new String[]{"Id", "Usuario", "Email", "Teléfono", "Rol"}, 0));
+            new String[]{"Id", "Usuario", "Email", "Teléfono", "Rol"}, 0
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        });
         tbClientes.setBackground(ThemeConstants.CARD_BACKGROUND);
         tbClientes.setForeground(ThemeConstants.TEXT_PRIMARY);
         tbClientes.setRowHeight(ThemeConstants.TABLE_ROW_HEIGHT);
         tbClientes.setShowGrid(false);
         tbClientes.setFillsViewportHeight(true);
         tbClientes.setFont(ThemeConstants.FONT_SMALL);
-        tbClientes.setSelectionBackground(new Color(168, 85, 247, 70));
+        tbClientes.setSelectionBackground(ThemeConstants.SELECTION_PURPLE);
         tbClientes.setSelectionForeground(ThemeConstants.TEXT_PRIMARY);
+
+        // Listener de doble clic
+        tbClientes.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2 && tbClientes.getSelectedRow() != -1) {
+                    abrirHistorialCliente();
+                }
+            }
+        });
 
         clientsScroll = new JScrollPane(tbClientes);
         clientsScroll.setOpaque(false);
@@ -76,6 +86,25 @@ public class ClientsPage extends JPanel {
         clientsScroll.setBorder(BorderFactory.createEmptyBorder());
         panel.add(clientsScroll, BorderLayout.CENTER);
         return panel;
+    }
+
+    private void abrirHistorialCliente() {
+        int selectedRow = tbClientes.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this,
+                    "Por favor selecciona un cliente de la tabla para consultar su historial.",
+                    "Atención", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Obtener datos de la fila del modelo
+        DefaultTableModel model = (DefaultTableModel) tbClientes.getModel();
+        String nombreCliente = (String) model.getValueAt(selectedRow, 1);
+        String ccCliente = (String) model.getValueAt(selectedRow, 3); // Teléfono/CC en columna 3 o búsqueda
+
+        Window window = SwingUtilities.getWindowAncestor(this);
+        HistorialComprasClienteDialog dialog = new HistorialComprasClienteDialog(window, nombreCliente, ccCliente);
+        dialog.setVisible(true);
     }
 
     private void refreshData() {
@@ -92,8 +121,10 @@ public class ClientsPage extends JPanel {
     private void actualizarEstadoVacio() {
         if (tbClientes.getRowCount() == 0) {
             clientsScroll.setViewportView(createEmptyState("icons/clients.svg"));
+            if (btnHistorial != null) btnHistorial.setEnabled(false);
         } else {
             clientsScroll.setViewportView(tbClientes);
+            if (btnHistorial != null) btnHistorial.setEnabled(true);
         }
         clientsScroll.revalidate();
         clientsScroll.repaint();
@@ -113,3 +144,4 @@ public class ClientsPage extends JPanel {
         return icon;
     }
 }
+

@@ -1,6 +1,7 @@
 package com.mycompany.zl_solucion_integral.views.components.organisms;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.mycompany.zl_solucion_integral.config.ResultadoOperacion;
 import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
@@ -93,8 +94,12 @@ public class PasswordRecoveryDialog extends JDialog {
         JPanel btnRow = new JPanel(new GridLayout(1, 2, 10, 0));
         btnRow.setOpaque(false);
 
-        JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.setFont(ThemeConstants.FONT_BODY);
+        FlatSVGIcon cancelIcon = new FlatSVGIcon("icons/xmark.svg", 16, 16);
+        cancelIcon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, ThemeConstants.TEXT_SECONDARY));
+
+        NeonButton btnCancelar = new NeonButton("Cancelar");
+        btnCancelar.setIcon(cancelIcon);
+        btnCancelar.setIconTextGap(6);
         btnCancelar.addActionListener(e -> dispose());
 
         NeonButton btnVerificar = new NeonButton("VERIFICAR");

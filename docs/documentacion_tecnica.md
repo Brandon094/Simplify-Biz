@@ -1,52 +1,52 @@
-# Documentación Técnica & Guía de Ingeniería — ERP+ Business (v1.3.0)
+# Documentación Técnica & Guía de Ingeniería — ERP+ BUSINESS (v2.0.0)
 
 > **Documentación Técnica Empresarial / Silicon Valley Startup Standard**  
-> Especificación de arquitectura, patrones de diseño de software, pipeline de datos, motor de renderizado Swing 2D y protocolos de seguridad.
+> Especificación de arquitectura, patrones de diseño de software, pipeline de datos, motor de renderizado Swing 2D y suite de pruebas.
 
 ---
 
 ## 1. Visión General del Sistema & Arquitectura High-Level
 
-**ERP+ Business** es una plataforma de software de escritorio desacoplada de alto rendimiento desarrollada en Java 25 y Swing, respaldada por un motor de persistencia relacional SQLite con registros WAL (*Write-Ahead Logging*). La arquitectura está diseñada bajo los principios **SOLID**, **DRY** (*Don't Repeat Yourself*) y **Atomic Design**.
+**ERP+ BUSINESS** es una plataforma de software de escritorio desacoplada de alto rendimiento desarrollada en Java 25 y Swing, respaldada por un motor de persistencia relacional SQLite con registros WAL (*Write-Ahead Logging*). La arquitectura está diseñada bajo los principios **SOLID**, **DRY** (*Don't Repeat Yourself*) y **Atomic Design**.
 
 ### 1.1 Diagrama de Arquitectura de Componentes
 
 ```text
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│                             PRESENTACIÓN & UI (Swing)                            │
-│  ┌───────────────────────┐  ┌─────────────────────────┐  ┌────────────────────┐  │
-│  │ MainTemplate (Shell)  │  │ DashboardPage           │  │ SalesPage (POS)    │  │
-│  └───────────┬───────────┘  └────────────┬────────────┘  └─────────┬──────────┘  │
-│              │                           │                         │             │
-│              ▼                           ▼                         ▼             │
-│  ┌────────────────────────────────────────────────────────────────────────────┐  │
-│  │ ATOMIC DESIGN COMPONENTS: NeonButton | NeonBarChart | NeonPieChart | Popup │  │
-│  └───────────────────────────────────────┬────────────────────────────────────┘  │
-└──────────────────────────────────────────┼───────────────────────────────────────┘
-                                           │ (ResultadoOperacion DTO)
-                                           ▼
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│                           CAPA DE CONTROLADORES & LOGICA                         │
-│  ┌────────────────────────┐  ┌────────────────────────┐  ┌─────────────────────┐ │
-│  │ ProductoController     │  │ VentasController       │  │ UsuarioController   │ │
-│  └───────────┬────────────┘  └───────────┬────────────┘  └──────────┬──────────┘ │
-└──────────────┼───────────────────────────┼──────────────────────────┼────────────┘
-               │                           │                          │
-               └───────────────────────────┼──────────────────────────┘
-                                           ▼
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│                         INFRAESTRUCTURA & PERSISTENCIA                           │
-│  ┌────────────────────────┐  ┌────────────────────────┐  ┌─────────────────────┐ │
-│  │ GestorConexion (WAL)   │  │ ConexionDB (Schema)    │  │ Seguridad (SHA-256) │ │
-│  └───────────┬────────────┘  └───────────┬────────────┘  └──────────┬──────────┘ │
-└──────────────┼───────────────────────────┼──────────────────────────┼────────────┘
-               │                           │                          │
-               ▼                           ▼                          ▼
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│                          ALMACENAMIENTO FISICO (SQLite)                          │
-│               Windows: %APPDATA%/ERPPlusBusiness/db.db                           │
-│               Linux: ~/.config/ERPPlusBusiness/db.db                            │
-└──────────────────────────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────────────────────────┐
+│                                CAPA DE PRESENTACIÓN (Swing)                           │
+│  ┌─────────────────────────────┐  ┌─────────────────────────┐  ┌───────────────────┐  │
+│  │ MainTemplate (Shell Frame)  │  │ SalesPage (POS 2.0)     │  │ DashboardPage     │  │
+│  └──────────────┬──────────────┘  └────────────┬────────────┘  └─────────┬─────────┘  │
+│                 │                              │                         │            │
+│                 ▼                              ▼                         ▼            │
+│  ┌─────────────────────────────────────────────────────────────────────────────────┐  │
+│  │ ATOMIC DESIGN: NeonButton | NeonPieChart | NeonBarChart | AutocompletePopup<T>  │  │
+│  └──────────────────────────────────────┬──────────────────────────────────────────┘  │
+└─────────────────────────────────────────┼─────────────────────────────────────────────┘
+                                          │ Transfiere DTO `ResultadoOperacion`
+                                          ▼
+┌───────────────────────────────────────────────────────────────────────────────────────┐
+│                                 CAPA DE CONTROLADORES (MVC)                           │
+│  ┌──────────────────────────┐  ┌──────────────────────────┐  ┌──────────────────────┐ │
+│  │ ProductoController       │  │ VentasController         │  │ CarteraController    │ │
+│  └────────────┬─────────────┘  └────────────┬─────────────┘  └──────────┬───────────┘ │
+└───────────────┼─────────────────────────────┼───────────────────────────┼─────────────┘
+                │                             │                           │
+                └─────────────────────────────┼───────────────────────────┘
+                                              ▼
+┌───────────────────────────────────────────────────────────────────────────────────────┐
+│                            CAPA DE INFRAESTRUCTURA & DATOS                            │
+│  ┌──────────────────────────┐  ┌──────────────────────────┐  ┌──────────────────────┐ │
+│  │ GestorConexion (Singleton│  │ ConexionDB (Schema/DDL)  │  │ ExcelSQLiteManager   │ │
+│  └────────────┬─────────────┘  └────────────┬─────────────┘  └──────────┬───────────┘ │
+└───────────────┼─────────────────────────────┼───────────────────────────┼─────────────┘
+                │ JDBC / SQLite WAL           │                           │
+                ▼                             ▼                           ▼
+┌───────────────────────────────────────────────────────────────────────────────────────┐
+│                              ALMACENAMIENTO RELACIONAL                                │
+│                   Windows: %APPDATA%/ERPPlusBusiness/db.db                            │
+│                   Linux:   ~/.config/ERPPlusBusiness/db.db                            │
+└───────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -66,19 +66,26 @@ com.mycompany.zl_solucion_integral/
 ├── controllers/         # Reglas de negocio y transacciones (DAOs embebidos)
 │   ├── ProductoController.java    # Gestión de inventario, stock crítico e inversión
 │   ├── VentasController.java      # Transacciones ACID de POS y utilidad neta
-│   └── UsuarioController.java     # Autenticación, clientes y empleados
-├── models/              # Modelos de dominio POJO (Lombok)
+│   ├── UsuarioController.java     # Autenticación, clientes y empleados
+│   ├── CarteraController.java     # Gestión de cartera, recaudo de abonos y saldos
+│   ├── ComprasController.java     # Transacciones ACID de abastecimiento e incremento de stock
+│   └── ProveedorController.java   # Gestión de proveedores y sugerencias de autocompletado
+├── models/              # Modelos de dominio POJO
 │   ├── Producto.java              # Atributos SKU, precios (venta/costo), stock y categoría
 │   ├── Usuario.java               # Roles, credenciales e identificación
 │   ├── Venta.java                 # Transacción compuesta con snapshot de precios
+│   ├── Compra.java                # Orden de compra e ingreso a almacén
+│   ├── DetalleCompra.java         # Renglón de producto recibido
+│   ├── Proveedor.java             # Maestro de proveedores
 │   └── Sesion.java                # Contenedor de sesión activa en la JVM
-└── views/               # Interfaz gráfica moderna (FlatLaf + Cyberpunk Neon)
+├── views/               # Interfaz gráfica moderna (FlatLaf + Cyberpunk Neon)
     ├── components/
     │   ├── atoms/                 # NeonButton, NeonLineChart, NeonPieChart, NeonBarChart, RoundedPanel
     │   ├── AutocompletePopup.java # Motor genérico de autocompletado en tiempo real
-    │   ├── molecules/             # SidebarItem
-    │   └── organisms/             # ModernSidebar, MetricCard, PasswordRecoveryDialog
-    └── [Pages]                    # DashboardPage, SalesPage, ProductPage, ClientsPage, ReportsPage, ConfigPage
+    │   ├── dialogs/               # ManualUsuarioDialog, LicenciaDialog, RegistrarAbonoDialog, HistorialAbonosDialog, HistorialComprasClienteDialog, RegistrarCompraDialog
+    │   ├── molecules/             # SidebarItem, SidebarSection (Acordeón colapsable neumórfico con Preferences persistence)
+    │   └── organisms/             # ModernSidebar, MetricCard
+    └── [Pages]                    # DashboardPage, SalesPage, ProductPage, ComprasPage, ClientsPage, CarteraPage, ReportsPage, ConfigPage, ModernLoginPage
 ```
 
 ---
@@ -91,12 +98,9 @@ Para evitar los bloqueos `SQLITE_BUSY` (`database is locked`), la aplicación ma
 - `PRAGMA busy_timeout=5000;` (Espera defensiva de 5000 ms).
 - `PRAGMA foreign_keys=ON;` (Enforza integridad referencial).
 
-### 3.2 Motor Genérico de Autocompletado (`AutocompletePopup<T>`)
-Implementado mediante un popup desacoplado que soporta interfaces funcionales:
-- `SearchProvider<T>`: Consulta asíncrona de coincidencia (ej: `productoCtrl.buscarProductosSugeridos`).
-- `DisplayFormatter<T>`: Formateo dinámico del ítem desplegado.
-- `SelectionListener<T>`: Callback al seleccionar con clic o tecla `ENTER`.
-- Interceptación de teclado (`VK_UP`, `VK_DOWN`, `VK_ESCAPE`, `VK_ENTER`) que transfiere el foco sin cerrar el popup.
+### 3.2 Motor Genérico de Autocompletado & Componentes Custom Table (`SalesPage.java`)
+- **`AutocompletePopup<T>`**: Implementado mediante un popup desacoplado que soporta interfaces funcionales (`SearchProvider<T>`, `DisplayFormatter<T>`, `SelectionListener<T>`).
+- **`CartRowActionsPanel` & `CartCellEditor`**: Renderizador y editor celda a celda en `JTable` para la columna de acciones del carrito POS. Emplea íconos vectoriales FlatSVG (`plus.svg`, `minus.svg`, `products.svg`, `trash.svg`) con desacoplamiento de eventos vía `TableCellEditor` e intercepción atómica del estado del modelo `cartItems`.
 
 ### 3.3 Motor de Renderizado Gráfico 2D (`Graphics2D`)
 - **`NeonPieChart`**:
@@ -119,9 +123,9 @@ BEGIN TRANSACTION;
 INSERT INTO ventas (cliente, cc_cliente, vendedor, fecha, total, metodo_pago, pago_confirmado)
 VALUES (?, ?, ?, ?, ?, ?, ?);
 
--- 2. Insertar detalles reteniendo snapshot de costo
-INSERT INTO detalles_venta (venta_id, producto, cantidad, codigo, precio, precio_costo, total)
-VALUES (?, ?, ?, ?, ?, ?, ?);
+-- 2. Insertar detalles reteniendo snapshot de costo y % de descuento
+INSERT INTO detalles_venta (venta_id, producto, cantidad, codigo, precio, precio_costo, total, descuento)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 
 -- 3. Descontar inventario de forma defensiva
 UPDATE productos SET cantidad = cantidad - ? 
@@ -132,27 +136,79 @@ COMMIT; -- O ROLLBACK en caso de excepción
 
 - Si `metodoPago` es `"Crédito"`, `pago_confirmado` se establece en `'deudor'`. En `"Efectivo"` o `"Transferencia"`, en `'pagado'`.
 
-### 4.2 Métricas Financieras del Dashboard
+### 4.2 Métricas del Resumen Ejecutivo en Centro de Reportes & Exportaciones
 
-1. **Ventas Totales ($)**: `SELECT SUM(total) FROM ventas;`
-2. **Utilidad Neta ($)**: `SELECT SUM(total - (precio_costo * cantidad)) FROM detalles_venta;`
-3. **Inversión en Bodega ($)**: `SELECT SUM(precio_costo * cantidad) FROM productos;`
-4. **Margen Real (%)**: `(Utilidad Neta / Ventas Totales) * 100.0`
+El **Centro de Reportes** (`ReportsPage.java`) incluye un módulo de inteligencia financiera en tiempo real que reevalúa automáticamente las ventas filtradas por fecha o búsqueda histórica:
+
+1. **Total Facturado ($)**: Suma de la columna `Precio Total` de todas las ventas seleccionadas.
+2. **Costo de Mercancía COGS ($)**: `SELECT SUM(cantidad * precio_costo) FROM detalles_venta WHERE venta_id IN (...)`.
+3. **Utilidad Neta ($) & Margen (%)**: `Ganancia = Total Facturado - COGS`; `Margen % = (Ganancia / Total Facturado) * 100.0`.
+4. **Desglose de Métodos de Pago**: Acumulado y proporción para **Efectivo**, **Transferencia** y **Crédito**.
+5. **Exportación a Excel con Apache POI (`VentasController.exportarDatosTablaAExcel`)**:
+   - Aplica estilos corporativos con banner de título ("ERP+ BUSINESS - Reporte Oficial de Ventas").
+   - Cabeceras con relleno azul oscuro (`#1E293B`) y texto en negrita.
+   - Formato numérico `$#,##0.00` en celdas de moneda y fila final de **Gran Total**.
+6. **Exportación a PDF / Impresión Nativa**:
+   - Invocación nativa a `JTable.print(JTable.PrintMode.FIT_WIDTH, header, footer)` que permite previsualizar e imprimir o generar un PDF vectorizado.
+
+### 4.3 Módulo de Cartera & Recaudo de Abonos (`CarteraController.registrarAbono`)
+
+```sql
+BEGIN TRANSACTION;
+
+-- 1. Consultar total de venta y total acumulado abonado previamente
+SELECT v.total, COALESCE(SUM(a.monto), 0.0) AS abonado
+FROM ventas v LEFT JOIN abonos_cartera a ON v.id = a.venta_id
+WHERE v.id = ? GROUP BY v.id;
+
+-- 2. Insertar nuevo registro en abonos_cartera
+INSERT INTO abonos_cartera (venta_id, monto, fecha, metodo_pago, observacion)
+VALUES (?, ?, date('now'), ?, ?);
+
+-- 3. Si (saldoPendiente - monto) <= 0.01, saldar deuda automáticamente
+UPDATE ventas SET pago_confirmado = 'pagado' WHERE id = ?;
+
+COMMIT; -- O ROLLBACK si el monto supera el saldo pendiente o falla la conexión
+```
 
 ---
 
-## 5. Construcción, Pruebas y Despliegue
+## 5. Suite de Pruebas Automatizadas (JUnit 5)
+
+La aplicación cuenta con **41 pruebas unitarias e integrales** que ejecutan contra bases de datos en memoria o aisladas en directorio temporal (`@TempDir`), garantizando que la suite sea **reproducible, libre de efectos secundarios y no altere la base de datos de producción**.
+
+```bash
+# Ejecución oficial de tests
+mvn test
+```
+
+| Suite de Prueba | Capa | Cantidad | Descripción y Aspectos Evaluados |
+| :--- | :--- | :---: | :--- |
+| `VentasControllerTest` | Controller | 3 | Transacciones atómicas de POS, actualización de stock, rollback defensivo por stock insuficiente y filtro por rango de fechas. |
+| `ComprasControllerTest` | Controller | 2 | Orden de compra atómica, incremento de stock entrante y recalculación de costo unitario. |
+| `ProductoControllerTest` | Controller | 5 | Creación/actualización de repuestos, cálculo de inversión total de bodega, alerta de stock crítico y búsqueda por SKU/categoría. |
+| `UsuarioControllerTest` | Controller | 4 | Autenticación con hash SHA-256, cambio de contraseña, roles (Admin/Vendedor/Cliente) y registro de clientes. |
+| `CarteraControllerTest` | Controller | 2 | Recaudo de abonos parciales, saldo pendiente de cuentas por cobrar y liquidación automática de facturas a crédito. |
+| `ProveedorControllerTest` | Controller | 1 | Alta y búsqueda reactiva de proveedores sugeridos por NIT o nombre. |
+| `GestorConexionTest` | Config | 3 | Singleton de conexión SQLite, reconexión automática tras reinicio de pruebas y pragmas WAL. |
+| `ValidacionesTest` | Config | 16 | Parsers defensivos numéricos anti-crash (`NumberFormatException`), limpia de caracteres de moneda e interpolación de porcentajes. |
+| `LicenciaManagerTest` | Config | 3 | Cifrado HWID, validación de licencias activas/expiradas y generación de firmas criptográficas. |
+| `ExcelSQLiteManagerTest` | Config | 2 | Generación de plantilla modelo `.xlsx`, lectura de cabeceras de Excel e importación dinámica con mapeo visual. |
+
+---
+
+## 6. Construcción, Pruebas y Despliegue
 
 ```bash
 # Compilar fuentes Java
 mvn clean compile
 
-# Ejecutar suite de pruebas unitarias (JUnit 5 en memoria)
+# Ejecutar suite completa de 41 pruebas unitarias (JUnit 5)
 mvn test
 
-# Empaquetar artefacto JAR ejecutable
+# Empaquetar artefacto JAR ejecutable (Shaded Fat-JAR)
 mvn clean package
 
 # Ejecución en producción
-java -jar dist/Simplify-Biz-1.3.0.jar
+java -jar dist/ERP-Plus-Business-2.0.0.jar
 ```

@@ -1,4 +1,4 @@
-# Referencia de API & Controladores — ERP+ Business (v1.3.0)
+# Referencia de API & Controladores — ERP+ Business (v2.0.0)
 
 > **Especificación Técnica de Métodos de Lógica de Negocio y Data Access Object (DAO)**  
 > Todos los controladores ejecutan operaciones desacopladas de Swing y retornan `ResultadoOperacion` inmutable.
@@ -63,19 +63,86 @@ Transacciones comerciales, historial, reportes y cotizaciones.
 | Método | Parámetros | Retorno | Descripción |
 | :--- | :--- | :--- | :--- |
 | `guardarVenta` | `Venta v, List<Producto> cart, JTable t` | `ResultadoOperacion` | **Transacción ACID atómica:** inserta venta, detalles con snapshot de costo y descuenta stock en SQLite. |
+| `mostrarVentasPorCliente` | `JTable t, String cc, String nom` | `void` | Consulta y carga las facturas asociadas a un cliente por Cédula/NIT o Nombre ordenadas cronológicamente. |
+| `mostrarDetallesVenta` | `JTable t, int ventaId` | `void` | Carga los productos y subtotales comprados de una factura específica en la tabla de detalle. |
 | `obtenerUtilidadTotal` | — | `double` | Calcula la ganancia neta real ($): `SELECT SUM(total - (precio_costo * cantidad)) FROM detalles_venta`. |
+| `obtenerVentasTotalesPorPeriodo` | `String periodo` | `double` | Calcula ventas totales por periodo ("Hoy", "Últimos 7 Días", "Este Mes", "Histórico Total"). |
+| `obtenerUtilidadTotalPorPeriodo` | `String periodo` | `double` | Calcula la utilidad neta total por periodo. |
+| `obtenerCogsPorVentaIds` | `List<Integer> ventaIds` | `double` | Calcula el Costo de Mercancía Vendida (COGS) para un listado de IDs de ventas visibles/filtrados. |
 | `obtenerVentasUltimos7Dias` | — | `List<Double>` | Totales acumulados diarios de los últimos 7 días. |
-| `exportarDatosTablaAExcel` | `JTable table, String path` | `void` | Exporta la tabla visible a formato Microsoft Excel `.xlsx` vía Apache POI. |
+| `exportarDatosTablaAExcel` | `JTable table, String path` | `void` | Exporta la tabla visible a formato Microsoft Excel `.xlsx` vía Apache POI con diseño ejecutivo corporativo, banner de título, cabeceras en azul oscuro `#1E293B`, formato `$#,##0.00` y fila de Gran Total. |
+
 
 ---
 
-## 4. `Validaciones` & `ResultadoOperacion`
+## 4. `CarteraController`
+
+Gestión de cuentas por cobrar, saldos deudores y registro atómico de abonos.
+
+### Métodos Principales
+
+| Método | Parámetros | Retorno | Descripción |
+| :--- | :--- | :--- | :--- |
+| `obtenerVentasEnCartera` | `JTable tabla, String filtro` | `void` | Carga las ventas a crédito calculando `Total Venta`, `Total Abonado` y `Saldo Pendiente`. Soporta filtro por cliente o cédula. |
+| `registrarAbono` | `int ventaId, double monto, String metodo, String obs` | `ResultadoOperacion` | **Transacción atómica:** inserta el recaudo en `abonos_cartera`. Si `saldoPendiente <= 0.01`, actualiza el estado de la venta a `'pagado'`. |
+| `obtenerHistorialAbonos` | `int ventaId` | `List<Object[]>` | Obtiene el historial completo de pagos parciales aplicados a una venta a crédito. |
+| `obtenerResumenCartera` | — | `double[]` | Calcula los KPIs globales del módulo: `[0]` Cartera Pendiente ($), `[1]` Recaudado Mes ($), `[2]` Deudores Activos (count). |
+
+---
+
+## 5. `ComprasController`
+
+Abastecimiento de bodega, registro de facturas de compra e incremento atómico de stock.
+
+### Métodos Principales
+
+| Método | Parámetros | Retorno | Descripción |
+| :--- | :--- | :--- | :--- |
+| `guardarEntradaCompra` | `Compra c, List<DetalleCompra> det` | `ResultadoOperacion` | **Transacción ACID atómica:** guarda compra, detalles, incrementa existencias (`cantidad = cantidad + ?`) y actualiza el costo de adquisición (`precio_costo`). |
+| `mostrarHistorialCompras` | `JTable tabla, String filtro` | `void` | Carga el listado de entradas de almacén aplicando formato contable `UIUtils.applyTableStyling`. |
+| `mostrarDetallesCompra` | `JTable tabla, int compraId` | `void` | Carga los renglones de productos recibidos en una orden de compra específica. |
+| `obtenerResumenCompras` | — | `double[]` | Retorna los KPIs globales de compras: `[0]` Total Invertido ($), `[1]` Entradas Recibidas (#), `[2]` Proveedores Atendidos (#). |
+
+---
+
+## 6. `ProveedorController`
+
+Gestión de proveedores e integración con el motor de autocompletado del módulo de compras.
+
+### Métodos Principales
+
+| Método | Parámetros | Retorno | Descripción |
+| :--- | :--- | :--- | :--- |
+| `guardarOActualizarProveedor` | `Proveedor p` | `ResultadoOperacion` | Inserta o actualiza un proveedor verificando unicidad por NIT. |
+| `mostrarProveedores` | `JTable tabla` | `void` | Carga la lista completa de proveedores registrados. |
+| `buscarProveedoresSugeridos` | `String query` | `List<Proveedor>` | Consulta en tiempo real (`LIKE %query%`) para el componente `AutocompletePopup`. |
+
+---
+
+## 7. `ExcelSQLiteManager`
+
+Motor de procesamiento de hojas de cálculo (Excel `.xlsx` / `.xls` y CSV) para importación de inventario y facturas de compras con mapeo dinámico de columnas y estrategia Upsert.
+
+### Métodos Principales
+
+| Método | Parámetros | Retorno | Descripción |
+| :--- | :--- | :--- | :--- |
+| `leerCabeceras` | `File archivo` | `List<String>` | Extrae la primera fila del archivo Excel/CSV como nombres de columna para poblar los selectores de mapeo visual. |
+| `leerVistaPrevia` | `File archivo, Map<String, Integer> mapeo, int maxFilas` | `List<Object[]>` | Lee las primeras 5 filas aplicando las transformaciones de mapeo para mostrar la tabla de vista previa en vivo. |
+| `importarConMapeo` | `File archivo, Map<String, Integer> mapeo` | `ResultadoOperacion` | Procesa el archivo completo en una transacción SQLite. Realiza **Upsert** (actualiza precio, costo y suma existencias si el SKU existe, o crea el producto si es nuevo). |
+| `generarPlantillaModelo` | `File destino` | `ResultadoOperacion` | Genera y guarda una plantilla `.xlsx` con las columnas estándar esperadas por el sistema (`codigo_barras`, `nombre`, `precio`, `costo`, `stock`, `categoria`). |
+
+---
+
+## 8. `Validaciones` & `ResultadoOperacion`
 
 ### Parsers Defensivos
 - `Validaciones.parseEntero(String)`: Retorna `Integer` o `null` sin lanzar excepción.
 - `Validaciones.parseDecimalNoNegativo(String)`: Acepta coma o punto decimal y retorna `Double` o `null`.
 - `Validaciones.parseFecha(String)`: Valida formato estricto `dd/MM/yyyy`.
+- `Validaciones.limpiarFormatoMoneda(String)`: Limpia caracteres de moneda como `$`, `,`, espacios mediante regex `[^0-9,.-]` para parseo numérico seguro.
 
 ### DTO `ResultadoOperacion`
 - `ResultadoOperacion.ok(mensaje)` / `ResultadoOperacion.error(mensaje)`
 - Encapsula el estado de la operación permitiendo que Swing renderice alertas con `UIUtils.showSuccess` o `UIUtils.showError`.
+

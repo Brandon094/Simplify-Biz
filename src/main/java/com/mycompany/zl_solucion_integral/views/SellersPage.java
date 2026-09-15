@@ -11,9 +11,7 @@ import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 import java.awt.*;
 
 public class SellersPage extends JPanel {
@@ -27,27 +25,7 @@ public class SellersPage extends JPanel {
     public SellersPage() {
         setOpaque(false);
         setLayout(new BorderLayout(20, 20));
-        setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-
-        // Header (microcopy de contexto)
-        JPanel headerPanel = new JPanel();
-        headerPanel.setOpaque(false);
-        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
-
-        JLabel title = new JLabel("Gestión de empleados", createIcon("icons/staff.svg", ThemeConstants.NEON_PURPLE, 24, 24), SwingConstants.LEFT);
-        title.setForeground(ThemeConstants.TEXT_PRIMARY);
-        title.setFont(ThemeConstants.FONT_TITLE);
-        title.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JTextArea subtitle = UIUtils.createWrappingLabel(
-                "Registra y administra el personal con acceso al sistema",
-                ThemeConstants.FONT_SMALL, ThemeConstants.TEXT_SECONDARY);
-        subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        headerPanel.add(title);
-        headerPanel.add(Box.createVerticalStrut(4));
-        headerPanel.add(subtitle);
-        add(headerPanel, BorderLayout.NORTH);
+        setBorder(BorderFactory.createEmptyBorder(10, 20, 15, 20));
 
         // Contenido Principal
         mainContent = new JPanel(new BorderLayout(25, 0));
@@ -106,7 +84,8 @@ public class SellersPage extends JPanel {
         gbc.gridx = 0;
 
         gbc.gridy = 0; gbc.insets = new Insets(0, 0, 16, 0);
-        JLabel formTitle = new JLabel("Registrar empleado");
+        JLabel formTitle = new JLabel("Registrar empleado", createIcon("icons/user-plus.svg", ThemeConstants.NEON_PURPLE, 20, 20), SwingConstants.LEFT);
+        formTitle.setIconTextGap(8);
         formTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
         formTitle.setFont(ThemeConstants.FONT_SUBTITLE);
         p.add(formTitle, gbc);
@@ -121,14 +100,14 @@ public class SellersPage extends JPanel {
         gbc.gridy = 3; gbc.insets = new Insets(0, 0, 4, 0);
         p.add(createLabel("TELÉFONO / CELULAR"), gbc);
         txtTel = createTextField("Ej: 3001234567");
-        setupFieldIcon(txtTel, "icons/user.svg");
+        setupFieldIcon(txtTel, "icons/phone.svg");
         gbc.gridy = 4; gbc.insets = new Insets(0, 0, 12, 0);
         p.add(UIUtils.createFieldWithHelper(txtTel, "Debe tener 10 dígitos numéricos"), gbc);
 
         gbc.gridy = 5; gbc.insets = new Insets(0, 0, 4, 0);
         p.add(createLabel("CORREO ELECTRÓNICO"), gbc);
         txtEmail = createTextField("vendedor@chopcode.com");
-        setupFieldIcon(txtEmail, "icons/settings.svg");
+        setupFieldIcon(txtEmail, "icons/email.svg");
         gbc.gridy = 6; gbc.insets = new Insets(0, 0, 12, 0);
         p.add(txtEmail, gbc);
 
@@ -145,7 +124,7 @@ public class SellersPage extends JPanel {
 
         NeonButton btnSave = new NeonButton("Registrar empleado");
         btnSave.setNeonColor(ThemeConstants.NEON_GREEN);
-        btnSave.setIcon(createIcon("icons/plus.svg", ThemeConstants.NEON_GREEN, 16, 16));
+        btnSave.setIcon(createIcon("icons/user-plus.svg", ThemeConstants.NEON_GREEN, 16, 16));
         btnSave.setIconTextGap(6);
         btnSave.setPreferredSize(new Dimension(0, 42));
         btnSave.addActionListener(e -> saveSeller());
@@ -153,7 +132,7 @@ public class SellersPage extends JPanel {
 
         NeonButton btnClear = new NeonButton("Limpiar");
         btnClear.setNeonColor(ThemeConstants.NEON_BLUE);
-        btnClear.setIcon(createIcon("icons/settings.svg", ThemeConstants.NEON_BLUE, 16, 16));
+        btnClear.setIcon(createIcon("icons/update.svg", ThemeConstants.NEON_BLUE, 16, 16));
         btnClear.setIconTextGap(6);
         btnClear.setPreferredSize(new Dimension(0, 42));
         btnClear.addActionListener(e -> clearFields());
@@ -176,7 +155,8 @@ public class SellersPage extends JPanel {
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setOpaque(false);
 
-        JLabel tableTitle = new JLabel("Empleados registrados");
+        JLabel tableTitle = new JLabel("Empleados registrados", createIcon("icons/staff.svg", ThemeConstants.NEON_PURPLE, 20, 20), SwingConstants.LEFT);
+        tableTitle.setIconTextGap(8);
         tableTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
         tableTitle.setFont(ThemeConstants.FONT_SUBTITLE);
         headerPanel.add(tableTitle, BorderLayout.WEST);
@@ -216,7 +196,7 @@ public class SellersPage extends JPanel {
         tbSellers.setShowGrid(false);
         tbSellers.setFillsViewportHeight(true);
         tbSellers.setFont(ThemeConstants.FONT_SMALL);
-        tbSellers.setSelectionBackground(new Color(34, 197, 94, 70));
+        tbSellers.setSelectionBackground(ThemeConstants.SELECTION_GREEN);
         tbSellers.setSelectionForeground(ThemeConstants.TEXT_PRIMARY);
         
         tbSellers.getSelectionModel().addListSelectionListener(e -> {

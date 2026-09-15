@@ -38,6 +38,11 @@ public class SalesPage extends JPanel {
     private JTable tbCart;
     private DefaultTableModel cartModel;
     private JLabel lblTotal;
+    private JLabel lblSubtotal;
+    private JLabel lblDiscountSavings;
+    private JLabel lblItemCount;
+    private JPanel centerCardPanel;
+    private JPanel emptyCartState;
 
     private List<Venta> cartItems = new ArrayList<>();
     private Producto selectedProduct = null;
@@ -47,27 +52,7 @@ public class SalesPage extends JPanel {
     public SalesPage() {
         setOpaque(false);
         setLayout(new BorderLayout(15, 15));
-        setBorder(BorderFactory.createEmptyBorder(25, 25, 20, 25));
-
-        // Header (microcopy de contexto)
-        JPanel headerPanel = new JPanel();
-        headerPanel.setOpaque(false);
-        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
-
-        JLabel title = new JLabel("Punto de venta", createIcon("icons/sales.svg", ThemeConstants.NEON_GREEN, 24, 24), SwingConstants.LEFT);
-        title.setForeground(ThemeConstants.TEXT_PRIMARY);
-        title.setFont(ThemeConstants.FONT_TITLE);
-        title.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JTextArea subtitle = UIUtils.createWrappingLabel(
-                "Registra ventas ágiles: busca productos, arma el carrito y cobra en segundos",
-                ThemeConstants.FONT_SMALL, ThemeConstants.TEXT_SECONDARY);
-        subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        headerPanel.add(title);
-        headerPanel.add(Box.createVerticalStrut(4));
-        headerPanel.add(subtitle);
-        add(headerPanel, BorderLayout.NORTH);
+        setBorder(BorderFactory.createEmptyBorder(10, 20, 15, 20));
 
         // Col 1: Búsqueda de Producto
         panelBusqueda = createProductSearchPanel();
@@ -83,11 +68,24 @@ public class SalesPage extends JPanel {
         checkoutScroll.setBorder(BorderFactory.createEmptyBorder());
         checkoutScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-        mainGrid = new JPanel(new GridLayout(1, 3, 15, 0));
+        // Grid proporciones: Búsqueda (28%), Carrito Ampliado (44%), Checkout (28%)
+        mainGrid = new JPanel(new GridBagLayout());
         mainGrid.setOpaque(false);
-        mainGrid.add(panelBusqueda);
-        mainGrid.add(panelCarrito);
-        mainGrid.add(checkoutScroll);
+        GridBagConstraints gbcGrid = new GridBagConstraints();
+        gbcGrid.fill = GridBagConstraints.BOTH;
+        gbcGrid.gridy = 0; gbcGrid.weighty = 1.0;
+
+        gbcGrid.gridx = 0; gbcGrid.weightx = 0.28;
+        gbcGrid.insets = new Insets(0, 0, 0, 10);
+        mainGrid.add(panelBusqueda, gbcGrid);
+
+        gbcGrid.gridx = 1; gbcGrid.weightx = 0.44;
+        gbcGrid.insets = new Insets(0, 0, 0, 10);
+        mainGrid.add(panelCarrito, gbcGrid);
+
+        gbcGrid.gridx = 2; gbcGrid.weightx = 0.28;
+        gbcGrid.insets = new Insets(0, 0, 0, 0);
+        mainGrid.add(checkoutScroll, gbcGrid);
 
         add(mainGrid, BorderLayout.CENTER);
 
@@ -158,23 +156,45 @@ public class SalesPage extends JPanel {
         p.setLayout(new BorderLayout(0, 10));
         p.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
 
+        JPanel headerRow = new JPanel(new BorderLayout());
+        headerRow.setOpaque(false);
         JLabel title = new JLabel("Carrito de compras", createIcon("icons/cart-shopping.svg", ThemeConstants.NEON_CYAN, 18, 18), SwingConstants.LEFT);
         title.setForeground(ThemeConstants.TEXT_PRIMARY);
         title.setFont(ThemeConstants.FONT_SUBTITLE);
-        p.add(title, BorderLayout.NORTH);
+        
+        lblItemCount = new JLabel("0 ítems ");
+        lblItemCount.setForeground(ThemeConstants.TEXT_SECONDARY);
+        lblItemCount.setFont(ThemeConstants.FONT_SMALL);
 
-        cartModel = new DefaultTableModel(new String[]{"Producto", "Cant.", "Total"}, 0);
+        headerRow.add(title, BorderLayout.WEST);
+        headerRow.add(lblItemCount, BorderLayout.EAST);
+        p.add(headerRow, BorderLayout.NORTH);
+
+        cartModel = new DefaultTableModel(new String[]{"Producto", "Cant.", "Total", "Acciones"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return column == 3; // Solo la columna de acciones es interactiva
+            }
+        };
+
         tbCart = new JTable(cartModel);
         tbCart.setBackground(ThemeConstants.CARD_BACKGROUND);
         tbCart.setForeground(ThemeConstants.TEXT_PRIMARY);
-        tbCart.setRowHeight(ThemeConstants.TABLE_ROW_HEIGHT);
+        tbCart.setRowHeight(38);
         tbCart.setFont(ThemeConstants.FONT_SMALL);
         tbCart.setShowGrid(false);
         tbCart.setFillsViewportHeight(true);
-        tbCart.setSelectionBackground(new Color(6, 182, 212, 70));
+        tbCart.setSelectionBackground(ThemeConstants.withAlpha(ThemeConstants.NEON_CYAN, 50));
         tbCart.setSelectionForeground(ThemeConstants.TEXT_PRIMARY);
 
-        tbCart.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+        // Anchos de columna optimizados
+        tbCart.getColumnModel().getColumn(0).setPreferredWidth(120);
+        tbCart.getColumnModel().getColumn(1).setPreferredWidth(35);
+        tbCart.getColumnModel().getColumn(2).setPreferredWidth(75);
+        tbCart.getColumnModel().getColumn(3).setPreferredWidth(115);
+
+        // Cell renderer para columnas 0, 1 y 2
+        DefaultTableCellRenderer textRenderer = new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
                     boolean isSelected, boolean hasFocus, int row, int column) {
@@ -184,12 +204,25 @@ public class SalesPage extends JPanel {
                     component.setBackground(row % 2 == 0
                             ? ThemeConstants.CARD_BACKGROUND
                             : ThemeConstants.TABLE_ZEBRA);
-                    component.setForeground(ThemeConstants.TEXT_SECONDARY);
+                    component.setForeground(ThemeConstants.TEXT_PRIMARY);
                 }
-                setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+                setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
                 return component;
             }
+        };
+        tbCart.getColumnModel().getColumn(0).setCellRenderer(textRenderer);
+        tbCart.getColumnModel().getColumn(1).setCellRenderer(textRenderer);
+        tbCart.getColumnModel().getColumn(2).setCellRenderer(textRenderer);
+
+        // Renderer y Editor para la columna 3 (Botones SVG por fila: + / - / Edit / Trash)
+        CartRowActionsPanel rowActionsRenderer = new CartRowActionsPanel();
+
+        tbCart.getColumnModel().getColumn(3).setCellRenderer((table, value, isSelected, hasFocus, row, column) -> {
+            rowActionsRenderer.updateBackground(isSelected, row % 2 == 0);
+            return rowActionsRenderer;
         });
+
+        tbCart.getColumnModel().getColumn(3).setCellEditor(new CartCellEditor());
 
         JTableHeader cartHeader = tbCart.getTableHeader();
         cartHeader.setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
@@ -202,14 +235,335 @@ public class SalesPage extends JPanel {
         scroll.setOpaque(false);
         scroll.getViewport().setOpaque(false);
         scroll.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
-        p.add(scroll, BorderLayout.CENTER);
+
+        // Panel de Estado Vacío Animado/Grafico
+        emptyCartState = new JPanel(new GridBagLayout());
+        emptyCartState.setOpaque(false);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0; gbc.gridy = 0;
+        
+        JLabel lblEmptyIcon = new JLabel(createIcon("icons/cart-shopping.svg", ThemeConstants.withAlpha(ThemeConstants.TEXT_SECONDARY, 80), 54, 54));
+        emptyCartState.add(lblEmptyIcon, gbc);
+
+        gbc.gridy = 1; gbc.insets = new Insets(12, 0, 4, 0);
+        JLabel lblEmptyTitle = new JLabel("Tu carrito está vacío");
+        lblEmptyTitle.setForeground(ThemeConstants.TEXT_PRIMARY);
+        lblEmptyTitle.setFont(ThemeConstants.FONT_SUBTITLE.deriveFont(Font.BOLD, 15f));
+        emptyCartState.add(lblEmptyTitle, gbc);
+
+        gbc.gridy = 2; gbc.insets = new Insets(0, 0, 0, 0);
+        JLabel lblEmptySub = new JLabel("<html><body style='width: 200px; text-align: center;'>Busca productos a la izquierda o digita su código SKU para armar la orden.</body></html>");
+        lblEmptySub.setForeground(ThemeConstants.TEXT_SECONDARY);
+        lblEmptySub.setFont(ThemeConstants.FONT_SMALL);
+        lblEmptySub.setHorizontalAlignment(SwingConstants.CENTER);
+        emptyCartState.add(lblEmptySub, gbc);
+
+        // CardLayout central para alternar entre Estado Vacío y Tabla de Carrito
+        centerCardPanel = new JPanel(new CardLayout());
+        centerCardPanel.setOpaque(false);
+        centerCardPanel.add(emptyCartState, "EMPTY");
+        centerCardPanel.add(scroll, "CART");
+
+        p.add(centerCardPanel, BorderLayout.CENTER);
+
+        // Footer con Gran Total de Venta, Subtotal y Desglose de Descuentos
+        JPanel footerPanel = new JPanel();
+        footerPanel.setOpaque(false);
+        footerPanel.setLayout(new BoxLayout(footerPanel, BoxLayout.Y_AXIS));
+
+        JSeparator lineSep = new JSeparator(JSeparator.HORIZONTAL);
+        lineSep.setForeground(ThemeConstants.INPUT_BORDER);
+        lineSep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+
+        JPanel breakdownPanel = new JPanel(new GridLayout(2, 2, 6, 2));
+        breakdownPanel.setOpaque(false);
+        breakdownPanel.setBorder(BorderFactory.createEmptyBorder(6, 6, 2, 6));
+
+        JLabel lblSubtotalTag = new JLabel("Subtotal sin desc:");
+        lblSubtotalTag.setForeground(ThemeConstants.TEXT_SECONDARY);
+        lblSubtotalTag.setFont(ThemeConstants.FONT_SMALL);
+
+        lblSubtotal = new JLabel("$ 0.00", SwingConstants.RIGHT);
+        lblSubtotal.setForeground(ThemeConstants.TEXT_SECONDARY);
+        lblSubtotal.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
+
+        JLabel lblDiscountTag = new JLabel("Ahorro / Descuento:");
+        lblDiscountTag.setForeground(ThemeConstants.NEON_CYAN);
+        lblDiscountTag.setFont(ThemeConstants.FONT_SMALL);
+
+        lblDiscountSavings = new JLabel("-$ 0.00 (0%)", SwingConstants.RIGHT);
+        lblDiscountSavings.setForeground(ThemeConstants.NEON_CYAN);
+        lblDiscountSavings.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
+
+        breakdownPanel.add(lblSubtotalTag);
+        breakdownPanel.add(lblSubtotal);
+        breakdownPanel.add(lblDiscountTag);
+        breakdownPanel.add(lblDiscountSavings);
+
+        JPanel totalRow = new JPanel(new BorderLayout());
+        totalRow.setOpaque(false);
+        totalRow.setBorder(BorderFactory.createEmptyBorder(4, 6, 6, 6));
 
         lblTotal = new JLabel("TOTAL: $ 0.00", SwingConstants.RIGHT);
         lblTotal.setForeground(ThemeConstants.NEON_GREEN);
-        lblTotal.setFont(ThemeConstants.FONT_TITLE);
-        p.add(lblTotal, BorderLayout.SOUTH);
+        lblTotal.setFont(ThemeConstants.FONT_TITLE.deriveFont(Font.BOLD, 22f));
+        
+        totalRow.add(lblTotal, BorderLayout.CENTER);
+
+        footerPanel.add(Box.createVerticalStrut(4));
+        footerPanel.add(lineSep);
+        footerPanel.add(breakdownPanel);
+        footerPanel.add(Box.createVerticalStrut(2));
+        footerPanel.add(totalRow);
+
+        p.add(footerPanel, BorderLayout.SOUTH);
 
         return p;
+    }
+
+    // Componente interno para mostrar botones con SVG minus.svg y plus.svg directamente en cada fila de la tabla
+    private class CartRowActionsPanel extends JPanel {
+        private final JButton btnPlus = createRowIconButton("icons/plus.svg", ThemeConstants.NEON_GREEN, "Aumentar (+1)");
+        private final JButton btnMinus = createRowIconButton("icons/minus.svg", ThemeConstants.NEON_PURPLE, "Disminuir (-1)");
+        private final JButton btnTrash = createRowIconButton("icons/trash.svg", ThemeConstants.NEON_RED, "Quitar ítem");
+
+        public CartRowActionsPanel() {
+            setOpaque(true);
+            setLayout(new FlowLayout(FlowLayout.CENTER, 4, 4));
+            add(btnPlus);
+            add(btnMinus);
+            add(btnTrash);
+        }
+
+        public void updateBackground(boolean isSelected, boolean isEven) {
+            if (isSelected) {
+                setBackground(ThemeConstants.withAlpha(ThemeConstants.NEON_CYAN, 50));
+            } else {
+                setBackground(isEven ? ThemeConstants.CARD_BACKGROUND : ThemeConstants.TABLE_ZEBRA);
+            }
+        }
+
+        public void setActionListeners(java.awt.event.ActionListener onPlus,
+                                       java.awt.event.ActionListener onMinus,
+                                       java.awt.event.ActionListener onTrash) {
+            for (java.awt.event.ActionListener al : btnPlus.getActionListeners()) btnPlus.removeActionListener(al);
+            for (java.awt.event.ActionListener al : btnMinus.getActionListeners()) btnMinus.removeActionListener(al);
+            for (java.awt.event.ActionListener al : btnTrash.getActionListeners()) btnTrash.removeActionListener(al);
+
+            btnPlus.addActionListener(onPlus);
+            btnMinus.addActionListener(onMinus);
+            btnTrash.addActionListener(onTrash);
+        }
+
+        private JButton createRowIconButton(String iconPath, Color accentColor, String tooltip) {
+            JButton btn = new JButton();
+            btn.setPreferredSize(new Dimension(26, 26));
+            btn.setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
+            btn.setFocusPainted(false);
+            btn.setToolTipText(tooltip);
+            btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            btn.setBorder(BorderFactory.createLineBorder(new Color(accentColor.getRed(), accentColor.getGreen(), accentColor.getBlue(), 140), 1, true));
+            btn.setIcon(createIcon(iconPath, accentColor, 13, 13));
+
+            // Efecto Hover neumórfico con cursor de manito (HAND_CURSOR)
+            btn.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseEntered(java.awt.event.MouseEvent e) {
+                    btn.setBackground(accentColor);
+                    btn.setIcon(createIcon(iconPath, Color.WHITE, 13, 13));
+                }
+
+                @Override
+                public void mouseExited(java.awt.event.MouseEvent e) {
+                    btn.setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
+                    btn.setIcon(createIcon(iconPath, accentColor, 13, 13));
+                }
+            });
+            return btn;
+        }
+    }
+
+    private class CartCellEditor extends javax.swing.AbstractCellEditor implements javax.swing.table.TableCellEditor {
+        private final CartRowActionsPanel rowActionsEditor = new CartRowActionsPanel();
+        private int currentRow = -1;
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            this.currentRow = row;
+            rowActionsEditor.updateBackground(true, row % 2 == 0);
+            rowActionsEditor.setActionListeners(
+                    e -> { fireEditingStopped(); changeQtyAtRow(currentRow, 1); },
+                    e -> { fireEditingStopped(); changeQtyAtRow(currentRow, -1); },
+                    e -> { fireEditingStopped(); removeCartItemAtRow(currentRow); }
+            );
+            return rowActionsEditor;
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            return "";
+        }
+    }
+
+    private void changeQtyAtRow(int rowIndex, int delta) {
+        if (rowIndex < 0 || rowIndex >= cartItems.size()) return;
+        Venta item = cartItems.get(rowIndex);
+        int newQty = item.getCantidad() + delta;
+
+        if (newQty <= 0) {
+            removeCartItemAtRow(rowIndex);
+            return;
+        }
+
+        if (item.getProducto() != null && newQty > item.getProducto().getCantidad()) {
+            UIUtils.showError(this, "La cantidad (" + newQty + ") supera el stock disponible (" + item.getProducto().getCantidad() + ").");
+            return;
+        }
+
+        double unitPrice = item.getTotal() / item.getCantidad();
+        item.setCantidad(newQty);
+        item.setTotal(unitPrice * newQty);
+
+        cartModel.setValueAt(newQty, rowIndex, 1);
+        cartModel.setValueAt(String.format("$ %.2f", item.getTotal()), rowIndex, 2);
+        updateTotal();
+    }
+
+    private void setCustomQtyAtRow(int rowIndex) {
+        if (rowIndex < 0 || rowIndex >= cartItems.size()) return;
+        Venta item = cartItems.get(rowIndex);
+        String input = JOptionPane.showInputDialog(this,
+                "Ingresa la nueva cantidad para " + item.getProducto().getProducto() + ":",
+                "Modificar cantidad", JOptionPane.QUESTION_MESSAGE);
+        
+        if (input == null || input.trim().isEmpty()) return;
+
+        if (!com.mycompany.zl_solucion_integral.config.Validaciones.validarCantidad(input.trim())) {
+            UIUtils.showError(this, "La cantidad debe ser un número entero positivo.");
+            return;
+        }
+
+        int newQty = Integer.parseInt(input.trim());
+        if (newQty <= 0) {
+            removeCartItemAtRow(rowIndex);
+            return;
+        }
+
+        if (item.getProducto() != null && newQty > item.getProducto().getCantidad()) {
+            UIUtils.showError(this, "La cantidad (" + newQty + ") supera el stock disponible (" + item.getProducto().getCantidad() + ").");
+            return;
+        }
+
+        double unitPrice = item.getTotal() / item.getCantidad();
+        item.setCantidad(newQty);
+        item.setTotal(unitPrice * newQty);
+
+        cartModel.setValueAt(newQty, rowIndex, 1);
+        cartModel.setValueAt(String.format("$ %.2f", item.getTotal()), rowIndex, 2);
+        updateTotal();
+    }
+
+    private void removeCartItemAtRow(int rowIndex) {
+        if (rowIndex < 0 || rowIndex >= cartItems.size()) return;
+        cartItems.remove(rowIndex);
+        cartModel.removeRow(rowIndex);
+        updateTotal();
+    }
+
+    private JButton createMiniCartButton(String text, String iconPath, Color accentColor, String tooltip) {
+        JButton btn = new JButton(text);
+        btn.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD, 11f));
+        btn.setForeground(ThemeConstants.TEXT_PRIMARY);
+        btn.setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
+        btn.setFocusPainted(false);
+        btn.setToolTipText(tooltip);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(accentColor.getRed(), accentColor.getGreen(), accentColor.getBlue(), 120), 1, true),
+                BorderFactory.createEmptyBorder(4, 8, 4, 8)
+        ));
+        if (iconPath != null) {
+            btn.setIcon(createIcon(iconPath, accentColor, 12, 12));
+            btn.setIconTextGap(4);
+        }
+        return btn;
+    }
+
+    private void changeSelectedQty(int delta) {
+        int selectedRow = tbCart.getSelectedRow();
+        if (selectedRow < 0 || selectedRow >= cartItems.size()) {
+            UIUtils.showError(this, "Selecciona un producto del carrito para modificar su cantidad.");
+            return;
+        }
+        Venta item = cartItems.get(selectedRow);
+        int newQty = item.getCantidad() + delta;
+
+        if (newQty <= 0) {
+            removeSelectedCartItem();
+            return;
+        }
+
+        if (item.getProducto() != null && newQty > item.getProducto().getCantidad()) {
+            UIUtils.showError(this, "La cantidad (" + newQty + ") supera el stock disponible (" + item.getProducto().getCantidad() + ").");
+            return;
+        }
+
+        double unitPrice = item.getTotal() / item.getCantidad();
+        item.setCantidad(newQty);
+        item.setTotal(unitPrice * newQty);
+
+        cartModel.setValueAt(newQty, selectedRow, 1);
+        cartModel.setValueAt(String.format("$ %.2f", item.getTotal()), selectedRow, 2);
+        updateTotal();
+    }
+
+    private void setCustomQtyForSelected() {
+        int selectedRow = tbCart.getSelectedRow();
+        if (selectedRow < 0 || selectedRow >= cartItems.size()) {
+            UIUtils.showError(this, "Selecciona un producto del carrito para editar su cantidad.");
+            return;
+        }
+        Venta item = cartItems.get(selectedRow);
+        String input = JOptionPane.showInputDialog(this,
+                "Ingresa la nueva cantidad para " + item.getProducto().getProducto() + ":",
+                "Modificar cantidad", JOptionPane.QUESTION_MESSAGE);
+        
+        if (input == null || input.trim().isEmpty()) return;
+
+        if (!com.mycompany.zl_solucion_integral.config.Validaciones.validarCantidad(input.trim())) {
+            UIUtils.showError(this, "La cantidad debe ser un número entero positivo.");
+            return;
+        }
+
+        int newQty = Integer.parseInt(input.trim());
+        if (newQty <= 0) {
+            removeSelectedCartItem();
+            return;
+        }
+
+        if (item.getProducto() != null && newQty > item.getProducto().getCantidad()) {
+            UIUtils.showError(this, "La cantidad (" + newQty + ") supera el stock disponible (" + item.getProducto().getCantidad() + ").");
+            return;
+        }
+
+        double unitPrice = item.getTotal() / item.getCantidad();
+        item.setCantidad(newQty);
+        item.setTotal(unitPrice * newQty);
+
+        cartModel.setValueAt(newQty, selectedRow, 1);
+        cartModel.setValueAt(String.format("$ %.2f", item.getTotal()), selectedRow, 2);
+        updateTotal();
+    }
+
+    private void removeSelectedCartItem() {
+        int selectedRow = tbCart.getSelectedRow();
+        if (selectedRow < 0 || selectedRow >= cartItems.size()) {
+            UIUtils.showError(this, "Selecciona un producto del carrito para quitar.");
+            return;
+        }
+        cartItems.remove(selectedRow);
+        cartModel.removeRow(selectedRow);
+        updateTotal();
     }
 
     private JPanel createCheckoutPanel() {
@@ -381,14 +735,26 @@ public class SalesPage extends JPanel {
         double subtotal = selectedProduct.getPrecio() * qty;
         double total = subtotal - (subtotal * discount / 100.0);
 
+        Producto prodToCart = new Producto();
+        prodToCart.setId(selectedProduct.getId());
+        prodToCart.setProducto(selectedProduct.getProducto());
+        prodToCart.setPrecio(selectedProduct.getPrecio());
+        prodToCart.setPrecioCosto(selectedProduct.getPrecioCosto());
+        prodToCart.setCantidad(selectedProduct.getCantidad());
+        prodToCart.setCodigo(selectedProduct.getCodigo());
+        prodToCart.setCategoria(selectedProduct.getCategoria());
+        prodToCart.setDescuento(discount);
+        prodToCart.setPrecioCalculado(total);
+
         Venta v = new Venta();
-        v.setProducto(selectedProduct);
+        v.setProducto(prodToCart);
         v.setCantidad(qty);
+        v.setDescuento(discount);
         v.setTotal(total);
         v.setFecha(LocalDate.now());
 
         cartItems.add(v);
-        cartModel.addRow(new Object[]{selectedProduct.getProducto(), qty, String.format("$ %.2f", total)});
+        cartModel.addRow(new Object[]{selectedProduct.getProducto(), qty, String.format("$ %.2f", total), ""});
         updateTotal();
 
         // Reset
@@ -400,8 +766,36 @@ public class SalesPage extends JPanel {
     }
 
     private void updateTotal() {
-        double total = cartItems.stream().mapToDouble(Venta::getTotal).sum();
-        lblTotal.setText(String.format("TOTAL: $ %.2f", total));
+        double grandTotal = cartItems.stream().mapToDouble(Venta::getTotal).sum();
+        double grandSubtotal = cartItems.stream().mapToDouble(v -> v.getProducto() != null ? (v.getProducto().getPrecio() * v.getCantidad()) : v.getTotal()).sum();
+        double savings = grandSubtotal - grandTotal;
+        double effectiveDiscountPct = grandSubtotal > 0 ? (savings / grandSubtotal * 100.0) : 0.0;
+
+        int totalUnits = cartItems.stream().mapToInt(Venta::getCantidad).sum();
+        
+        lblTotal.setText(String.format("TOTAL: $ %.2f", grandTotal));
+        if (lblSubtotal != null) {
+            lblSubtotal.setText(String.format("$ %.2f", grandSubtotal));
+        }
+        if (lblDiscountSavings != null) {
+            if (savings > 0.01) {
+                lblDiscountSavings.setText(String.format("-$ %.2f (%.1f%%)", savings, effectiveDiscountPct));
+            } else {
+                lblDiscountSavings.setText("-$ 0.00 (0%)");
+            }
+        }
+        if (lblItemCount != null) {
+            lblItemCount.setText(totalUnits == 1 ? "1 ítem " : totalUnits + " ítems ");
+        }
+
+        if (centerCardPanel != null) {
+            CardLayout cl = (CardLayout) centerCardPanel.getLayout();
+            if (cartItems.isEmpty()) {
+                cl.show(centerCardPanel, "EMPTY");
+            } else {
+                cl.show(centerCardPanel, "CART");
+            }
+        }
     }
 
     private void syncClientState() {

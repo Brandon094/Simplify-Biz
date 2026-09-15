@@ -9,6 +9,8 @@ import java.util.Map;
 public class NeonPieChart extends JPanel {
     private final Map<String, Double> data;
     private final String title;
+    private final String iconPath;
+    private FlatSVGIcon svgIcon;
     private final Color[] neonColors = {
         ThemeConstants.NEON_PURPLE, // #A855F7
         ThemeConstants.NEON_BLUE,   // #3B82F6
@@ -25,9 +27,22 @@ public class NeonPieChart extends JPanel {
     private int hoverIndex = -1;
 
     public NeonPieChart(String title, Map<String, Double> data) {
+        this(title, "icons/chart-pie.svg", data);
+    }
+
+    public NeonPieChart(String title, String iconPath, Map<String, Double> data) {
         this.title = title;
+        this.iconPath = iconPath;
         this.data = data;
         setOpaque(false);
+        if (iconPath != null && !iconPath.isEmpty()) {
+            try {
+                svgIcon = new FlatSVGIcon(iconPath, 18, 18);
+                svgIcon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, ThemeConstants.NEON_PURPLE));
+            } catch (Exception e) {
+                svgIcon = null;
+            }
+        }
 
         java.awt.event.MouseAdapter adapter = new java.awt.event.MouseAdapter() {
             @Override
@@ -157,9 +172,14 @@ public class NeonPieChart extends JPanel {
         int padding = 16;
 
         // Título del gráfico
+        int titleX = padding;
+        if (svgIcon != null) {
+            svgIcon.paintIcon(this, g2, padding, 6);
+            titleX = padding + 26;
+        }
         g2.setColor(ThemeConstants.TEXT_PRIMARY);
-        g2.setFont(ThemeConstants.FONT_SUBTITLE);
-        g2.drawString(title, padding, padding + 10);
+        g2.setFont(ThemeConstants.FONT_SUBTITLE.deriveFont(Font.BOLD, 14f));
+        g2.drawString(title, titleX, 20);
 
         if (data == null || data.isEmpty()) {
             FlatSVGIcon emptyIcon = new FlatSVGIcon("icons/products.svg", 22, 22);

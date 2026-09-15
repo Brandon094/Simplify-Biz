@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mycompany</groupId>
-    <artifactId>Simplify-Biz</artifactId>
-    <version>1.3.0</version>
+    <artifactId>ERP-Plus-Business</artifactId>
+    <version>2.0.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -25,7 +25,7 @@
 
         <!--
           Carpeta visible dentro del proyecto donde se copia el JAR final tras
-          el `package`, para ejecutarlo como `java -jar dist/Simplify-Biz-1.3.0.jar`.
+          el `package`, para ejecutarlo como `java -jar dist/Simplify-Biz-2.0.0.jar`.
         -->
         <dist.dir>${project.basedir}/dist</dist.dir>
     </properties>
@@ -152,16 +152,14 @@
                 </executions>
             </plugin>
 
-            <!--
-              Copia el JAR final a ./dist/ tras el package, para que quede a mano
-              dentro del proyecto (el target real vive fuera, en disco nativo).
-              Ejecutar con:  java -jar dist/Simplify-Biz-1.3.0.jar
-            -->
+            <!-- Plugin para copiar el JAR a dist/ -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>3.1.0</version>
                 <executions>
+                    <!-- Copia el JAR sombreado resultante a la carpeta dist/ al finalizar -->
+                    <!-- el `package`, para ejecutarlo como `java -jar dist/ERP-Plus-Business-2.0.0.jar`. -->
                     <execution>
                         <id>copiar-jar-a-dist</id>
                         <phase>package</phase>
@@ -170,10 +168,8 @@
                         </goals>
                         <configuration>
                             <target>
-                                <mkdir dir="${dist.dir}"/>
-                                <copy file="${target.dir}/${project.build.finalName}.jar"
-                                      tofile="${dist.dir}/${project.build.finalName}.jar"
-                                      overwrite="true" verbose="true"/>
+                                <mkdir dir="${project.basedir}/dist"/>
+                                <copy file="${project.build.directory}/${project.build.finalName}.jar" tofile="${project.basedir}/dist/${project.build.finalName}.jar" overwrite="true"/>
                             </target>
                         </configuration>
                     </execution>

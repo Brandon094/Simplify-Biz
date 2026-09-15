@@ -18,191 +18,241 @@ import java.sql.Statement;
  */
 public class ExcelSQLiteManager {
 
-    public static void importarExcel(String rutaExcel, String nombreTabla) {
-        Connection conn = GestorConexion.getInstancia().obtenerConexion();
 
-        try {
-            if (conn != null) {
-                System.out.println("Conexión a SQLite establecida.");
 
-                try (FileInputStream fis = new FileInputStream(rutaExcel); Workbook workbook = new XSSFWorkbook(fis)) {
-                    // Recorrer todas las hojas del archivo Excel
-                    for (int sheetIndex = 0; sheetIndex < workbook.getNumberOfSheets(); sheetIndex++) {
-                        Sheet sheet = workbook.getSheetAt(sheetIndex);
-                        System.out.println("Procesando hoja: " + sheet.getSheetName());
-
-                        // Crear la tabla si no existe
-                        if (sheetIndex == 0) { // Solo se genera la tabla una vez
-                            String createTableSQL = generarSQLCreacionTabla(sheet, nombreTabla);
-                            try (PreparedStatement stmt = conn.prepareStatement(createTableSQL)) {
-                                stmt.executeUpdate();
-                                System.out.println("Tabla verificada/creada correctamente: " + nombreTabla);
-                            }
-                        }
-
-                        // Importar los datos de la hoja
-                        for (int i = 1; i <= sheet.getLastRowNum(); i++) { // Empezar en la segunda fila (i = 1)
-                            Row row = sheet.getRow(i);
-
-                            if (row == null) {
-                                continue; // Si la fila está vacía, saltar a la siguiente
-                            }
-
-                            // Leer los datos de las columnas
-                            String nombreProducto = obtenerValorCelda(row.getCell(0)); // Asumimos que la segunda columna es el nombre del producto
-                            double precio = obtenerValorNumerico(row.getCell(1)); // Asumimos que la tercera columna es el precio
-                            double cantidad = obtenerValorNumerico(row.getCell(2)); // Asumimos que la cuarta columna es la cantidad
-                            String codigoProducto = obtenerValorCelda(row.getCell(3)); // Asumimos que la primera columna es el código
-                            String categoria = obtenerValorCelda(row.getCell(4)); // Asumimos que la quinta columna es la categoría
-
-                            // Verificar si el producto ya existe
-                            String selectSQL = "SELECT cantidad FROM " + nombreTabla + " WHERE codigo = ?";
-                            try (PreparedStatement selectStmt = conn.prepareStatement(selectSQL)) {
-                                selectStmt.setString(1, codigoProducto);
-                                ResultSet rs = selectStmt.executeQuery();
-
-                                if (rs.next()) {
-                                    // Actualizar el producto si ya existe
-                                    double cantidadExistente = rs.getDouble("cantidad");
-                                    String updateSQL = "UPDATE " + nombreTabla + " SET cantidad = ?, categoria = ?, precio = ? WHERE codigo = ?";
-                                    try (PreparedStatement updateStmt = conn.prepareStatement(updateSQL)) {
-                                        updateStmt.setDouble(1, cantidadExistente + cantidad);
-                                        updateStmt.setString(2, categoria);
-                                        updateStmt.setDouble(3, precio);
-                                        updateStmt.setString(4, codigoProducto);
-                                        updateStmt.executeUpdate();
-                                    }
-                                } else {
-                                    // Insertar el producto si no existe
-                                    String insertSQL = "INSERT INTO " + nombreTabla + " (producto, precio, cantidad, codigo, categoria) VALUES (?, ?, ?, ?, ?)";
-                                    try (PreparedStatement insertStmt = conn.prepareStatement(insertSQL)) {
-                                        insertStmt.setString(1, nombreProducto);
-                                        insertStmt.setDouble(2, precio);
-                                        insertStmt.setDouble(3, cantidad);
-                                        insertStmt.setString(4, codigoProducto);
-                                        insertStmt.setString(5, categoria);
-                                        insertStmt.executeUpdate();
-                                    }
-                                }
-                            }
-                        }
+    /**
+     * Lee y retorna los nombres de cabecera de la primera fila del archivo Excel dado.
+     */
+    public static java.util.List<String> leerCabeceras(java.io.File archivo) throws IOException {
+        java.util.List<String> cabeceras = new java.util.ArrayList<>();
+        try (FileInputStream fis = new FileInputStream(archivo); Workbook workbook = WorkbookFactory.create(fis)) {
+            Sheet sheet = workbook.getSheetAt(0);
+            Row headerRow = sheet.getRow(0);
+            if (headerRow != null) {
+                for (int c = 0; c < headerRow.getLastCellNum(); c++) {
+                    Cell celda = headerRow.getCell(c);
+                    String val = celda != null ? obtenerValorTexto(celda) : "";
+                    if (!val.trim().isEmpty()) {
+                        cabeceras.add(val.trim());
+                    } else {
+                        cabeceras.add("Columna " + (c + 1));
                     }
-                    System.out.println("Datos importados correctamente.");
                 }
-            } else {
-                System.out.println("Error al establecer la conexión a la base de datos.");
             }
-        } catch (SQLException | IOException e) {
-            System.err.println("Error general: " + e.getMessage());
         }
+        return cabeceras;
     }
 
-    // Método para exportar datos desde una tabla SQLite a un archivo Excel
-    public static void exportarDatosAExcel(String nombreTabla, String rutaExcel) {
+    /**
+     * Lee hasta maxFilas de vista previa del archivo Excel.
+     */
+    public static java.util.List<Object[]> leerVistaPrevia(java.io.File archivo, int maxFilas) throws IOException {
+        java.util.List<Object[]> filas = new java.util.ArrayList<>();
+        try (FileInputStream fis = new FileInputStream(archivo); Workbook workbook = WorkbookFactory.create(fis)) {
+            Sheet sheet = workbook.getSheetAt(0);
+            int totalFilas = sheet.getLastRowNum();
+            for (int r = 1; r <= Math.min(totalFilas, maxFilas); r++) {
+                Row row = sheet.getRow(r);
+                if (row == null) continue;
+                int cols = row.getLastCellNum();
+                Object[] objFila = new Object[cols];
+                for (int c = 0; c < cols; c++) {
+                    Cell celda = row.getCell(c);
+                    objFila[c] = celda != null ? obtenerValorTexto(celda) : "";
+                }
+                filas.add(objFila);
+            }
+        }
+        return filas;
+    }
+
+    /**
+     * Importa productos desde Excel con mapeo dinámico de columnas y manejo defensivo de tipos.
+     */
+    public static ResultadoOperacion importarConMapeo(java.io.File archivo, java.util.Map<String, Integer> mapeo, String categoriaDefault) {
         Connection conn = GestorConexion.getInstancia().obtenerConexion();
-        FileOutputStream fos = null;
+        if (conn == null) {
+            return ResultadoOperacion.error("No hay conexión a la base de datos.");
+        }
 
-        try {
-            if (conn != null) {
-                System.out.println("Conexión a SQLite establecida.");
+        int creados = 0;
+        int actualizados = 0;
+        int omitidos = 0;
 
-                // Crear un libro de trabajo y una hoja de Excel
-                Workbook workbook = new XSSFWorkbook();
-                Sheet sheet = workbook.createSheet(nombreTabla);
+        try (FileInputStream fis = new FileInputStream(archivo); Workbook workbook = WorkbookFactory.create(fis)) {
+            Sheet sheet = workbook.getSheetAt(0);
+            int totalFilas = sheet.getLastRowNum();
 
-                // Ejecutar una consulta para obtener los datos de la tabla sin la columna id
-                String query = "SELECT producto, precio, cantidad, codigo, categoria FROM " + nombreTabla; // Omitir 'id'
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(query);
+            String selectSQL = "SELECT cantidad, precio, precio_costo FROM productos WHERE codigo = ?";
+            String insertSQL = "INSERT INTO productos (producto, precio, precio_costo, cantidad, codigo, categoria) VALUES (?, ?, ?, ?, ?, ?)";
+            String updateSQL = "UPDATE productos SET cantidad = cantidad + ?, precio = ?, precio_costo = ?, categoria = ? WHERE codigo = ?";
 
-                // Obtener los metadatos de las columnas
-                int columnCount = rs.getMetaData().getColumnCount();
+            conn.setAutoCommit(false); // Transacción atómica por lote
 
-                // Crear la fila de encabezado en la primera fila del Excel
-                Row headerRow = sheet.createRow(0);
-                for (int i = 1; i <= columnCount; i++) {
-                    Cell cell = headerRow.createCell(i - 1);
-                    cell.setCellValue(rs.getMetaData().getColumnName(i));
+            for (int i = 1; i <= totalFilas; i++) {
+                Row row = sheet.getRow(i);
+                if (row == null) continue;
+
+                // Extraer valores según mapeo (-1 indica no asignado)
+                Integer idxNombre = mapeo.get("nombre");
+                Integer idxCodigo = mapeo.get("codigo");
+                Integer idxPrecio = mapeo.get("precio");
+                Integer idxCosto = mapeo.get("precio_costo");
+                Integer idxStock = mapeo.get("cantidad");
+                Integer idxCat = mapeo.get("categoria");
+
+                String nombre = (idxNombre != null && idxNombre >= 0) ? obtenerValorTexto(row.getCell(idxNombre)) : "";
+                String codigo = (idxCodigo != null && idxCodigo >= 0) ? obtenerValorTexto(row.getCell(idxCodigo)) : "";
+                double precio = (idxPrecio != null && idxPrecio >= 0) ? obtenerValorDoubleDefensivo(row.getCell(idxPrecio)) : 0.0;
+                double costo = (idxCosto != null && idxCosto >= 0) ? obtenerValorDoubleDefensivo(row.getCell(idxCosto)) : 0.0;
+                int stock = (idxStock != null && idxStock >= 0) ? (int) Math.round(obtenerValorDoubleDefensivo(row.getCell(idxStock))) : 1;
+                String cat = (idxCat != null && idxCat >= 0) ? obtenerValorTexto(row.getCell(idxCat)) : "";
+
+                if (cat.trim().isEmpty()) {
+                    cat = (categoriaDefault != null && !categoriaDefault.trim().isEmpty()) ? categoriaDefault.trim() : "GENERAL";
                 }
 
-                // Escribir los datos en las filas siguientes
-                int rowIndex = 1;
-                while (rs.next()) {
-                    Row row = sheet.createRow(rowIndex++);
-                    for (int i = 1; i <= columnCount; i++) {
-                        Cell cell = row.createCell(i - 1);
-                        cell.setCellValue(rs.getString(i));
+                // Autogenerar código SKU si viene vacío
+                if (codigo.trim().isEmpty()) {
+                    if (nombre.trim().isEmpty()) {
+                        omitidos++;
+                        continue; // Fila vacía
+                    }
+                    codigo = "SKU-IMP-" + System.currentTimeMillis() + "-" + i;
+                }
+
+                if (nombre.trim().isEmpty()) {
+                    nombre = "Producto " + codigo;
+                }
+
+                // Verificar si existe el producto en SQLite
+                try (PreparedStatement psSelect = conn.prepareStatement(selectSQL)) {
+                    psSelect.setString(1, codigo.trim());
+                    ResultSet rs = psSelect.executeQuery();
+
+                    if (rs.next()) {
+                        // Actualizar producto existente (Upsert)
+                        try (PreparedStatement psUp = conn.prepareStatement(updateSQL)) {
+                            psUp.setInt(1, Math.max(0, stock));
+                            psUp.setDouble(2, precio > 0 ? precio : rs.getDouble("precio"));
+                            psUp.setDouble(3, costo > 0 ? costo : rs.getDouble("precio_costo"));
+                            psUp.setString(4, cat.toUpperCase());
+                            psUp.setString(5, codigo.trim());
+                            psUp.executeUpdate();
+                            actualizados++;
+                        }
+                    } else {
+                        // Insertar nuevo producto
+                        try (PreparedStatement psIn = conn.prepareStatement(insertSQL)) {
+                            psIn.setString(1, nombre.trim());
+                            psIn.setDouble(2, precio);
+                            psIn.setDouble(3, costo);
+                            psIn.setInt(4, Math.max(0, stock));
+                            psIn.setString(5, codigo.trim());
+                            psIn.setString(6, cat.toUpperCase());
+                            psIn.executeUpdate();
+                            creados++;
+                        }
                     }
                 }
-
-                // Escribir el libro de Excel en el archivo
-                fos = new FileOutputStream(rutaExcel);
-                workbook.write(fos);
-
-                System.out.println("Datos exportados correctamente a " + rutaExcel);
-
-                // Cerrar recursos
-                rs.close();
-                stmt.close();
-                workbook.close();
-            } else {
-                System.out.println("Error al establecer la conexión a la base de datos.");
             }
-        } catch (SQLException | IOException e) {
-            System.out.println("Error: " + e.getMessage());
-        } finally {
-            try {
-                if (fos != null) {
-                    fos.close();
-                }
-            } catch (IOException e) {
-                System.out.println("Error al cerrar el archivo: " + e.getMessage());
-            }
+
+            conn.commit();
+            conn.setAutoCommit(true);
+
+            String msg = String.format("Importación completada: %d creados, %d actualizados, %d omitidos.", creados, actualizados, omitidos);
+            return ResultadoOperacion.ok(msg);
+
+        } catch (Exception e) {
+            try { conn.rollback(); conn.setAutoCommit(true); } catch (SQLException ignored) {}
+            return ResultadoOperacion.error("Error durante la importación: " + e.getMessage());
         }
     }
 
     /**
-     * Genera la sentencia SQL para crear una tabla en SQLite con el mismo
-     * esquema que la primera fila de un archivo Excel.
-     *
-     * @param sheet La hoja del archivo Excel que contiene los datos.
-     * @param nombreTabla Nombre de la tabla que se creará en SQLite.
-     * @return La sentencia SQL para crear la tabla.
+     * Genera un archivo Excel (.xlsx) con la plantilla modelo oficial ERP+ Business.
      */
-    private static String generarSQLCreacionTabla(Sheet sheet, String nombreTabla) {
-        Row headerRow = sheet.getRow(0);
-        StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
-        sb.append(nombreTabla).append(" (");
+    public static ResultadoOperacion generarPlantillaModelo(java.io.File archivoDestino) {
+        try (Workbook workbook = new XSSFWorkbook(); FileOutputStream fos = new FileOutputStream(archivoDestino)) {
+            Sheet sheet = workbook.createSheet("Productos ERP+");
 
-        for (int j = 0; j < headerRow.getLastCellNum(); j++) {
-            String columnName = headerRow.getCell(j).getStringCellValue().trim();
-            // Ajusta la columna de categoría para que acepte NULL o tenga un valor predeterminado
-            if (columnName.equalsIgnoreCase("categoria")) {
-                sb.append(columnName).append(" TEXT DEFAULT 'Sin Categoría'"); // Establece valor por defecto
-            } else {
-                sb.append(columnName).append(" TEXT");
+            // Estilos de Encabezado
+            CellStyle headerStyle = workbook.createCellStyle();
+            Font font = workbook.createFont();
+            font.setBold(true);
+            font.setColor(IndexedColors.WHITE.getIndex());
+            headerStyle.setFont(font);
+            headerStyle.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
+            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+            // Cabeceras
+            String[] cabeceras = {"CÓDIGO SKU", "NOMBRE DEL PRODUCTO", "PRECIO VENTA", "PRECIO COSTO", "CANTIDAD STOCK", "CATEGORÍA"};
+            Row headerRow = sheet.createRow(0);
+            for (int i = 0; i < cabeceras.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(cabeceras[i]);
+                cell.setCellStyle(headerStyle);
             }
 
-            if (j < headerRow.getLastCellNum() - 1) {
-                sb.append(", ");
+            // Datos de Ejemplo
+            Object[][] ejemplos = {
+                {"SKU-001", "Filtro de Aceite Universal", 25000.0, 15000.0, 20, "LUBRICANTES"},
+                {"SKU-002", "Kit Pastillas de Freno Delanteras", 85000.0, 52000.0, 10, "FRENOS"},
+                {"SKU-003", "Batería 12V 100Ah Heavy Duty", 320000.0, 210000.0, 5, "ELÉCTRICO"}
+            };
+
+            for (int r = 0; r < ejemplos.length; r++) {
+                Row row = sheet.createRow(r + 1);
+                for (int c = 0; c < ejemplos[r].length; c++) {
+                    Cell cell = row.createCell(c);
+                    if (ejemplos[r][c] instanceof Number) {
+                        cell.setCellValue(((Number) ejemplos[r][c]).doubleValue());
+                    } else {
+                        cell.setCellValue(ejemplos[r][c].toString());
+                    }
+                }
             }
+
+            for (int i = 0; i < cabeceras.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            workbook.write(fos);
+            return ResultadoOperacion.ok("Plantilla modelo guardada exitosamente en:\n" + archivoDestino.getAbsolutePath());
+        } catch (IOException e) {
+            return ResultadoOperacion.error("Error al generar la plantilla: " + e.getMessage());
         }
-        sb.append(");");
-        return sb.toString();
     }
 
-    private static String obtenerValorCelda(Cell celda) {
-        if (celda == null) {
-            return "";
+    private static String obtenerValorTexto(Cell celda) {
+        if (celda == null) return "";
+        switch (celda.getCellType()) {
+            case STRING: return celda.getStringCellValue().trim();
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(celda)) {
+                    return celda.getDateCellValue().toString();
+                }
+                double num = celda.getNumericCellValue();
+                if (num == (long) num) {
+                    return String.format("%d", (long) num);
+                } else {
+                    return String.format("%.2f", num);
+                }
+            case BOOLEAN: return String.valueOf(celda.getBooleanCellValue());
+            case FORMULA:
+                try { return celda.getStringCellValue(); } 
+                catch (Exception e) { return String.valueOf(celda.getNumericCellValue()); }
+            default: return "";
         }
-        return celda.getCellType() == CellType.STRING ? celda.getStringCellValue().trim() : "";
     }
 
-    private static double obtenerValorNumerico(Cell celda) {
-        if (celda == null) {
-            return 0.0;
+    private static double obtenerValorDoubleDefensivo(Cell celda) {
+        if (celda == null) return 0.0;
+        if (celda.getCellType() == CellType.NUMERIC) {
+            return celda.getNumericCellValue();
         }
-        return celda.getCellType() == CellType.NUMERIC ? celda.getNumericCellValue() : 0.0;
+        String txt = obtenerValorTexto(celda);
+        return Validaciones.limpiarFormatoMoneda(txt);
     }
-
 }
+

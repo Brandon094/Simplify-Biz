@@ -30,6 +30,7 @@ public class ThemeConstants {
     public static Color NEON_CYAN;
     public static Color NEON_GREEN;
     public static Color NEON_RED;
+    public static Color NEON_AMBER;
 
     // ---- Colores de Texto ----
     public static Color TEXT_PRIMARY;
@@ -50,8 +51,15 @@ public class ThemeConstants {
     public static Color ACTIVE_BACKGROUND;
     /** Panel de marca en la pantalla de login (se mantiene oscuro como acento). */
     public static Color BRAND_BACKGROUND;
+    public static Color BRAND_TEXT_PRIMARY;
+    public static Color BRAND_TEXT_SECONDARY;
     /** Líneas de la cuadrícula de las gráficas. */
     public static Color GRID_LINE;
+    /** Fondo de selección en tablas (variantes con alfa por color de acento). */
+    public static Color SELECTION_PURPLE;
+    public static Color SELECTION_CYAN;
+    public static Color SELECTION_GREEN;
+    public static Color SELECTION_BLUE;
 
     // ---- Tamaños táctiles (accesibilidad/uso en pantallas pequeñas) ----
     /** Altura mínima recomendada para objetivos táctiles (botones, campos). */
@@ -101,6 +109,7 @@ public class ThemeConstants {
             NEON_CYAN = decode("#06B6D4");
             NEON_GREEN = decode("#22C55E");
             NEON_RED = decode("#EF4444");
+            NEON_AMBER = decode("#F59E0B");
 
             TEXT_PRIMARY = decode("#FFFFFF");
             TEXT_SECONDARY = decode("#94A3B8");
@@ -112,7 +121,13 @@ public class ThemeConstants {
             HOVER_BACKGROUND = new Color(255, 255, 255, 10);
             ACTIVE_BACKGROUND = new Color(168, 85, 247, 30);
             BRAND_BACKGROUND = new Color(17, 24, 39);
+            BRAND_TEXT_PRIMARY = decode("#FFFFFF");
+            BRAND_TEXT_SECONDARY = decode("#94A3B8");
             GRID_LINE = new Color(148, 163, 184, 35);
+            SELECTION_PURPLE = new Color(168, 85, 247, 70);
+            SELECTION_CYAN = new Color(6, 182, 212, 70);
+            SELECTION_GREEN = new Color(34, 197, 94, 70);
+            SELECTION_BLUE = new Color(59, 130, 246, 70);
         } else {
             // ---- PALETA CLARA ----
             BACKGROUND = decode("#EEF2F7");
@@ -124,6 +139,7 @@ public class ThemeConstants {
             NEON_CYAN = decode("#0891B2");
             NEON_GREEN = decode("#16A34A");
             NEON_RED = decode("#DC2626");
+            NEON_AMBER = decode("#D97706");
 
             TEXT_PRIMARY = decode("#0F172A");
             TEXT_SECONDARY = decode("#475569");
@@ -134,9 +150,20 @@ public class ThemeConstants {
             CARD_BORDER = new Color(148, 163, 184, 120);
             HOVER_BACKGROUND = new Color(226, 232, 240, 120);
             ACTIVE_BACKGROUND = new Color(168, 85, 247, 35);
-            BRAND_BACKGROUND = new Color(30, 41, 59);
+            BRAND_BACKGROUND = new Color(17, 24, 39);
+            BRAND_TEXT_PRIMARY = decode("#FFFFFF");
+            BRAND_TEXT_SECONDARY = decode("#94A3B8");
             GRID_LINE = new Color(148, 163, 184, 70);
+            SELECTION_PURPLE = new Color(124, 58, 237, 50);
+            SELECTION_CYAN = new Color(8, 145, 178, 50);
+            SELECTION_GREEN = new Color(22, 163, 74, 50);
+            SELECTION_BLUE = new Color(37, 99, 235, 50);
         }
+    }
+
+    /** Devuelve el color con la transparencia indicada (0–255). */
+    public static Color withAlpha(Color c, int alpha) {
+        return new Color(c.getRed(), c.getGreen(), c.getBlue(), alpha);
     }
 
     private static Color decode(String hex) {

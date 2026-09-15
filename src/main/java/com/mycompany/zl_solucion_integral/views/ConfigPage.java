@@ -1,231 +1,324 @@
 package com.mycompany.zl_solucion_integral.views;
 
+import com.mycompany.zl_solucion_integral.config.LicenciaManager;
 import com.mycompany.zl_solucion_integral.config.SelecionRuta;
 import com.mycompany.zl_solucion_integral.views.components.LayoutResponsive;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
+import com.mycompany.zl_solucion_integral.views.components.UIUtils;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonButton;
 import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
-import com.mycompany.zl_solucion_integral.views.components.UIUtils;
+import com.mycompany.zl_solucion_integral.views.components.dialogs.LicenciaDialog;
+import com.mycompany.zl_solucion_integral.views.components.dialogs.ManualUsuarioDialog;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
+
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+/**
+ * Vista principal de Configuración del Sistema de ERP+ Business.
+ * Presenta el almacenamiento de BD, la gestión de licencias criptográficas,
+ * acceso directo al Manual de Usuario y la telemetría del sistema con estética Neón Cyberpunk.
+ */
 public class ConfigPage extends JPanel {
+
     private JTextField txtDbPath;
-    private JPanel contentDb;
-    private NeonButton btnCambiarRuta;
-    /** Filas "etiqueta / valor" del panel de informacion, para reflow en movil. */
-    private final java.util.List<JPanel> filasDatos = new java.util.ArrayList<>();
 
     public ConfigPage() {
         setOpaque(false);
-        setLayout(new BorderLayout(20, 20));
-        setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+        setLayout(new BorderLayout(0, 0));
 
-        // Header (microcopy de contexto)
-        JPanel headerPanel = new JPanel();
-        headerPanel.setOpaque(false);
-        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+        // Panel Principal dentro de ScrollPane para navegación fluida
+        JPanel scrollContent = new JPanel();
+        scrollContent.setOpaque(false);
+        scrollContent.setLayout(new BoxLayout(scrollContent, BoxLayout.Y_AXIS));
+        scrollContent.setBorder(new EmptyBorder(10, 20, 20, 20));
 
-        JPanel titleRow = UIUtils.createWrappingTitleRow("icons/settings.svg",
-                ThemeConstants.NEON_PURPLE, 24, "Configuración del sistema",
-                ThemeConstants.FONT_TITLE, ThemeConstants.TEXT_PRIMARY);
-        titleRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+        // 1. Tarjeta: Base de Datos
+        JPanel dbCard = createDbConfigPanel();
+        dbCard.setAlignmentX(Component.LEFT_ALIGNMENT);
+        scrollContent.add(dbCard);
+        scrollContent.add(Box.createVerticalStrut(18));
 
-        JTextArea subtitle = UIUtils.createWrappingLabel(
-                "Ajusta el almacenamiento y conoce los detalles técnicos de tu instalación",
-                ThemeConstants.FONT_SMALL, ThemeConstants.TEXT_SECONDARY);
-        subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        // 2. Tarjeta: Licencia y Activación
+        JPanel licenseCard = createLicensePanel();
+        licenseCard.setAlignmentX(Component.LEFT_ALIGNMENT);
+        scrollContent.add(licenseCard);
+        scrollContent.add(Box.createVerticalStrut(18));
 
-        headerPanel.add(titleRow);
-        headerPanel.add(Box.createVerticalStrut(4));
-        headerPanel.add(subtitle);
-        add(headerPanel, BorderLayout.NORTH);
+        // 3. Tarjeta: Manual de Usuario & Centro de Ayuda
+        JPanel manualCard = createManualHelpPanel();
+        manualCard.setAlignmentX(Component.LEFT_ALIGNMENT);
+        scrollContent.add(manualCard);
+        scrollContent.add(Box.createVerticalStrut(18));
 
-        // Contenido Principal
-        JPanel mainContent = new JPanel(new GridBagLayout());
-        mainContent.setOpaque(false);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
-        gbc.gridx = 0;
-        gbc.anchor = GridBagConstraints.NORTH;
+        // 4. Tarjeta: Información del Sistema
+        JPanel infoCard = createInfoPanel();
+        infoCard.setAlignmentX(Component.LEFT_ALIGNMENT);
+        scrollContent.add(infoCard);
 
-        // Sección Base de Datos
-        gbc.gridy = 0;
-        mainContent.add(createDbConfigPanel(), gbc);
+        JScrollPane scrollPane = new JScrollPane(scrollContent);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-        // Sección Información del Sistema
-        gbc.gridy = 1;
-        gbc.insets = new Insets(30, 0, 0, 0);
-        mainContent.add(createInfoPanel(), gbc);
-
-        // Espaciador para empujar todo hacia arriba
-        gbc.gridy = 2;
-        gbc.weighty = 1.0;
-        mainContent.add(Box.createVerticalGlue(), gbc);
-
-        add(mainContent, BorderLayout.CENTER);
-
-        // Adaptabilidad: en movil las filas "etiqueta / valor" se apilan.
-        LayoutResponsive.listen(this, bp -> {
-            boolean movil = LayoutResponsive.esColumnaUnica(bp);
-            for (JPanel row : filasDatos) {
-                aplicarFilaResponsive(row, movil);
-            }
-            if (contentDb != null) {
-                contentDb.setLayout(movil
-                        ? new BorderLayout(0, 10)
-                        : new BorderLayout(10, 10));
-                contentDb.removeAll();
-                if (movil) {
-                    contentDb.add(txtDbPath, BorderLayout.NORTH);
-                    contentDb.add(btnCambiarRuta, BorderLayout.CENTER);
-                } else {
-                    contentDb.add(txtDbPath, BorderLayout.CENTER);
-                    contentDb.add(btnCambiarRuta, BorderLayout.EAST);
-                }
-                contentDb.revalidate();
-                contentDb.repaint();
-            }
-            revalidate();
-            repaint();
-        });
-    }
-
-    /** En movil, el valor de una fila pasa debajo de su etiqueta. */
-    private void aplicarFilaResponsive(JPanel row, boolean movil) {
-        if (row.getComponentCount() < 2) {
-            return;
-        }
-        Component labelPanel = row.getComponent(0);
-        Component valueComp = row.getComponent(1);
-        row.removeAll();
-        row.setLayout(movil ? new GridLayout(2, 1, 0, 2) : new BorderLayout());
-        row.add(labelPanel, movil ? null : BorderLayout.WEST);
-        row.add(valueComp, movil ? null : BorderLayout.EAST);
-        row.revalidate();
-        row.repaint();
+        add(scrollPane, BorderLayout.CENTER);
     }
 
     private JPanel createDbConfigPanel() {
-        RoundedPanel p = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
-        p.setLayout(new BorderLayout(15, 15));
-        p.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
+        RoundedPanel p = new RoundedPanel(18, ThemeConstants.CARD_BACKGROUND);
+        p.setLayout(new BorderLayout(0, 14));
+        p.setBorder(new EmptyBorder(20, 22, 20, 22));
 
-        JLabel lblTitle = new JLabel("Base de datos", createIcon("icons/database.svg", ThemeConstants.NEON_BLUE, 20, 20), SwingConstants.LEFT);
+        // Header Tarjeta
+        JPanel cardHeader = new JPanel(new BorderLayout());
+        cardHeader.setOpaque(false);
+
+        JLabel lblTitle = new JLabel("Base de Datos Local", createIcon("icons/database.svg", ThemeConstants.NEON_BLUE, 20, 20), SwingConstants.LEFT);
         lblTitle.setForeground(ThemeConstants.NEON_BLUE);
         lblTitle.setFont(ThemeConstants.FONT_SUBTITLE);
-        p.add(lblTitle, BorderLayout.NORTH);
+        lblTitle.setIconTextGap(10);
 
-        contentDb = new JPanel(new BorderLayout(10, 10));
-        contentDb.setOpaque(false);
-        JPanel content = contentDb;
+        JLabel badgeStatus = createBadge("SQLITE (WAL)", ThemeConstants.NEON_BLUE);
+
+        cardHeader.add(lblTitle, BorderLayout.WEST);
+        cardHeader.add(badgeStatus, BorderLayout.EAST);
+        p.add(cardHeader, BorderLayout.NORTH);
+
+        // Body Tarjeta (Input + Botón)
+        JPanel contentRow = new JPanel(new BorderLayout(14, 0));
+        contentRow.setOpaque(false);
 
         txtDbPath = new JTextField(SelecionRuta.cargarRutaBaseDatos());
         txtDbPath.setEditable(false);
+        txtDbPath.setPreferredSize(new Dimension(0, 42));
         txtDbPath.setBackground(ThemeConstants.INPUT_BACKGROUND);
-        txtDbPath.setForeground(ThemeConstants.TEXT_SECONDARY);
+        txtDbPath.setForeground(ThemeConstants.TEXT_PRIMARY);
+        txtDbPath.setFont(ThemeConstants.FONT_BODY);
+        txtDbPath.setCaretColor(ThemeConstants.NEON_BLUE);
 
-        JLabel icon = new JLabel(createIcon("icons/database.svg", ThemeConstants.TEXT_SECONDARY, 17, 17));
-        icon.setForeground(ThemeConstants.TEXT_SECONDARY);
-        icon.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        JLabel icon = new JLabel(createIcon("icons/folder.svg", ThemeConstants.TEXT_SECONDARY, 16, 16));
+        icon.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 8));
         txtDbPath.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_COMPONENT, icon);
 
         txtDbPath.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeConstants.INPUT_BORDER, 1),
-            BorderFactory.createEmptyBorder(10, 15, 10, 15)
+                BorderFactory.createLineBorder(ThemeConstants.INPUT_BORDER, 1),
+                BorderFactory.createEmptyBorder(6, 10, 6, 10)
         ));
-        content.add(txtDbPath, BorderLayout.CENTER);
+        contentRow.add(txtDbPath, BorderLayout.CENTER);
 
-        btnCambiarRuta = new NeonButton("Cambiar ruta");
+        NeonButton btnCambiarRuta = new NeonButton("Cambiar Carpeta");
         btnCambiarRuta.setNeonColor(ThemeConstants.NEON_BLUE);
-        btnCambiarRuta.setIcon(createIcon("icons/settings.svg", ThemeConstants.NEON_BLUE, 17, 17));
+        btnCambiarRuta.setIcon(createIcon("icons/folder.svg", ThemeConstants.NEON_BLUE, 16, 16));
         btnCambiarRuta.setIconTextGap(8);
-        btnCambiarRuta.setPreferredSize(new Dimension(150, ThemeConstants.TOUCH_TARGET_MIN));
-        btnCambiarRuta.setMinimumSize(new Dimension(0, ThemeConstants.TOUCH_TARGET_MIN));
+        btnCambiarRuta.setPreferredSize(new Dimension(170, 42));
         btnCambiarRuta.addActionListener(e -> changeDbPath());
-        btnCambiarRuta.setToolTipText("Selecciona una nueva carpeta donde se guardará la base de datos. Requiere reiniciar la aplicación.");
-        content.add(btnCambiarRuta, BorderLayout.EAST);
+        btnCambiarRuta.setToolTipText("Selecciona una nueva carpeta de almacenamiento para la base de datos.");
+        contentRow.add(btnCambiarRuta, BorderLayout.EAST);
 
-        p.add(content, BorderLayout.CENTER);
+        p.add(contentRow, BorderLayout.CENTER);
 
-        JTextArea lblHint = UIUtils.createWrappingLabel(
-                "Respalde db.db antes de mover la ruta de almacenamiento.",
-                ThemeConstants.FONT_SMALL.deriveFont(Font.ITALIC), ThemeConstants.TEXT_SECONDARY);
+        // Footer Hint
+        JLabel lblHint = new JLabel("💡 Nota: Respalda db.db antes de mover la ruta de almacenamiento. Requiere reiniciar la aplicación.");
+        lblHint.setFont(ThemeConstants.FONT_SMALL);
+        lblHint.setForeground(ThemeConstants.TEXT_SECONDARY);
         p.add(lblHint, BorderLayout.SOUTH);
 
         return p;
     }
 
+    private JPanel createLicensePanel() {
+        RoundedPanel p = new RoundedPanel(18, ThemeConstants.CARD_BACKGROUND);
+        p.setLayout(new BorderLayout(0, 14));
+        p.setBorder(new EmptyBorder(20, 22, 20, 22));
+
+        // Header Tarjeta
+        JPanel cardHeader = new JPanel(new BorderLayout());
+        cardHeader.setOpaque(false);
+
+        JLabel lblTitle = new JLabel("Licencia & Activación de Software", createIcon("icons/license.svg", ThemeConstants.NEON_GREEN, 20, 20), SwingConstants.LEFT);
+        lblTitle.setForeground(ThemeConstants.NEON_GREEN);
+        lblTitle.setFont(ThemeConstants.FONT_SUBTITLE);
+        lblTitle.setIconTextGap(10);
+
+        LicenciaManager.InfoLicencia info = LicenciaManager.obtenerInfoLicencia();
+        boolean isPro = info.getEstado() == LicenciaManager.EstadoLicencia.PRO_ACTIVA;
+        JLabel badgeStatus = createBadge(isPro ? "PRO ACTIVA" : "DEMO (" + info.getDiasRestantes() + " DÍAS)", isPro ? ThemeConstants.NEON_GREEN : ThemeConstants.NEON_CYAN);
+
+        cardHeader.add(lblTitle, BorderLayout.WEST);
+        cardHeader.add(badgeStatus, BorderLayout.EAST);
+        p.add(cardHeader, BorderLayout.NORTH);
+
+        // Body Tarjeta
+        JPanel contentRow = new JPanel(new BorderLayout(14, 0));
+        contentRow.setOpaque(false);
+
+        String desc = "Estado de Licencia: " + info.getEstado().getDescripcion() +
+                (isPro ? " — Registrado a: " + info.getCliente() : " — Período de evaluación de 30 días.");
+        JLabel lblInfo = new JLabel(desc);
+        lblInfo.setForeground(ThemeConstants.TEXT_PRIMARY);
+        lblInfo.setFont(ThemeConstants.FONT_BODY);
+        contentRow.add(lblInfo, BorderLayout.CENTER);
+
+        NeonButton btnLicencia = new NeonButton("Administrar Licencia");
+        btnLicencia.setNeonColor(ThemeConstants.NEON_GREEN);
+        btnLicencia.setIcon(createIcon("icons/license.svg", ThemeConstants.NEON_GREEN, 16, 16));
+        btnLicencia.setIconTextGap(8);
+        btnLicencia.setPreferredSize(new Dimension(200, 42));
+        btnLicencia.addActionListener(e -> {
+            Frame topFrame = (Frame) SwingUtilities.getWindowAncestor(this);
+            LicenciaDialog dialog = new LicenciaDialog(topFrame, () -> {
+                // Refresh al actualizar licencia
+                removeAll();
+                add(new ConfigPage(), BorderLayout.CENTER);
+                revalidate();
+                repaint();
+            });
+            dialog.setVisible(true);
+        });
+        contentRow.add(btnLicencia, BorderLayout.EAST);
+
+        p.add(contentRow, BorderLayout.CENTER);
+        return p;
+    }
+
+    private JPanel createManualHelpPanel() {
+        RoundedPanel p = new RoundedPanel(18, ThemeConstants.CARD_BACKGROUND);
+        p.setLayout(new BorderLayout(0, 14));
+        p.setBorder(new EmptyBorder(20, 22, 20, 22));
+
+        // Header Tarjeta
+        JPanel cardHeader = new JPanel(new BorderLayout());
+        cardHeader.setOpaque(false);
+
+        JLabel lblTitle = new JLabel("Manual de Usuario & Centro de Ayuda", createIcon("icons/manual.svg", ThemeConstants.NEON_PURPLE, 20, 20), SwingConstants.LEFT);
+        lblTitle.setForeground(ThemeConstants.NEON_PURPLE);
+        lblTitle.setFont(ThemeConstants.FONT_SUBTITLE);
+        lblTitle.setIconTextGap(10);
+
+        JLabel badgeStatus = createBadge("DOCUMENTACIÓN OFICIAL", ThemeConstants.NEON_PURPLE);
+
+        cardHeader.add(lblTitle, BorderLayout.WEST);
+        cardHeader.add(badgeStatus, BorderLayout.EAST);
+        p.add(cardHeader, BorderLayout.NORTH);
+
+        // Body Tarjeta
+        JPanel contentRow = new JPanel(new BorderLayout(14, 0));
+        contentRow.setOpaque(false);
+
+        JLabel lblInfo = new JLabel("Consulta guías interactivas, preguntas frecuentes y procedimientos operativos sin salir de la app.");
+        lblInfo.setForeground(ThemeConstants.TEXT_PRIMARY);
+        lblInfo.setFont(ThemeConstants.FONT_BODY);
+        contentRow.add(lblInfo, BorderLayout.CENTER);
+
+        NeonButton btnManual = new NeonButton("Abrir Manual de Usuario");
+        btnManual.setNeonColor(ThemeConstants.NEON_PURPLE);
+        btnManual.setIcon(createIcon("icons/manual.svg", ThemeConstants.NEON_PURPLE, 16, 16));
+        btnManual.setIconTextGap(8);
+        btnManual.setPreferredSize(new Dimension(220, 42));
+        btnManual.addActionListener(e -> {
+            Frame topFrame = (Frame) SwingUtilities.getWindowAncestor(this);
+            ManualUsuarioDialog dialog = new ManualUsuarioDialog(topFrame);
+            dialog.setVisible(true);
+        });
+        contentRow.add(btnManual, BorderLayout.EAST);
+
+        p.add(contentRow, BorderLayout.CENTER);
+        return p;
+    }
+
     private JPanel createInfoPanel() {
-        RoundedPanel p = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
-        p.setLayout(new GridLayout(4, 1, 10, 10));
-        p.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
+        RoundedPanel p = new RoundedPanel(18, ThemeConstants.CARD_BACKGROUND);
+        p.setLayout(new BorderLayout(0, 16));
+        p.setBorder(new EmptyBorder(20, 22, 20, 22));
 
-        p.add(createDataRow("Versión del software", "1.3.0", "icons/version-code.svg", ThemeConstants.NEON_PURPLE));
-        p.add(createDataRow("Motor de base de datos", "SQLite 3.46", "icons/database.svg", ThemeConstants.NEON_BLUE));
-        p.add(createDataRow("Licencia", "Pago único (ERP+ Business)", "icons/license.svg", ThemeConstants.NEON_GREEN));
-        p.add(createDeveloperRow());
+        JLabel lblTitle = new JLabel("Información y Telemetría del Sistema", createIcon("icons/info.svg", ThemeConstants.NEON_CYAN, 20, 20), SwingConstants.LEFT);
+        lblTitle.setForeground(ThemeConstants.NEON_CYAN);
+        lblTitle.setFont(ThemeConstants.FONT_SUBTITLE);
+        lblTitle.setIconTextGap(10);
+        p.add(lblTitle, BorderLayout.NORTH);
 
+        JPanel gridPanel = new JPanel(new GridLayout(4, 1, 0, 12));
+        gridPanel.setOpaque(false);
+
+        gridPanel.add(createDataRow("Versión del Software", "2.0.0 (Enterprise Major)", "icons/version-code.svg", ThemeConstants.NEON_PURPLE));
+        gridPanel.add(createDataRow("Motor de Base de Datos", "SQLite 3.46 (WAL Mode)", "icons/database.svg", ThemeConstants.NEON_BLUE));
+        gridPanel.add(createDataRow("Licenciamiento Criptográfico", "RSA-2048 Hardware-Bound", "icons/license.svg", ThemeConstants.NEON_GREEN));
+        gridPanel.add(createDeveloperRow());
+
+        p.add(gridPanel, BorderLayout.CENTER);
         return p;
     }
 
     private JPanel createDataRow(String label, String value, String iconPath, Color iconColor) {
         JLabel valueLabel = new JLabel(value);
-        valueLabel.setForeground(ThemeConstants.NEON_PURPLE);
+        valueLabel.setForeground(iconColor);
         valueLabel.setFont(ThemeConstants.FONT_BODY.deriveFont(Font.BOLD));
         return createDataRow(label, valueLabel, iconPath, iconColor);
     }
 
-    private JPanel createDataRow(String label, JLabel valueLabel, String iconPath, Color iconColor) {
+    private JPanel createDataRow(String label, Component valueComp, String iconPath, Color iconColor) {
         JPanel row = new JPanel(new BorderLayout());
         row.setOpaque(false);
-        filasDatos.add(row);
+        row.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeConstants.CARD_BORDER),
+                new EmptyBorder(4, 0, 8, 0)
+        ));
 
         JLabel icon = new JLabel(createIcon(iconPath, iconColor, 18, 18));
-        icon.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+        icon.setBorder(new EmptyBorder(0, 0, 0, 10));
 
         JLabel lblLabel = new JLabel(label);
         lblLabel.setForeground(ThemeConstants.TEXT_SECONDARY);
         lblLabel.setFont(ThemeConstants.FONT_BODY);
-        
-        JPanel labelPanel = new JPanel(new BorderLayout());
+
+        JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         labelPanel.setOpaque(false);
-        labelPanel.add(icon, BorderLayout.WEST);
-        labelPanel.add(lblLabel, BorderLayout.CENTER);
-        
+        labelPanel.add(icon);
+        labelPanel.add(lblLabel);
+
         row.add(labelPanel, BorderLayout.WEST);
-        row.add(valueLabel, BorderLayout.EAST);
+        row.add(valueComp, BorderLayout.EAST);
         return row;
     }
 
     private JPanel createDeveloperRow() {
-        JLabel link = new JLabel("<html><a href=''>ChopCode Solutions</a></html>");
+        JLabel link = new JLabel("<html><u>ChopCode Solutions</u> ↗</html>");
         link.setForeground(ThemeConstants.NEON_CYAN);
-        link.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
+        link.setFont(ThemeConstants.FONT_BODY.deriveFont(Font.BOLD));
         link.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        link.setToolTipText("Abrir el portafolio de ChopCode Solutions");
+        link.setToolTipText("Abrir el portafolio oficial de ChopCode Solutions");
         link.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 try {
                     Desktop.getDesktop().browse(java.net.URI.create("https://portafolio-brandon-daza.web.app/"));
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(ConfigPage.this,
-                            "No se pudo abrir el portafolio web.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
+                    UIUtils.showError(ConfigPage.this, "No se pudo abrir el navegador web.");
                 }
             }
         });
-        return createDataRow("Desarrollador", link, "icons/developer.svg", ThemeConstants.NEON_CYAN);
+        return createDataRow("Desarrollador Oficial", link, "icons/developer.svg", ThemeConstants.NEON_CYAN);
+    }
+
+    private JLabel createBadge(String text, Color neonColor) {
+        JLabel badge = new JLabel(text);
+        badge.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
+        badge.setForeground(neonColor);
+        badge.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(neonColor, 1),
+                BorderFactory.createEmptyBorder(3, 10, 3, 10)
+        ));
+        return badge;
     }
 
     private FlatSVGIcon createIcon(String path, Color color, int width, int height) {
@@ -239,7 +332,7 @@ public class ConfigPage extends JPanel {
         if (newPath != null) {
             guardarRutaEnConfig(newPath);
             txtDbPath.setText(newPath);
-            UIUtils.showInfo(this, "Guardado", "Configuración guardada. Reinicie la aplicación para aplicar cambios.");
+            UIUtils.showInfo(this, "Ruta Actualizada", "La configuración de almacenamiento ha sido guardada. Reinicia la aplicación para aplicar los cambios.");
         }
     }
 
@@ -248,12 +341,12 @@ public class ConfigPage extends JPanel {
         try (FileInputStream input = new FileInputStream("config.properties")) {
             props.load(input);
         } catch (IOException e) {
-            System.out.println("Archivo de configuración no encontrado. Creando uno nuevo...");
+            System.out.println("Creando nuevo archivo config.properties...");
         }
 
         try (FileOutputStream output = new FileOutputStream("config.properties")) {
             props.setProperty("db.path", ruta);
-            props.store(output, "Configuración de la base de datos");
+            props.store(output, "Configuración de la Base de Datos - ERP+ Business");
         } catch (IOException e) {
             e.printStackTrace();
         }

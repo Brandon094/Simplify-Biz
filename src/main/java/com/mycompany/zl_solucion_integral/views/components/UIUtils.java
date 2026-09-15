@@ -554,7 +554,7 @@ public class UIUtils {
         table.setShowGrid(false);
         table.setFillsViewportHeight(true);
         table.setFont(ThemeConstants.FONT_SMALL);
-        table.setSelectionBackground(new Color(168, 85, 247, 70));
+        table.setSelectionBackground(ThemeConstants.SELECTION_PURPLE);
         table.setSelectionForeground(ThemeConstants.TEXT_PRIMARY);
 
         // Encabezado
@@ -588,7 +588,7 @@ public class UIUtils {
                         }
                         Component c = super.getTableCellRendererComponent(tbl, formatted, isSelected, hasFocus, row, column);
                         if (isSelected) {
-                            c.setBackground(new Color(168, 85, 247, 40));
+                            c.setBackground(ThemeConstants.ACTIVE_BACKGROUND);
                         } else {
                             c.setBackground(row % 2 == 0 ? ThemeConstants.CARD_BACKGROUND : ThemeConstants.TABLE_ZEBRA);
                             c.setForeground(ThemeConstants.TEXT_PRIMARY);
@@ -598,7 +598,7 @@ public class UIUtils {
                         return c;
                     }
                 });
-                col.setPreferredWidth(headerText.equalsIgnoreCase("Precio Total") || headerText.equalsIgnoreCase("Total") ? 120 : 100);
+                col.setPreferredWidth(headerText.equalsIgnoreCase("Precio Total") || headerText.equalsIgnoreCase("Total") ? 135 : 125);
             } else if (isCenterColumn(headerText)) {
                 col.setCellRenderer(new javax.swing.table.DefaultTableCellRenderer() {
                     @Override
@@ -609,11 +609,11 @@ public class UIUtils {
                         }
                         Component c = super.getTableCellRendererComponent(tbl, cellValue, isSelected, hasFocus, row, column);
                         if (isSelected) {
-                            c.setBackground(new Color(168, 85, 247, 40));
+                            c.setBackground(ThemeConstants.ACTIVE_BACKGROUND);
                         } else {
                             c.setBackground(row % 2 == 0 ? ThemeConstants.CARD_BACKGROUND : ThemeConstants.TABLE_ZEBRA);
                             if (headerText.equalsIgnoreCase("Pago confirmado") && value != null && value.toString().equalsIgnoreCase("deudor")) {
-                                c.setForeground(new Color(245, 158, 11)); // Tono ámbar para deudores
+                                c.setForeground(ThemeConstants.NEON_AMBER); // Tono ámbar para deudores
                             } else {
                                 c.setForeground(ThemeConstants.TEXT_SECONDARY);
                             }
@@ -624,8 +624,11 @@ public class UIUtils {
                     }
                 });
                 if (headerText.equalsIgnoreCase("Cantidad") || headerText.equalsIgnoreCase("Stock")) col.setPreferredWidth(75);
-                else if (headerText.equalsIgnoreCase("Código") || headerText.equalsIgnoreCase("SKU")) col.setPreferredWidth(90);
-                else if (headerText.equalsIgnoreCase("Fecha")) col.setPreferredWidth(100);
+                else if (headerText.equalsIgnoreCase("Código") || headerText.equalsIgnoreCase("SKU")) col.setPreferredWidth(95);
+                else if (headerText.equalsIgnoreCase("Fecha")) col.setPreferredWidth(95);
+                else if (headerText.equalsIgnoreCase("CC Cliente")) col.setPreferredWidth(110);
+                else if (headerText.equalsIgnoreCase("Metodo pago") || headerText.equalsIgnoreCase("Método pago")) col.setPreferredWidth(115);
+                else if (headerText.equalsIgnoreCase("Pago confirmado") || headerText.equalsIgnoreCase("Estado")) col.setPreferredWidth(120);
                 else col.setPreferredWidth(110);
             } else {
                 col.setCellRenderer(new javax.swing.table.DefaultTableCellRenderer() {
@@ -633,7 +636,7 @@ public class UIUtils {
                     public Component getTableCellRendererComponent(JTable tbl, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                         Component c = super.getTableCellRendererComponent(tbl, value, isSelected, hasFocus, row, column);
                         if (isSelected) {
-                            c.setBackground(new Color(168, 85, 247, 40));
+                            c.setBackground(ThemeConstants.ACTIVE_BACKGROUND);
                         } else {
                             c.setBackground(row % 2 == 0 ? ThemeConstants.CARD_BACKGROUND : ThemeConstants.TABLE_ZEBRA);
                             c.setForeground(ThemeConstants.TEXT_SECONDARY);
@@ -643,13 +646,14 @@ public class UIUtils {
                         return c;
                     }
                 });
-                if (headerText.equalsIgnoreCase("Producto") || headerText.equalsIgnoreCase("Nombre")) col.setPreferredWidth(180);
-                else if (headerText.equalsIgnoreCase("Cliente") || headerText.equalsIgnoreCase("Categoría")) col.setPreferredWidth(140);
-                else if (headerText.equalsIgnoreCase("Vendedor")) col.setPreferredWidth(120);
+                if (headerText.equalsIgnoreCase("Producto") || headerText.equalsIgnoreCase("Nombre")) col.setPreferredWidth(230);
+                else if (headerText.equalsIgnoreCase("Cliente") || headerText.equalsIgnoreCase("Categoría")) col.setPreferredWidth(160);
+                else if (headerText.equalsIgnoreCase("Vendedor")) col.setPreferredWidth(110);
                 else col.setPreferredWidth(110);
             }
         }
     }
+
 
     private static boolean isCurrencyColumn(String header) {
         if (header == null) return false;

@@ -276,4 +276,28 @@ public class Validaciones {
         }
     }
 
+    /**
+     * Limpia símbolos de moneda ($), espacios y reemplaza comas por puntos para convertir defensivamente a double.
+     */
+    public static double limpiarFormatoMoneda(String valor) {
+        if (valor == null || valor.trim().isEmpty()) {
+            return 0.0;
+        }
+        try {
+            String limpio = valor.replaceAll("[^0-9,.-]", "").trim();
+            if (limpio.contains(",") && limpio.contains(".")) {
+                if (limpio.indexOf('.') < limpio.indexOf(',')) {
+                    limpio = limpio.replace(".", "").replace(',', '.');
+                } else {
+                    limpio = limpio.replace(",", "");
+                }
+            } else if (limpio.contains(",")) {
+                limpio = limpio.replace(',', '.');
+            }
+            return Double.parseDouble(limpio);
+        } catch (Exception e) {
+            return 0.0;
+        }
+    }
 }
+

@@ -64,7 +64,7 @@ public class VentasController {
 
     public ResultadoOperacion guardarVenta(final Venta venta, List<Producto> productosVendidos, JTable tablaVentas) {
         String sqlInsertVenta = "INSERT INTO ventas (cliente, cc_cliente, vendedor, fecha, total, metodo_pago, pago_confirmado) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        String sqlInsertDetalleVenta = "INSERT INTO detalles_venta (venta_id, producto, cantidad, codigo, precio, precio_costo, total) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sqlInsertDetalleVenta = "INSERT INTO detalles_venta (venta_id, producto, cantidad, codigo, precio, precio_costo, total, descuento) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlUpdateStock = "UPDATE productos SET cantidad = cantidad - ? WHERE codigo = ? AND cantidad >= ?";
 
         Connection conn = null;
@@ -110,14 +110,15 @@ public class VentasController {
             psStock = conn.prepareStatement(sqlUpdateStock);
 
             for (Producto producto : productosVendidos) {
-                // Insertar en detalles_venta
+                // Insertar en detalles_venta (total ya refleja el valor neto final cobrado)
                 psDetalle.setInt(1, ventaId);
                 psDetalle.setString(2, producto.getProducto());
                 psDetalle.setInt(3, producto.getCantidadSolicitada());
                 psDetalle.setString(4, producto.getCodigo());
                 psDetalle.setDouble(5, producto.getPrecio());
                 psDetalle.setDouble(6, producto.getPrecioCosto());
-                psDetalle.setDouble(7, producto.getPrecio() * producto.getCantidadSolicitada());
+                psDetalle.setDouble(7, producto.getPrecioCalculado() > 0 ? producto.getPrecioCalculado() : (producto.getPrecio() * producto.getCantidadSolicitada()));
+                psDetalle.setDouble(8, producto.getDescuento());
                 psDetalle.executeUpdate();
 
                 // Actualizar stock del producto
@@ -402,19 +403,6 @@ public class VentasController {
 
             tablaVentas.setModel(modelo);
 
-            // Ajustar el tamaño de las columnas
-            tablaVentas.getColumnModel().getColumn(0).setPreferredWidth(50);  // Id
-            tablaVentas.getColumnModel().getColumn(1).setPreferredWidth(250); // Producto
-            tablaVentas.getColumnModel().getColumn(2).setPreferredWidth(80);  // Cantidad
-            tablaVentas.getColumnModel().getColumn(3).setPreferredWidth(100); // Código
-            tablaVentas.getColumnModel().getColumn(4).setPreferredWidth(75);  // Precio
-            tablaVentas.getColumnModel().getColumn(5).setPreferredWidth(150); // Cliente
-            tablaVentas.getColumnModel().getColumn(6).setPreferredWidth(100); // CC Cliente
-            tablaVentas.getColumnModel().getColumn(7).setPreferredWidth(100); // metodo pago
-            tablaVentas.getColumnModel().getColumn(8).setPreferredWidth(100); // pago confirmado
-            tablaVentas.getColumnModel().getColumn(9).setPreferredWidth(100); // Vendedor
-            tablaVentas.getColumnModel().getColumn(10).setPreferredWidth(100); // Fecha
-            tablaVentas.getColumnModel().getColumn(11).setPreferredWidth(100); // Precio Total
 
             // Opcional: ajustar automáticamente las alturas de las filas si el contenido lo requiere
             //tablaVentas.setRowHeight(25);
@@ -512,21 +500,8 @@ public class VentasController {
             }
 
             tablaVentas.setModel(modelo);
-
-            // Ajustar tamaños de columnas
-            tablaVentas.getColumnModel().getColumn(0).setPreferredWidth(50);  // Id
-            tablaVentas.getColumnModel().getColumn(1).setPreferredWidth(250); // Producto
-            tablaVentas.getColumnModel().getColumn(2).setPreferredWidth(50);  // Cantidad
-            tablaVentas.getColumnModel().getColumn(3).setPreferredWidth(100); // Código
-            tablaVentas.getColumnModel().getColumn(4).setPreferredWidth(75);  // Precio
-            tablaVentas.getColumnModel().getColumn(5).setPreferredWidth(150); // Cliente
-            tablaVentas.getColumnModel().getColumn(6).setPreferredWidth(100); // CC Cliente
-            tablaVentas.getColumnModel().getColumn(7).setPreferredWidth(100); // Vendedor
-            tablaVentas.getColumnModel().getColumn(8).setPreferredWidth(100); // metodo pago
-            tablaVentas.getColumnModel().getColumn(9).setPreferredWidth(100); // pago confirmado
-            tablaVentas.getColumnModel().getColumn(10).setPreferredWidth(100); // Fecha
-            tablaVentas.getColumnModel().getColumn(11).setPreferredWidth(100); // Precio Total
             return ResultadoOperacion.ok("");
+
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error al mostrar ventas", e);
             return ResultadoOperacion.error(UIMessages.MSG_ERROR_BD);
@@ -650,36 +625,150 @@ public class VentasController {
     }
 
     public void exportarDatosTablaAExcel(JTable tabla, String rutaExcel) throws IOException {
-        // Crear un libro de trabajo de Excel
         Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Datos Exportados");
+        Sheet sheet = workbook.createSheet("Reporte de Ventas");
 
-        // Obtener el modelo de la tabla
         TableModel model = tabla.getModel();
 
-        // Escribir los encabezados de la tabla en la primera fila del archivo Excel
-        Row headerRow = sheet.createRow(0);
+        // 1. Estilos visuales
+        // Estilo de Banner de Título
+        CellStyle titleStyle = workbook.createCellStyle();
+        Font titleFont = workbook.createFont();
+        titleFont.setBold(true);
+        titleFont.setFontHeightInPoints((short) 14);
+        titleFont.setColor(IndexedColors.WHITE.getIndex());
+        titleStyle.setFont(titleFont);
+        titleStyle.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
+        titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        titleStyle.setAlignment(HorizontalAlignment.LEFT);
+
+        // Estilo de Encabezados de Tabla
+        CellStyle headerStyle = workbook.createCellStyle();
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerFont.setColor(IndexedColors.WHITE.getIndex());
+        headerStyle.setFont(headerFont);
+        headerStyle.setFillForegroundColor(IndexedColors.ROYAL_BLUE.getIndex());
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        headerStyle.setAlignment(HorizontalAlignment.CENTER);
+
+        // Estilos de Celdas
+        DataFormat dataFormat = workbook.createDataFormat();
+        
+        CellStyle currencyStyle = workbook.createCellStyle();
+        currencyStyle.setDataFormat(dataFormat.getFormat("$#,##0.00"));
+        currencyStyle.setAlignment(HorizontalAlignment.RIGHT);
+
+        CellStyle centerStyle = workbook.createCellStyle();
+        centerStyle.setAlignment(HorizontalAlignment.CENTER);
+
+        CellStyle totalStyle = workbook.createCellStyle();
+        Font totalFont = workbook.createFont();
+        totalFont.setBold(true);
+        totalStyle.setFont(totalFont);
+        totalStyle.setDataFormat(dataFormat.getFormat("$#,##0.00"));
+        totalStyle.setAlignment(HorizontalAlignment.RIGHT);
+        totalStyle.setBorderTop(BorderStyle.THIN);
+        totalStyle.setBorderBottom(BorderStyle.DOUBLE);
+
+        // 2. Fila de Título Corporativo
+        Row titleRow = sheet.createRow(0);
+        Cell titleCell = titleRow.createCell(0);
+        titleCell.setCellValue("ERP+ BUSINESS — INFORME EJECUTIVO DE VENTAS");
+        titleCell.setCellStyle(titleStyle);
+        sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, Math.max(1, model.getColumnCount() - 1)));
+
+        // Fila de Fecha de Generación
+        Row dateRow = sheet.createRow(1);
+        Cell dateCell = dateRow.createCell(0);
+        dateCell.setCellValue("Generado el: " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+
+        // 3. Fila de Encabezados de la Tabla
+        Row headerRow = sheet.createRow(3);
         for (int col = 0; col < model.getColumnCount(); col++) {
             Cell cell = headerRow.createCell(col);
             cell.setCellValue(model.getColumnName(col));
+            cell.setCellStyle(headerStyle);
         }
 
-        // Escribir los datos visibles de la tabla en las filas siguientes
+        double totalSumaVentas = 0;
+        int totalColIndex = -1;
+
+        // 4. Escribir Datos de la Tabla
         for (int row = 0; row < model.getRowCount(); row++) {
-            Row excelRow = sheet.createRow(row + 1);
+            Row excelRow = sheet.createRow(row + 4);
             for (int col = 0; col < model.getColumnCount(); col++) {
                 Cell cell = excelRow.createCell(col);
                 Object value = model.getValueAt(row, col);
-                cell.setCellValue(value != null ? value.toString() : "");
+                String colName = model.getColumnName(col).toLowerCase();
+
+                if (value != null) {
+                    if (value instanceof Number) {
+                        double valNum = ((Number) value).doubleValue();
+                        cell.setCellValue(valNum);
+                        if (colName.contains("total") || colName.contains("precio")) {
+                            cell.setCellStyle(currencyStyle);
+                            if (colName.contains("total")) {
+                                totalSumaVentas += valNum;
+                                totalColIndex = col;
+                            }
+                        }
+                    } else {
+                        String valStr = value.toString().trim();
+                        // Intentar parsear como moneda si viene formateado tipo "$ 15.000,00"
+                        if (valStr.startsWith("$")) {
+                            try {
+                                String cleanVal = valStr.replace("$", "").replace(".", "").replace(",", ".").trim();
+                                double dVal = Double.parseDouble(cleanVal);
+                                cell.setCellValue(dVal);
+                                cell.setCellStyle(currencyStyle);
+                                if (colName.contains("total")) {
+                                    totalSumaVentas += dVal;
+                                    totalColIndex = col;
+                                }
+                            } catch (Exception e) {
+                                cell.setCellValue(valStr);
+                            }
+                        } else {
+                            cell.setCellValue(valStr);
+                            if (colName.contains("fecha") || colName.contains("código") || colName.contains("estado") || colName.contains("pago")) {
+                                cell.setCellStyle(centerStyle);
+                            }
+                        }
+                    }
+                } else {
+                    cell.setCellValue("");
+                }
             }
         }
 
-        // Guardar el archivo Excel en la ruta especificada
+        // 5. Fila de Total Acumulado al Final
+        int lastRowNum = model.getRowCount() + 4;
+        Row totalRow = sheet.createRow(lastRowNum);
+        Cell labelTotalCell = totalRow.createCell(0);
+        labelTotalCell.setCellValue("TOTAL GENERAL");
+        Font boldF = workbook.createFont();
+        boldF.setBold(true);
+        CellStyle boldL = workbook.createCellStyle();
+        boldL.setFont(boldF);
+        labelTotalCell.setCellStyle(boldL);
+
+        if (totalColIndex != -1) {
+            Cell valTotalCell = totalRow.createCell(totalColIndex);
+            valTotalCell.setCellValue(totalSumaVentas);
+            valTotalCell.setCellStyle(totalStyle);
+        }
+
+        // 6. Auto-ajustar Ancho de Columnas
+        for (int col = 0; col < model.getColumnCount(); col++) {
+            sheet.autoSizeColumn(col);
+            sheet.setColumnWidth(col, Math.max(sheet.getColumnWidth(col) + 1024, 3800));
+        }
+
+        // Guardar archivo Excel
         try (FileOutputStream fileOut = new FileOutputStream(rutaExcel)) {
             workbook.write(fileOut);
         }
-
-        // Cerrar el libro de trabajo
         workbook.close();
     }
 
@@ -856,14 +945,123 @@ public class VentasController {
     }
 
     public double obtenerUtilidadTotal() {
-        String sql = "SELECT SUM(total - (precio_costo * cantidad)) FROM detalles_venta";
+        return obtenerUtilidadTotalPorPeriodo("Histórico Total");
+    }
+
+    public double obtenerVentasTotalesPorPeriodo(String periodo) {
+        String whereClause = getWhereClauseForPeriod(periodo, "fecha");
+        String sql = "SELECT SUM(total) FROM ventas " + whereClause;
         try (Statement st = conn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
-            if (rs.next()) {
-                return rs.getDouble(1);
-            }
+            if (rs.next()) return rs.getDouble(1);
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al obtener utilidad total", e);
+            logger.log(Level.SEVERE, "Error al obtener ventas totales por periodo", e);
         }
         return 0.0;
     }
+
+    public double obtenerUtilidadTotalPorPeriodo(String periodo) {
+        String whereClause = getWhereClauseForPeriod(periodo, "v.fecha");
+        String sql = "SELECT SUM(d.total - (d.precio_costo * d.cantidad)) FROM detalles_venta d "
+                + "JOIN ventas v ON d.venta_id = v.id " + whereClause;
+        try (Statement st = conn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            if (rs.next()) return rs.getDouble(1);
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al obtener utilidad total por periodo", e);
+        }
+        return 0.0;
+    }
+
+    public double obtenerCogsPorVentaIds(List<Integer> ventaIds) {
+        if (ventaIds == null || ventaIds.isEmpty()) return 0.0;
+        StringBuilder sql = new StringBuilder("SELECT SUM(cantidad * precio_costo) FROM detalles_venta WHERE venta_id IN (");
+        for (int i = 0; i < ventaIds.size(); i++) {
+            sql.append(i == 0 ? "?" : ", ?");
+        }
+        sql.append(")");
+        try (PreparedStatement ps = conn().prepareStatement(sql.toString())) {
+            for (int i = 0; i < ventaIds.size(); i++) {
+                ps.setInt(i + 1, ventaIds.get(i));
+            }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getDouble(1);
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al calcular COGS por IDs de venta", e);
+        }
+        return 0.0;
+    }
+
+    private String getWhereClauseForPeriod(String periodo, String campoFecha) {
+        if ("Hoy".equalsIgnoreCase(periodo)) {
+            return "WHERE " + campoFecha + " = date('now')";
+        } else if ("Últimos 7 Días".equalsIgnoreCase(periodo)) {
+            return "WHERE " + campoFecha + " >= date('now', '-6 days')";
+        } else if ("Este Mes".equalsIgnoreCase(periodo)) {
+            return "WHERE " + campoFecha + " >= date('now', 'start of month')";
+        }
+        return ""; // Histórico Total (sin WHERE)
+    }
+
+    /**
+     * Obtiene el listado de ventas asociadas a un cliente por su Cédula/NIT o Nombre.
+     */
+    public void mostrarVentasPorCliente(JTable tabla, String ccCliente, String nombreCliente) {
+        DefaultTableModel model = (DefaultTableModel) tabla.getModel();
+        model.setRowCount(0);
+
+        String sql = "SELECT id, fecha, vendedor, total, metodo_pago, pago_confirmado "
+                   + "FROM ventas "
+                   + "WHERE (cc_cliente = ? AND cc_cliente != '' AND cc_cliente != 'N/A') "
+                   + "   OR (LOWER(cliente) = LOWER(?)) "
+                   + "ORDER BY fecha DESC, id DESC";
+
+        try (PreparedStatement pstmt = conn().prepareStatement(sql)) {
+            pstmt.setString(1, ccCliente != null ? ccCliente.trim() : "");
+            pstmt.setString(2, nombreCliente != null ? nombreCliente.trim() : "");
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                String estado = rs.getString("pago_confirmado");
+                String estadoStr = "pagado".equalsIgnoreCase(estado) ? "Pagado" : "Deudor (Crédito)";
+                model.addRow(new Object[]{
+                    rs.getInt("id"),
+                    com.mycompany.zl_solucion_integral.views.components.UIUtils.formatDate(rs.getString("fecha")),
+                    rs.getString("vendedor"),
+                    rs.getString("metodo_pago"),
+                    estadoStr,
+                    rs.getDouble("total")
+                });
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al consultar historial de compras por cliente", e);
+        }
+    }
+
+    /**
+     * Carga el desglose de productos de una venta en la tabla especificada.
+     */
+    public void mostrarDetallesVenta(JTable tabla, int ventaId) {
+        DefaultTableModel model = (DefaultTableModel) tabla.getModel();
+        model.setRowCount(0);
+
+        String sql = "SELECT producto, codigo, cantidad, precio, total "
+                   + "FROM detalles_venta WHERE venta_id = ?";
+
+        try (PreparedStatement pstmt = conn().prepareStatement(sql)) {
+            pstmt.setInt(1, ventaId);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getString("producto"),
+                    rs.getString("codigo"),
+                    rs.getInt("cantidad"),
+                    rs.getDouble("precio"),
+                    rs.getDouble("total")
+                });
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al consultar detalles de la venta " + ventaId, e);
+        }
+    }
 }
+

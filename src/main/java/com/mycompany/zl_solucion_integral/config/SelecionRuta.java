@@ -184,4 +184,84 @@ public class SelecionRuta {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Carga la preferencia de colapso del sidebar horizontal (contraído/expandido).
+     *
+     * @return true si el sidebar estaba colapsado (64px), false si estaba expandido (260px).
+     */
+    public static boolean cargarPreferenciaSidebarColapsado() {
+        Properties props = new Properties();
+        try (FileInputStream input = new FileInputStream("config.properties")) {
+            props.load(input);
+            String valor = props.getProperty("sidebar.collapsed");
+            if (valor != null) {
+                return Boolean.parseBoolean(valor);
+            }
+        } catch (IOException e) {
+            // No existe archivo aún
+        }
+        return false;
+    }
+
+    /**
+     * Guarda la preferencia del estado de colapso del sidebar en config.properties.
+     *
+     * @param colapsado true para contraído, false para expandido.
+     */
+    public static void guardarPreferenciaSidebarColapsado(boolean colapsado) {
+        Properties props = new Properties();
+        try (FileInputStream input = new FileInputStream("config.properties")) {
+            props.load(input);
+        } catch (IOException e) {
+            // Crear nuevo si no existe
+        }
+
+        try (FileOutputStream output = new FileOutputStream("config.properties")) {
+            props.setProperty("sidebar.collapsed", String.valueOf(colapsado));
+            props.store(output, "Configuración de la aplicación");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Evalúa si el usuario ya vio la guía interactiva de bienvenida de primer uso.
+     *
+     * @return true si ya fue mostrada/vista previamente, false si es la primera vez.
+     */
+    public static boolean cargarPrimerUsoVisto() {
+        Properties props = new Properties();
+        try (FileInputStream input = new FileInputStream("config.properties")) {
+            props.load(input);
+            String valor = props.getProperty("welcome.seen");
+            if (valor != null) {
+                return Boolean.parseBoolean(valor);
+            }
+        } catch (IOException e) {
+            // No existe archivo aún
+        }
+        return false;
+    }
+
+    /**
+     * Guarda el estado de la guía de bienvenida de primer uso en config.properties.
+     *
+     * @param visto true para no volver a mostrar automáticamente en el inicio.
+     */
+    public static void guardarPrimerUsoVisto(boolean visto) {
+        Properties props = new Properties();
+        try (FileInputStream input = new FileInputStream("config.properties")) {
+            props.load(input);
+        } catch (IOException e) {
+            // Crear si no existe
+        }
+
+        try (FileOutputStream output = new FileOutputStream("config.properties")) {
+            props.setProperty("welcome.seen", String.valueOf(visto));
+            props.store(output, "Configuración de la aplicación");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

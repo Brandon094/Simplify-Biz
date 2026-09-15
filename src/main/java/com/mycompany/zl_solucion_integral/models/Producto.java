@@ -125,6 +125,25 @@ public class Producto {
         this.cantidadSolicitada = cantidadSolicitada;
     }
 
+    private double descuento;
+    private double precioCalculado;
+
+    public double getDescuento() {
+        return descuento;
+    }
+
+    public void setDescuento(double descuento) {
+        this.descuento = descuento;
+    }
+
+    public double getPrecioCalculado() {
+        return precioCalculado;
+    }
+
+    public void setPrecioCalculado(double precioCalculado) {
+        this.precioCalculado = precioCalculado;
+    }
+
     @Override
     public String toString() {
         return String.format(
