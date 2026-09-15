@@ -26,26 +26,38 @@
   <div class="orb orb-blue"></div>
   <div class="orb orb-green"></div>
 
-  <!-- 1. Floating Glassmorphism Navbar -->
+  <!-- 1. Floating Glassmorphism Navbar (Mobile First with Hamburger Drawer) -->
   <nav class="navbar" id="navbar">
     <a href="#" class="nav-logo">
       <img src="assets/images/app_icon.png" alt="ERP+ Business Logo">
       <span>ERP+ <span class="gradient-text">Business</span></span>
     </a>
-    <ul class="nav-links">
+
+    <!-- Mobile Menu Hamburger Button -->
+    <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú de navegación" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <ul class="nav-links" id="navLinks">
       <li><a href="#modulos">Módulos</a></li>
       <li><a href="#beneficios">Beneficios</a></li>
       <li><a href="#calculadora">Calculadora ROI</a></li>
       <li><a href="#descarga">Descargas</a></li>
+      <li style="margin-top: 0.5rem;" class="mobile-only-cta">
+        <a href="#descarga" class="btn btn-primary">Probar Gratis</a>
+      </li>
     </ul>
-    <a href="#descarga" class="btn btn-primary">Probar Gratis</a>
+
+    <a href="#descarga" class="btn btn-primary nav-cta-desktop">Probar Gratis</a>
   </nav>
 
-  <!-- 2. Hero Section (Neuroventas Header & Primary CTA) -->
+  <!-- 2. Hero Section (Mobile First Header & Primary CTA) -->
   <section class="hero container">
     <div class="hero-badge animated-float">
       <img src="assets/icons/rocket.svg" width="16" alt="Rocket">
-      <span>Sistema Comercial v2.0.2 • Ultra Rápido & Seguro</span>
+      <span>Sistema Comercial v2.0.2 • Ultra Rápido</span>
     </div>
 
     <h1 class="hero-title">
@@ -81,16 +93,16 @@
             <img src="assets/icons/dashboard.svg" width="18" alt="Dashboard"> Dashboard
           </div>
           <div class="mock-item">
-            <img src="assets/icons/cart-shopping.svg" width="18" alt="POS"> Punto de Venta (POS)
+            <img src="assets/icons/cart-shopping.svg" width="18" alt="POS"> POS Ventas
           </div>
           <div class="mock-item">
-            <img src="assets/icons/products.svg" width="18" alt="Productos"> Inventario & Stock
+            <img src="assets/icons/products.svg" width="18" alt="Productos"> Inventario
           </div>
           <div class="mock-item">
-            <img src="assets/icons/wallet.svg" width="18" alt="Cartera"> Cartera & Cobranza
+            <img src="assets/icons/wallet.svg" width="18" alt="Cartera"> Cartera
           </div>
           <div class="mock-item">
-            <img src="assets/icons/reports.svg" width="18" alt="Reportes"> Reportes Cierre Z
+            <img src="assets/icons/reports.svg" width="18" alt="Reportes"> Cierre Z
           </div>
         </div>
 
@@ -110,8 +122,8 @@
 
           <div class="mock-chart-full">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <strong style="color: #FFF;">Rendimiento de Ventas por Día</strong>
-              <span style="font-size: 0.8rem; color: var(--text-secondary);">Esta semana</span>
+              <strong style="color: #FFF; font-size: 0.9rem;">Ventas Semanales</strong>
+              <span style="font-size: 0.75rem; color: var(--text-secondary);">Esta semana</span>
             </div>
             <div class="bar-container">
               <div class="bar" style="height: 45%;" title="Lunes"></div>
@@ -128,7 +140,7 @@
   </section>
 
   <!-- 4. Social Proof & Key Metrics Bar -->
-  <section class="social-proof">
+  <section class="social-proof" id="beneficios">
     <div class="container stats-grid">
       <div>
         <div class="stat-number gradient-cyan">99.9%</div>
@@ -136,20 +148,20 @@
       </div>
       <div>
         <div class="stat-number gradient-text">3x</div>
-        <div class="stat-desc">Más Rápido en Caja que Métodos Manuales</div>
+        <div class="stat-desc">Más Rápido en Caja</div>
       </div>
       <div>
         <div class="stat-number" style="color: var(--neon-green);">0$</div>
-        <div class="stat-desc">Comisiones por Transacción u Ocultas</div>
+        <div class="stat-desc">Comisiones Ocultas</div>
       </div>
       <div>
         <div class="stat-number" style="color: var(--neon-amber);">100%</div>
-        <div class="stat-desc">Privacidad & Datos Guardados Localmente</div>
+        <div class="stat-desc">Privacidad Local</div>
       </div>
     </div>
   </section>
 
-  <!-- 5. Core Business Modules (Atomic Cards) -->
+  <!-- 5. Core Business Modules (Mobile First Stack -> Grid) -->
   <section class="section container" id="modulos">
     <h2 class="section-title">Módulos Inteligentes Diseñados para <span class="gradient-text">Vender Más</span></h2>
     <p class="section-subtitle">
@@ -246,10 +258,10 @@
       </div>
 
       <div class="calc-results">
-        <h3 style="color: var(--text-secondary); font-size: 1rem;">ESTIMACIÓN DE IMPACTO MENSUAL</h3>
+        <h3 style="color: var(--text-secondary); font-size: 0.9rem;">ESTIMACIÓN DE IMPACTO MENSUAL</h3>
         <div class="result-amount" id="resDinero">$ 675,000 COP / mes</div>
         <div class="result-hours" id="resHoras">⏱️ Recuperas aprox. 21 horas libres al mes</div>
-        <p style="font-size: 0.85rem; color: var(--text-muted);">
+        <p style="font-size: 0.8rem; color: var(--text-muted);">
           Basado en la reducción del 70% en tiempos operativos de cuadre y la prevención del 4.5% en pérdidas de stock.
         </p>
       </div>
@@ -268,9 +280,9 @@
       <div class="glass-card download-card">
         <img src="assets/icons/rocket.svg" class="download-os-icon" alt="Windows">
         <h3>Versión para Windows</h3>
-        <p style="color: var(--text-secondary); margin: 0.75rem 0 1.5rem 0;">Compatible con Windows 10, 11 (64-bit)</p>
+        <p style="color: var(--text-secondary); margin: 0.5rem 0 1.25rem 0; font-size: 0.9rem;">Windows 10, 11 (64-bit)</p>
         <a href="../dist/Simplify-Biz-Setup.exe" class="btn btn-primary" onclick="alert('Iniciando descarga del instalador para Windows...');">
-          Descargar para Windows (.exe)
+          Descargar (.exe)
         </a>
       </div>
 
@@ -278,9 +290,9 @@
       <div class="glass-card download-card">
         <img src="assets/icons/boxes-stacked.svg" class="download-os-icon" alt="Linux">
         <h3>Versión para Linux</h3>
-        <p style="color: var(--text-secondary); margin: 0.75rem 0 1.5rem 0;">Compatible con Ubuntu, Debian, Mint (amd64)</p>
+        <p style="color: var(--text-secondary); margin: 0.5rem 0 1.25rem 0; font-size: 0.9rem;">Ubuntu, Debian, Mint (amd64)</p>
         <a href="../erp-plus-business_2.0.0_amd64.deb" class="btn btn-success" onclick="alert('Iniciando descarga del paquete .deb para Linux...');">
-          Descargar para Linux (.deb)
+          Descargar (.deb)
         </a>
       </div>
     </div>
