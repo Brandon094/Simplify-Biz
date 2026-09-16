@@ -173,6 +173,10 @@ Antes de iniciar una nueva fase, ejecutar `mvn clean package`, abrir el JAR y re
 
 ## Fase 6: Distribución e Iconografía Completa
 
+* [ ] **Endurecimiento de Licenciamiento RSA-2048 & Script Admin:**
+  - Desactivar validación simple `ERPPRO-` para evitar derivación inversa del algoritmo.
+  - Exigir firma criptográfica RSA-2048 estricta vinculada al `HardwareId` del cliente.
+  - Crear herramienta/script externo de administración para firma de licencias comerciales vitalicias de $800.000 COP / $1.000.000 COP con datos de cliente, HWID y fecha de vencimiento (`2099-12-31`).
 * [x] **Licenciamiento Criptográfico Hardware-Bound:** Generación de Hardware ID, firma RSA-2048, evaluación de período Demo (30 días) y diálogo modal `LicenciaDialog`.
 * [x] **Versionado y Notas de Publicación:** Actualización SemVer a v1.3.0 y creación del archivo oficial `CHANGELOG.md`.
 * [x] **Manual de Usuario Integrado:** Visor e interactivo de manual operativo dentro de la app (`ManualUsuarioDialog`) con búsqueda en tiempo real, arranque automático en Sección 0 y **paginador inferior fijo** sin necesidad de desplazamientos laterales.
