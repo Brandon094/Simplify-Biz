@@ -31,13 +31,13 @@ Este documento define el orden recomendado para continuar el desarrollo. La regl
 * [x] **Top Header Dinámico con SVG (v2.0.1):** Barra superior centralizada que actualiza en tiempo real el título, subtítulo e icono SVG temático con color neón dedicado por módulo, maximizando el espacio de trabajo vertical.
 * [x] **Menú Lateral Colapsable Horizontalmente (v2.0.1):** Contracción del `ModernSidebar` de 260px a 64px (+170px de espacio útil) con botón toggle `arrow-left.svg`/`arrow-right.svg`, centrado automático de iconos, tooltips y preferencia de acordeones respetada.
 * [x] **Persistencia de Descuentos POS & Layout Ampliado (v2.0.1):** Migración DDL de la columna `descuento` en `detalles_venta`, persistencia atómica en `VentasController`, carrito ampliado al 44% de peso horizontal, 3 botones por fila en 1 sola línea (`+`, `-`, `🗑`) y feedback transparente en el footer (subtotal bruto, ahorro/descuento en `-$` y `%`, y total neto final).
-* [x] **Asistente Inteligente de Importación Excel/CSV & Ergonomía POS (Fase 7 - v2.0.0):**
-  - Motor `ExcelSQLiteManager` con lectura de cabeceras en caliente, mapeo dinámico de columnas y estrategia de Upsert por SKU.
-  - Diálogo modal `ImportarProductosDialog` en 4 pasos con visualización de cabeceras y vista previa en vivo de 5 filas.
-  - Integración del importador en **Productos** y en **Abastecimiento & Proveedores** (facturas de entrada).
-  - Reorganización de botones de acción en Productos debajo del título.
-  - Botones del carrito POS ampliados a 115px con cursor mano (`HAND_CURSOR`) y efecto hover fluido.
-  - Suite de pruebas de JUnit 5 ampliada a **41/41 pruebas automatizadas pasando con éxito**.
+* [x] **Motor Dual de Importación Excel/CSV & Consolidación Atomic Design (v2.0.0):**
+  - Motor `ExcelSQLiteManager` parametrizado con enum `ModoImportacion` (`CATALOGO` y `ABASTECIMIENTO`).
+  - Importación en Modo Catálogo desde Productos (Upsert directo en SQLite por SKU).
+  - Importación en Modo Abastecimiento desde `RegistrarCompraDialog` (requiere Proveedor y Factura previa, precargando la tabla de compras para revisión visual antes de la confirmación).
+  - Consolidación y reubicación de todos los diálogos en `views/components/dialogs/`.
+  - Refactorización de todos los colores hardcodeados a tokens de `ThemeConstants`.
+  - Suite de pruebas JUnit 5 en **42/42 pruebas automatizadas pasando al 100% (BUILD SUCCESS)**.
 * [x] **Calculadora de Vueltas Exactas en POS (v2.0.3):** Integración de campo interactivo "Paga con ($)" con icono `wallet.svg` en la parte inferior del carrito de compras (`SalesPage`), realizando cálculo automático de vueltas exactas en verde neón o dinero faltante en rojo en tiempo real sin calculadoras externas.
 * [x] Documentación técnica, funcional, de arquitectura y de base de datos totalmente actualizada para la **versión 2.0.3**.
 

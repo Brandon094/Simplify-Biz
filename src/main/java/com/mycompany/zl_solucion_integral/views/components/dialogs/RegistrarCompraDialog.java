@@ -424,12 +424,37 @@ public class RegistrarCompraDialog extends JDialog {
     }
 
     private void cargarItemsDesdeExcel() {
+        String provNom = txtProveedorNombre.getText().trim();
+        String numFac = txtNumFactura.getText().trim();
+
+        if (provNom.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor ingresa o selecciona primero el Proveedor (Nombre / Razón Social).", "Proveedor Requerido", JOptionPane.WARNING_MESSAGE);
+            txtProveedorNombre.requestFocus();
+            return;
+        }
+
+        if (numFac.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor ingresa el Número de Factura o Remisión de la compra.", "Factura Requerida", JOptionPane.WARNING_MESSAGE);
+            txtNumFactura.requestFocus();
+            return;
+        }
+
         Window owner = SwingUtilities.getWindowAncestor(this);
-        com.mycompany.zl_solucion_integral.views.dialogs.ImportarProductosDialog dlg = 
-            new com.mycompany.zl_solucion_integral.views.dialogs.ImportarProductosDialog(owner, () -> {
-                // Al finalizar la importación a la BD, recargar los productos en la vista
-                JOptionPane.showMessageDialog(this, "Productos e insumos importados correctamente a bodega.\nPuedes agregarlos a esta entrada seleccionándolos en el buscador.", "Abastecimiento Exitoso", JOptionPane.INFORMATION_MESSAGE);
-            });
+        ImportarProductosDialog dlg = new ImportarProductosDialog(
+            owner,
+            ImportarProductosDialog.ModoImportacion.ABASTECIMIENTO,
+            null,
+            items -> {
+                if (items != null && !items.isEmpty()) {
+                    listaCarrito.addAll(items);
+                    refrescarTablaCarrito();
+                    JOptionPane.showMessageDialog(this,
+                        "¡Se cargaron " + items.size() + " ítems desde el Excel a la Factura N° " + numFac + "!\n" +
+                        "Revisa la orden y presiona 'Confirmar Ingreso a Bodega' para registrar la entrada oficialmente.",
+                        "Items Cargados a Factura", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        );
         dlg.setVisible(true);
     }
 }

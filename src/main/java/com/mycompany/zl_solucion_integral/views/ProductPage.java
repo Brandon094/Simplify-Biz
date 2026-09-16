@@ -515,8 +515,8 @@ public class ProductPage extends JPanel {
 
     private void abrirImportadorExcel() {
         Window owner = SwingUtilities.getWindowAncestor(this);
-        com.mycompany.zl_solucion_integral.views.dialogs.ImportarProductosDialog dlg = 
-            new com.mycompany.zl_solucion_integral.views.dialogs.ImportarProductosDialog(owner, this::refreshData);
+        com.mycompany.zl_solucion_integral.views.components.dialogs.ImportarProductosDialog dlg = 
+            new com.mycompany.zl_solucion_integral.views.components.dialogs.ImportarProductosDialog(owner, this::refreshData);
         dlg.setVisible(true);
     }
 

@@ -271,7 +271,7 @@ public class DashboardPage extends JPanel {
         content.add(createStatusRow("Sesión Activa", "icons/clients.svg", usuario, ThemeConstants.NEON_CYAN));
 
         // 5. Versión del Sistema
-        content.add(createStatusRow("Motor ERP+", "icons/settings.svg", "v1.3.0 Activo", ThemeConstants.NEON_PURPLE));
+        content.add(createStatusRow("Motor ERP+", "icons/settings.svg", "v2.0.0 Activo", ThemeConstants.NEON_PURPLE));
 
         card.add(content, BorderLayout.CENTER);
         return card;

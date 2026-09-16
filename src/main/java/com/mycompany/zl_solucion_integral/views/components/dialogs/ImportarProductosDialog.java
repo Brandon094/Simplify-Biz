@@ -1,4 +1,4 @@
-package com.mycompany.zl_solucion_integral.views.dialogs;
+package com.mycompany.zl_solucion_integral.views.components.dialogs;
 
 import com.mycompany.zl_solucion_integral.config.ExcelSQLiteManager;
 import com.mycompany.zl_solucion_integral.config.ResultadoOperacion;
@@ -23,6 +23,11 @@ import java.util.Map;
  */
 public class ImportarProductosDialog extends JDialog {
 
+    public enum ModoImportacion {
+        CATALOGO,
+        ABASTECIMIENTO
+    }
+
     private File archivoSeleccionado;
     private List<String> cabecerasExcel;
     private JLabel lblArchivo;
@@ -31,45 +36,74 @@ public class ImportarProductosDialog extends JDialog {
     private JTable tbPreview;
     private DefaultTableModel modelPreview;
     private Runnable onImportSuccess;
+    private ModoImportacion modo = ModoImportacion.CATALOGO;
+    private java.util.function.Consumer<List<com.mycompany.zl_solucion_integral.models.DetalleCompra>> onItemsLeidos;
 
     public ImportarProductosDialog(Window owner, Runnable onImportSuccess) {
-        super(owner, "Asistente de Importación Flexible de Productos (Excel/CSV)", ModalityType.APPLICATION_MODAL);
+        this(owner, ModoImportacion.CATALOGO, onImportSuccess, null);
+    }
+
+    public ImportarProductosDialog(Window owner, ModoImportacion modo, Runnable onImportSuccess, java.util.function.Consumer<List<com.mycompany.zl_solucion_integral.models.DetalleCompra>> onItemsLeidos) {
+        super(owner, modo == ModoImportacion.ABASTECIMIENTO ? 
+                "Cargar Factura desde Excel (Abastecimiento)" : 
+                "Asistente de Importación Flexible de Productos (Excel/CSV)", 
+                ModalityType.APPLICATION_MODAL);
+        this.modo = modo;
         this.onImportSuccess = onImportSuccess;
+        this.onItemsLeidos = onItemsLeidos;
 
-        setSize(850, 620);
+        setSize(940, 690);
+        setMinimumSize(new Dimension(840, 580));
+        setResizable(true);
         setLocationRelativeTo(owner);
+        
+        // Raíz en BorderLayout
         setLayout(new BorderLayout());
+        getContentPane().setBackground(ThemeConstants.BACKGROUND);
 
-        JPanel content = new JPanel(new BorderLayout(15, 15));
-        content.setBackground(ThemeConstants.BACKGROUND);
-        content.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        // Panel Principal con márgenes
+        JPanel rootPanel = new JPanel(new BorderLayout(12, 12));
+        rootPanel.setOpaque(false);
+        rootPanel.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
 
-        // Header
-        content.add(createHeaderPanel(), BorderLayout.NORTH);
+        // Header (Fijo Arriba)
+        rootPanel.add(createHeaderPanel(), BorderLayout.NORTH);
 
-        // Body (Paso 1: Archivo + Paso 2: Mapeo + Paso 3: Vista previa)
-        JPanel body = new JPanel(new BorderLayout(15, 15));
-        body.setOpaque(false);
-        body.add(createFileAndMappingPanel(), BorderLayout.NORTH);
-        body.add(createPreviewPanel(), BorderLayout.CENTER);
+        // Contenedor Central Desplazable (JScrollPane suave)
+        JPanel scrollBody = new JPanel(new BorderLayout(12, 12));
+        scrollBody.setOpaque(false);
+        scrollBody.add(createFileAndMappingPanel(), BorderLayout.NORTH);
+        scrollBody.add(createPreviewPanel(), BorderLayout.CENTER);
 
-        content.add(body, BorderLayout.CENTER);
+        JScrollPane scrollPane = new JScrollPane(scrollBody);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
-        // Footer Actions
-        content.add(createFooterPanel(), BorderLayout.SOUTH);
+        rootPanel.add(scrollPane, BorderLayout.CENTER);
 
-        add(content);
+        // Footer Actions (Fijo Abajo Garantizado)
+        rootPanel.add(createFooterPanel(), BorderLayout.SOUTH);
+
+        add(rootPanel, BorderLayout.CENTER);
     }
 
     private JPanel createHeaderPanel() {
         JPanel p = new JPanel(new BorderLayout(10, 0));
         p.setOpaque(false);
 
-        JLabel title = new JLabel("Asistente de Importación de Inventario", new FlatSVGIcon("icons/excel.svg", 24, 24), SwingConstants.LEFT);
+        String tituloTexto = modo == ModoImportacion.ABASTECIMIENTO ? 
+                "Importar Productos a Factura de Compra" : "Asistente de Importación de Inventario";
+        String subtituloTexto = modo == ModoImportacion.ABASTECIMIENTO ?
+                "Mapea las columnas del Excel de tu proveedor para cargar los ítems a la orden de compra actual." :
+                "Selecciona cualquier Excel de tu proveedor y mapea las columnas según corresponda.";
+
+        JLabel title = new JLabel(tituloTexto, createIcon("icons/excel.svg", ThemeConstants.NEON_GREEN, 24, 24), SwingConstants.LEFT);
         title.setFont(ThemeConstants.FONT_TITLE);
         title.setForeground(ThemeConstants.TEXT_PRIMARY);
 
-        JLabel subtitle = new JLabel("Selecciona cualquier Excel de tu proveedor y mapea las columnas según corresponda.");
+        JLabel subtitle = new JLabel(subtituloTexto);
         subtitle.setFont(ThemeConstants.FONT_BODY);
         subtitle.setForeground(ThemeConstants.TEXT_SECONDARY);
 
@@ -106,6 +140,9 @@ public class ImportarProductosDialog extends JDialog {
         gbc.gridx = 3; gbc.gridwidth = 1;
         NeonButton btnExplicar = new NeonButton("Examinar...");
         btnExplicar.setNeonColor(ThemeConstants.NEON_BLUE);
+        btnExplicar.setIcon(createIcon("icons/search.svg", ThemeConstants.NEON_BLUE, 14, 14));
+        btnExplicar.setIconTextGap(6);
+        btnExplicar.setPreferredSize(new Dimension(130, 36));
         btnExplicar.addActionListener(e -> seleccionarArchivo());
         p.add(btnExplicar, gbc);
 
@@ -162,8 +199,8 @@ public class ImportarProductosDialog extends JDialog {
 
     private JPanel createPreviewPanel() {
         RoundedPanel p = new RoundedPanel(16, ThemeConstants.CARD_BACKGROUND);
-        p.setLayout(new BorderLayout(5, 5));
-        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        p.setLayout(new BorderLayout(8, 8));
+        p.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
         JLabel title = new JLabel("3. Vista Previa de Filas a Importar (Primeras 5 filas):");
         title.setFont(ThemeConstants.FONT_SUBTITLE);
@@ -178,26 +215,54 @@ public class ImportarProductosDialog extends JDialog {
         scroll.setOpaque(false);
         scroll.getViewport().setOpaque(false);
         scroll.setBorder(BorderFactory.createEmptyBorder());
+        scroll.setPreferredSize(new Dimension(0, 140));
 
         p.add(scroll, BorderLayout.CENTER);
         return p;
     }
 
     private JPanel createFooterPanel() {
-        JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
+        JPanel p = new JPanel(new BorderLayout());
         p.setOpaque(false);
+        p.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(1, 0, 0, 0, ThemeConstants.CARD_BORDER),
+            BorderFactory.createEmptyBorder(12, 0, 0, 0)
+        ));
+
+        JLabel lblBadge = new JLabel("Asegúrate de mapear al menos Nombre y Precio Venta", createIcon("icons/bolt.svg", ThemeConstants.NEON_CYAN, 14, 14), SwingConstants.LEFT);
+        lblBadge.setFont(ThemeConstants.FONT_BODY);
+        lblBadge.setForeground(ThemeConstants.TEXT_SECONDARY);
+
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
+        actions.setOpaque(false);
 
         NeonButton btnCancelar = new NeonButton("Cancelar");
-        btnCancelar.setNeonColor(new Color(100, 110, 120));
+        btnCancelar.setNeonColor(ThemeConstants.TEXT_SECONDARY);
+        btnCancelar.setIcon(createIcon("icons/xmark.svg", ThemeConstants.TEXT_SECONDARY, 14, 14));
+        btnCancelar.setIconTextGap(6);
+        btnCancelar.setPreferredSize(new Dimension(120, 38));
         btnCancelar.addActionListener(e -> dispose());
 
-        NeonButton btnImportar = new NeonButton("Procesar e Importar");
+        String labelBtn = modo == ModoImportacion.ABASTECIMIENTO ? "Cargar a Factura" : "Procesar e Importar";
+        NeonButton btnImportar = new NeonButton(labelBtn);
         btnImportar.setNeonColor(ThemeConstants.NEON_GREEN);
+        btnImportar.setIcon(createIcon("icons/check-double.svg", ThemeConstants.NEON_GREEN, 16, 16));
+        btnImportar.setIconTextGap(8);
+        btnImportar.setPreferredSize(new Dimension(190, 38));
         btnImportar.addActionListener(e -> procesarImportacion());
 
-        p.add(btnCancelar);
-        p.add(btnImportar);
+        actions.add(btnCancelar);
+        actions.add(btnImportar);
+
+        p.add(lblBadge, BorderLayout.WEST);
+        p.add(actions, BorderLayout.EAST);
         return p;
+    }
+
+    private FlatSVGIcon createIcon(String path, Color color, int width, int height) {
+        FlatSVGIcon icon = new FlatSVGIcon(path, width, height);
+        icon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, color));
+        return icon;
     }
 
     private JComboBox<String> createCombo() {
@@ -284,6 +349,18 @@ public class ImportarProductosDialog extends JDialog {
             return;
         }
 
+        if (cbNombre.getSelectedIndex() <= 0) {
+            JOptionPane.showMessageDialog(this, "Debes vincular la columna del Excel que contiene el 'Nombre del Producto'.", UIMessages.TITULO_ERROR, JOptionPane.WARNING_MESSAGE);
+            cbNombre.requestFocus();
+            return;
+        }
+
+        if (cbPrecio.getSelectedIndex() <= 0) {
+            JOptionPane.showMessageDialog(this, "Debes vincular la columna del Excel que contiene el 'Precio de Venta'.", UIMessages.TITULO_ERROR, JOptionPane.WARNING_MESSAGE);
+            cbPrecio.requestFocus();
+            return;
+        }
+
         Map<String, Integer> mapeo = new HashMap<>();
         mapeo.put("nombre", cbNombre.getSelectedIndex() - 1);
         mapeo.put("codigo", cbCodigo.getSelectedIndex() - 1);
@@ -292,16 +369,33 @@ public class ImportarProductosDialog extends JDialog {
         mapeo.put("cantidad", cbStock.getSelectedIndex() - 1);
         mapeo.put("categoria", cbCategoria.getSelectedIndex() - 1);
 
-        ResultadoOperacion res = ExcelSQLiteManager.importarConMapeo(archivoSeleccionado, mapeo, txtCatDefault.getText());
+        if (modo == ModoImportacion.ABASTECIMIENTO) {
+            ExcelSQLiteManager.ResultadoLecturaAbastecimiento res = 
+                ExcelSQLiteManager.leerItemsParaAbastecimiento(archivoSeleccionado, mapeo, txtCatDefault.getText());
 
-        if (res.esExito()) {
-            JOptionPane.showMessageDialog(this, res.getMensaje(), UIMessages.TITULO_EXITO, JOptionPane.INFORMATION_MESSAGE);
-            if (onImportSuccess != null) {
-                onImportSuccess.run();
+            if (res.esExito()) {
+                if (onItemsLeidos != null) {
+                    onItemsLeidos.accept(res.getItems());
+                }
+                if (onImportSuccess != null) {
+                    onImportSuccess.run();
+                }
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, res.getMensaje(), UIMessages.TITULO_ERROR, JOptionPane.ERROR_MESSAGE);
             }
-            dispose();
         } else {
-            JOptionPane.showMessageDialog(this, res.getMensaje(), UIMessages.TITULO_ERROR, JOptionPane.ERROR_MESSAGE);
+            ResultadoOperacion res = ExcelSQLiteManager.importarConMapeo(archivoSeleccionado, mapeo, txtCatDefault.getText());
+
+            if (res.esExito()) {
+                JOptionPane.showMessageDialog(this, res.getMensaje(), UIMessages.TITULO_EXITO, JOptionPane.INFORMATION_MESSAGE);
+                if (onImportSuccess != null) {
+                    onImportSuccess.run();
+                }
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, res.getMensaje(), UIMessages.TITULO_ERROR, JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 }

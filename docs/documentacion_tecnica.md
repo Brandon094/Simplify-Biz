@@ -171,11 +171,25 @@ UPDATE ventas SET pago_confirmado = 'pagado' WHERE id = ?;
 COMMIT; -- O ROLLBACK si el monto supera el saldo pendiente o falla la conexión
 ```
 
+### 4.4 Motor Dual de Importación Excel/CSV (`ExcelSQLiteManager`)
+
+El motor de importación masiva soporta dos modos de operación parametrizados mediante la enumeración `ModoImportacion`:
+
+1. **`ModoImportacion.CATALOGO`**:
+   - Invocado desde la vista de **Inventario/Productos** (`ImportarProductosDialog`).
+   - Mapea dinámicamente las columnas de la plantilla Excel (Código/SKU, Nombre, Precio Venta, Precio Costo, Stock/Cantidad, Categoría).
+   - Inserta nuevos productos o actualiza los existentes en la tabla `productos` usando estrategia Upsert por SKU (incrementando el stock de forma atómica).
+2. **`ModoImportacion.ABASTECIMIENTO`**:
+   - Invocado desde la vista de **Registro de Compras** (`RegistrarCompraDialog`).
+   - Exige la validación previa de los campos obligatorios **Proveedor** y **Número de Factura**.
+   - Procesa las filas mediante `ExcelSQLiteManager.leerItemsParaAbastecimiento(...)`, retornando una estructura `ResultadoLecturaAbastecimiento` que incluye ítems válidos, advertencias y productos omitidos por costo/cantidad inválida.
+   - Precarga los ítems directamente en la tabla interactiva de la factura de compra (`listaCarrito`), permitiendo la revisión, ajuste y adición visual por parte del usuario antes de presionar "Confirmar Compra", lo cual procesa formalmente el abastecimiento en base de datos (incremento de bodega y actualización de costo de compra).
+
 ---
 
 ## 5. Suite de Pruebas Automatizadas (JUnit 5)
 
-La aplicación cuenta con **41 pruebas unitarias e integrales** que ejecutan contra bases de datos en memoria o aisladas en directorio temporal (`@TempDir`), garantizando que la suite sea **reproducible, libre de efectos secundarios y no altere la base de datos de producción**.
+La aplicación cuenta con **42 pruebas unitarias e integrales** que ejecutan contra bases de datos en memoria o aisladas en directorio temporal (`@TempDir`), garantizando que la suite sea **reproducible, libre de efectos secundarios y no altere la base de datos de producción**.
 
 ```bash
 # Ejecución oficial de tests
@@ -185,15 +199,14 @@ mvn test
 | Suite de Prueba | Capa | Cantidad | Descripción y Aspectos Evaluados |
 | :--- | :--- | :---: | :--- |
 | `VentasControllerTest` | Controller | 3 | Transacciones atómicas de POS, actualización de stock, rollback defensivo por stock insuficiente y filtro por rango de fechas. |
-| `ComprasControllerTest` | Controller | 2 | Orden de compra atómica, incremento de stock entrante y recalculación de costo unitario. |
+| `ComprasControllerTest` | Controller | 4 | Orden de compra atómica, incremento de stock entrante, validaciones de factura de abastecimiento y recalculación de costo unitario. |
 | `ProductoControllerTest` | Controller | 5 | Creación/actualización de repuestos, cálculo de inversión total de bodega, alerta de stock crítico y búsqueda por SKU/categoría. |
-| `UsuarioControllerTest` | Controller | 4 | Autenticación con hash SHA-256, cambio de contraseña, roles (Admin/Vendedor/Cliente) y registro de clientes. |
-| `CarteraControllerTest` | Controller | 2 | Recaudo de abonos parciales, saldo pendiente de cuentas por cobrar y liquidación automática de facturas a crédito. |
-| `ProveedorControllerTest` | Controller | 1 | Alta y búsqueda reactiva de proveedores sugeridos por NIT o nombre. |
-| `GestorConexionTest` | Config | 3 | Singleton de conexión SQLite, reconexión automática tras reinicio de pruebas y pragmas WAL. |
-| `ValidacionesTest` | Config | 16 | Parsers defensivos numéricos anti-crash (`NumberFormatException`), limpia de caracteres de moneda e interpolación de porcentajes. |
-| `LicenciaManagerTest` | Config | 3 | Cifrado HWID, validación de licencias activas/expiradas y generación de firmas criptográficas. |
-| `ExcelSQLiteManagerTest` | Config | 2 | Generación de plantilla modelo `.xlsx`, lectura de cabeceras de Excel e importación dinámica con mapeo visual. |
+| `UsuarioControllerTest` | Controller | 5 | Autenticación con hash SHA-256, cambio de contraseña, roles (Admin/Vendedor/Cliente) y registro de clientes. |
+| `CarteraControllerTest` | Controller | 6 | Recaudo de abonos parciales, saldo pendiente de cuentas por cobrar y liquidación automática de facturas a crédito. |
+| `ProveedorControllerTest` | Controller | 4 | Alta, edición, eliminación y búsqueda reactiva de proveedores sugeridos por NIT o nombre. |
+| `ConexionDBTest` | Config | 3 | Verificación de esquema DDL, migraciones de columna seguras (`migrarColumnaSegura`) e inicialización SQLite. |
+| `ExcelSQLiteManagerTest` | Config | 2 | Generación de plantilla modelo `.xlsx`, lectura de cabeceras, importación en modo Catálogo y lectura en modo Abastecimiento con `ResultadoLecturaAbastecimiento`. |
+| Total | Complete | **42** | **Suite 100% verde (BUILD SUCCESS)** |
 
 ---
 
@@ -203,7 +216,7 @@ mvn test
 # Compilar fuentes Java
 mvn clean compile
 
-# Ejecutar suite completa de 41 pruebas unitarias (JUnit 5)
+# Ejecutar suite completa de 42 pruebas unitarias (JUnit 5)
 mvn test
 
 # Empaquetar artefacto JAR ejecutable (Shaded Fat-JAR)

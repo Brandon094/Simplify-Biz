@@ -121,7 +121,11 @@ Gestión de proveedores e integración con el motor de autocompletado del módul
 
 ## 7. `ExcelSQLiteManager`
 
-Motor de procesamiento de hojas de cálculo (Excel `.xlsx` / `.xls` y CSV) para importación de inventario y facturas de compras con mapeo dinámico de columnas y estrategia Upsert.
+Motor de procesamiento de hojas de cálculo (Excel `.xlsx` / `.xls` y CSV) parametrizable por la enumeración `ModoImportacion` (`CATALOGO` y `ABASTECIMIENTO`).
+
+### Enumeraciones y DTOs
+- **`ModoImportacion`**: `CATALOGO` (importación directa a base de datos de productos) | `ABASTECIMIENTO` (lectura de ítems para precargar en tabla de orden de compra).
+- **`ResultadoLecturaAbastecimiento`**: Encapsula la lista de `DetalleCompra` válidos generados a partir del Excel, lista de advertencias de validación (`warnings`) y contador de filas procesadas/omitidas.
 
 ### Métodos Principales
 
@@ -129,7 +133,8 @@ Motor de procesamiento de hojas de cálculo (Excel `.xlsx` / `.xls` y CSV) para 
 | :--- | :--- | :--- | :--- |
 | `leerCabeceras` | `File archivo` | `List<String>` | Extrae la primera fila del archivo Excel/CSV como nombres de columna para poblar los selectores de mapeo visual. |
 | `leerVistaPrevia` | `File archivo, Map<String, Integer> mapeo, int maxFilas` | `List<Object[]>` | Lee las primeras 5 filas aplicando las transformaciones de mapeo para mostrar la tabla de vista previa en vivo. |
-| `importarConMapeo` | `File archivo, Map<String, Integer> mapeo` | `ResultadoOperacion` | Procesa el archivo completo en una transacción SQLite. Realiza **Upsert** (actualiza precio, costo y suma existencias si el SKU existe, o crea el producto si es nuevo). |
+| `importarConMapeo` | `File archivo, Map<String, Integer> mapeo` | `ResultadoOperacion` | Procesa el archivo completo en una transacción SQLite en modo Catálogo. Realiza **Upsert** (actualiza precio, costo y suma existencias si el SKU existe, o crea el producto si es nuevo). |
+| `leerItemsParaAbastecimiento` | `File archivo, Map<String, Integer> mapeo` | `ResultadoLecturaAbastecimiento` | Procesa el archivo Excel en modo Abastecimiento, transformando las filas en objetos `DetalleCompra` validados (costo y cantidad) para precargar la tabla de la orden de compra antes de confirmar la factura. |
 | `generarPlantillaModelo` | `File destino` | `ResultadoOperacion` | Genera y guarda una plantilla `.xlsx` con las columnas estándar esperadas por el sistema (`codigo_barras`, `nombre`, `precio`, `costo`, `stock`, `categoria`). |
 
 ---

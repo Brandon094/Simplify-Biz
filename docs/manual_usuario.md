@@ -81,15 +81,21 @@ Evita el dolor de perder mercancía por desorden o extravíos. Utiliza **Inventa
 
 ---
 
-## 6. Carga Masiva de Productos en Segundos
+## 6. Carga Masiva de Productos en Segundos (Excel / CSV)
 
-¿Tu proveedor te entregó una lista enorme de 500 o 1,000 productos? ¡No gastes días ni semanas digitando uno por uno!
+¿Tu proveedor te entregó una lista enorme de 500 o 1,000 productos? ¡No gastes días ni semanas digitando uno por uno! ERP+ Business ofrece dos modos inteligentes de carga masiva:
 
-### La Magia de la Carga Automática
-1. **Descarga el Formato Sencillo:** Obtén una plantilla limpia lista para llenar.
-2. **Abre el Asistente Inteligente:** Elige tu archivo de Excel con un solo clic.
-3. **Conecta los Datos de Forma Visual:** Indica de manera súper fácil cuál columna es el nombre, cuál es el precio y cuál es la cantidad.
-4. **Confirma y Disfruta:** En solo 5 segundos verás cientos de productos cargados en tu pantalla, listos para generar ventas.
+### Modo 1: Importación Directa al Catálogo (Módulo de Inventario)
+1. **Descarga la Plantilla:** Obtén una plantilla limpia en formato `.xlsx` desde el botón **Plantilla**.
+2. **Abre el Asistente:** Haz clic en **Importar Excel** en la pantalla de Productos.
+3. **Mapea las Columnas:** Indica visualmente qué columna corresponde a Nombre, Precio Venta, Precio Costo, Cantidad y Categoría.
+4. **Carga Inmediata:** Tus productos se guardan en la base de datos de inmediato. Si un producto ya existe (mismo código/SKU), el sistema actualiza su precio y le suma las nuevas cantidades automáticamente.
+
+### Modo 2: Importación a Factura de Abastecimiento (Módulo de Compras)
+1. **Abre el Registro de Compras:** Ingresa al módulo **Compras** y presiona **Registrar Entrada de Abastecimiento**.
+2. **Selecciona Proveedor y Factura (Obligatorio):** Selecciona el Proveedor e ingresa el Número de Factura.
+3. **Importa el Excel de la Compra:** Haz clic en **Importar Excel**. El asistente leerá el archivo y validará las cantidades y costos.
+4. **Revisión y Ajuste en la Tabla:** Todos los productos del Excel se cargarán en la tabla de la factura de compra de tu pantalla. Podrás revisar, modificar cantidades o precios unitarios y luego presionar **Confirmar Compra** para realizar el ingreso formal a la bodega.
 
 ---
 

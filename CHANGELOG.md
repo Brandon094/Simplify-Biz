@@ -4,26 +4,26 @@ Todas las modificaciones, mejoras, nuevas funcionalidades y correcciones de segu
 
 ---
 
-## [2.0.0] - 2026-09-14 — Enterprise Major Release
+## [2.0.0] - 2026-09-16 — Enterprise Major Release
 
 ### 🚀 Añadido (Enterprise Release)
+- **Flujo Dual de Importación Excel/CSV (`ExcelSQLiteManager`):**
+  - Introducción del enum `ModoImportacion` (`CATALOGO` y `ABASTECIMIENTO`).
+  - **Modo Catálogo:** Importación masiva e inteligente directamente a la base de datos de productos desde la pantalla de Inventario con estrategia Upsert por SKU (crea o actualiza existencias).
+  - **Modo Abastecimiento:** Integración en `RegistrarCompraDialog`. Valida obligatoriamente Proveedor y Número de Factura antes de procesar el archivo Excel. Carga los productos directamente en la tabla de compras para su revisión antes de confirmar formalmente el ingreso a bodega.
+- **Refactorización de Diálogos & Atomic Design:**
+  - Consolidación y reubicación de todos los diálogos modales en la estructura de paquetes `views/components/dialogs/` (`ImportarProductosDialog`, `RegistrarCompraDialog`, `ManualUsuarioDialog`, `LicenciaDialog`, `RegistrarAbonoDialog`, `HistorialAbonosDialog`, `HistorialComprasClienteDialog`).
+  - Eliminación de carpetas duplicadas e hiper-modularización del diseño UI/UX.
+  - Diseño de footer fijo responsivo con barra de botones de acción (`Cargar`, `Confirmar`, `Cancelar`) y panel central con desplazamiento (`JScrollPane`) para evitar truncado en resoluciones bajas.
+- **Refactorización Completa del Sistema de Color (DRY & ThemeConstants):**
+  - Reemplazo de colores hardcodeados por tokens centralizados en `ThemeConstants` en todas las vistas (`ClientsPage`, `ProductPage`, `SellersPage`, `AutocompletePopup`, `UIUtils`, `CarteraPage`, `ReportsPage`, `ProvidersPage`, `SalesPage`, `ModernLoginPage`, `ModernAdminRegistrationPage`).
+  - Renderizado vectorial dinamizado mediante `UIUtils.createIcon(path, color)`.
 - **Modificación Dinámica de Cantidades en el Carrito (POS):**
   - Columna de **Acciones** por fila en la tabla del carrito con botones vectoriales SVG (`plus.svg`, `minus.svg`, `products.svg`, `trash.svg`) para incrementar `+1`, mermar `-1`, editar cantidad exacta o eliminar el ítem.
-  - Reorganización en dos niveles dentro del footer del carrito (Línea divisoria `JSeparator`, barra de acciones globales y fila independiente de `TOTAL VENTA`) para evitar superposiciones.
-  - Validación dinámica contra el stock real de inventario en tiempo real.
-
-### Added / Añadido
-- **Versión Major 2.0.0 (Enterprise Ready):** Liberación oficial de arquitectura empresarial con suite completa de 9 módulos de negocio.
-- **Ecosistema de Iconografía Vectorial SVG (46 Iconos):** Sustitución total de emojis por iconos vectoriales FlatSVG con filtrado dinámico neón (incluyendo `info.svg`, `barcode.svg`, `boxes-stacked.svg`, `wallet.svg`, `ticket.svg`, `xmark.svg`, etc.).
-- **Módulo Completo de Proveedores (`ProvidersPage.java`):** Gestión integral CRUD de casas comerciales con autocompletado en tiempo real en la entrada de facturas de compra.
+  - Reorganización en dos niveles dentro del footer del carrito para evitar superposiciones visuales.
 - **Centro de Ayuda & Lector de Manual (`ManualUsuarioDialog`):** Lector e instructivo navegable con inicio automático en Sección 0 (Introducción), buscador por palabra clave y barra inferior fija de paginación.
 - **Gestión de Licencias & Evaluación Demo 30 Días (`LicenciaDialog`):** Sistema criptográfico con cálculo de Hardware ID, botón de copia en 1 clic y token de activación `ERPPRO-XXXX-XXXX-XXXX`.
-- **Navegación con Acordeón Inteligente (`SidebarSection`):** Grupos de opciones colapsables con tarjetas neumórficas, indicador de dirección (`▲`/`▼`) y persistencia automática del estado mediante `Preferences`. Swing con árbol navegable de capítulos, búsqueda en tiempo real, formato enriquecido e instrucciones paso a paso.
-- **Módulo de Cartera y Cuentas por Cobrar (CxC):** Panel completo con KPIs de Cartera Pendiente, Recaudado Mes y Deudores Activos. Soporte para abonos parciales y totales vía `RegistrarAbonoDialog` e `HistorialAbonosDialog`.
-- **Módulo de Compras y Entrada de Bodega (`ComprasPage`):** Gestión formal de abastecimiento con facturas de proveedor, incremento de stock atómico y actualización de costo de adquisición (`precio_costo`).
-- **Autocompletado Genérico DRY (`AutocompletePopup<T>`):** Sugerencias emergentes en tiempo real e insensibles a mayúsculas/minúsculas para productos y clientes en POS e Inventario.
-- **Exportación Ejecutiva a Excel Real (`.xlsx`):** Generación nativa con Apache POI incluyendo banner corporativo, encabezados `#1E293B`, formato de moneda `$#,##0.00` y fila de Gran Total.
-- **Generación e Impresión Oficial a PDF:** Vista previa e impresión vectorial mediante `JTable.print(...)`.
+- **Suite Completa de 42 Pruebas Automatizadas:** Cobertura integral de controladores, motor de base de datos, parsers y gestor de Excel con JUnit 5 pasando al 100%.
 
 ---
 

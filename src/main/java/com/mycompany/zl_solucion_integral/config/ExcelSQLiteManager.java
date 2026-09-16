@@ -169,6 +169,118 @@ public class ExcelSQLiteManager {
     }
 
     /**
+     * Contenedor de resultado para la lectura de ítems en modo Abastecimiento.
+     */
+    public static class ResultadoLecturaAbastecimiento {
+        private final boolean exito;
+        private final String mensaje;
+        private final java.util.List<com.mycompany.zl_solucion_integral.models.DetalleCompra> items;
+
+        public ResultadoLecturaAbastecimiento(boolean exito, String mensaje, java.util.List<com.mycompany.zl_solucion_integral.models.DetalleCompra> items) {
+            this.exito = exito;
+            this.mensaje = mensaje;
+            this.items = items;
+        }
+
+        public boolean esExito() { return exito; }
+        public String getMensaje() { return mensaje; }
+        public java.util.List<com.mycompany.zl_solucion_integral.models.DetalleCompra> getItems() { return items; }
+    }
+
+    /**
+     * Lee productos desde Excel para la Factura de Abastecimiento sin incrementar el stock directamente,
+     * pero garantizando que el producto exista en el catálogo (stock 0 si es nuevo) y retornando los ítems.
+     */
+    public static ResultadoLecturaAbastecimiento leerItemsParaAbastecimiento(java.io.File archivo, java.util.Map<String, Integer> mapeo, String categoriaDefault) {
+        Connection conn = GestorConexion.getInstancia().obtenerConexion();
+        if (conn == null) {
+            return new ResultadoLecturaAbastecimiento(false, "No hay conexión a la base de datos.", new java.util.ArrayList<>());
+        }
+
+        java.util.List<com.mycompany.zl_solucion_integral.models.DetalleCompra> listaItems = new java.util.ArrayList<>();
+        int omitidos = 0;
+
+        try (FileInputStream fis = new FileInputStream(archivo); Workbook workbook = WorkbookFactory.create(fis)) {
+            Sheet sheet = workbook.getSheetAt(0);
+            int totalFilas = sheet.getLastRowNum();
+
+            String selectSQL = "SELECT id, producto, precio, precio_costo FROM productos WHERE codigo = ?";
+            String insertSQL = "INSERT INTO productos (producto, precio, precio_costo, cantidad, codigo, categoria) VALUES (?, ?, ?, 0, ?, ?)";
+
+            conn.setAutoCommit(false);
+
+            for (int i = 1; i <= totalFilas; i++) {
+                Row row = sheet.getRow(i);
+                if (row == null) continue;
+
+                Integer idxNombre = mapeo.get("nombre");
+                Integer idxCodigo = mapeo.get("codigo");
+                Integer idxPrecio = mapeo.get("precio");
+                Integer idxCosto = mapeo.get("precio_costo");
+                Integer idxStock = mapeo.get("cantidad");
+                Integer idxCat = mapeo.get("categoria");
+
+                String nombre = (idxNombre != null && idxNombre >= 0) ? obtenerValorTexto(row.getCell(idxNombre)) : "";
+                String codigo = (idxCodigo != null && idxCodigo >= 0) ? obtenerValorTexto(row.getCell(idxCodigo)) : "";
+                double precio = (idxPrecio != null && idxPrecio >= 0) ? obtenerValorDoubleDefensivo(row.getCell(idxPrecio)) : 0.0;
+                double costo = (idxCosto != null && idxCosto >= 0) ? obtenerValorDoubleDefensivo(row.getCell(idxCosto)) : 0.0;
+                int cantidad = (idxStock != null && idxStock >= 0) ? (int) Math.round(obtenerValorDoubleDefensivo(row.getCell(idxStock))) : 1;
+                String cat = (idxCat != null && idxCat >= 0) ? obtenerValorTexto(row.getCell(idxCat)) : "";
+
+                if (cat.trim().isEmpty()) {
+                    cat = (categoriaDefault != null && !categoriaDefault.trim().isEmpty()) ? categoriaDefault.trim() : "GENERAL";
+                }
+
+                if (codigo.trim().isEmpty()) {
+                    if (nombre.trim().isEmpty()) {
+                        omitidos++;
+                        continue;
+                    }
+                    codigo = "SKU-IMP-" + System.currentTimeMillis() + "-" + i;
+                }
+
+                if (nombre.trim().isEmpty()) {
+                    nombre = "Producto " + codigo;
+                }
+
+                if (cantidad <= 0) cantidad = 1;
+
+                // Garantizar que el producto exista en el catálogo `productos` (si es nuevo, insertarlo con stock 0)
+                try (PreparedStatement psSelect = conn.prepareStatement(selectSQL)) {
+                    psSelect.setString(1, codigo.trim());
+                    ResultSet rs = psSelect.executeQuery();
+
+                    if (!rs.next()) {
+                        try (PreparedStatement psIn = conn.prepareStatement(insertSQL)) {
+                            psIn.setString(1, nombre.trim());
+                            psIn.setDouble(2, precio);
+                            psIn.setDouble(3, costo);
+                            psIn.setString(4, codigo.trim());
+                            psIn.setString(5, cat.toUpperCase());
+                            psIn.executeUpdate();
+                        }
+                    }
+                }
+
+                // Agregar ítem al listado de la orden de abastecimiento
+                com.mycompany.zl_solucion_integral.models.DetalleCompra det = 
+                    new com.mycompany.zl_solucion_integral.models.DetalleCompra(nombre.trim(), codigo.trim(), cantidad, costo);
+                listaItems.add(det);
+            }
+
+            conn.commit();
+            conn.setAutoCommit(true);
+
+            String msg = String.format("Se cargaron %d ítems a la orden de compra (%d omitidos).", listaItems.size(), omitidos);
+            return new ResultadoLecturaAbastecimiento(true, msg, listaItems);
+
+        } catch (Exception e) {
+            try { conn.rollback(); conn.setAutoCommit(true); } catch (SQLException ignored) {}
+            return new ResultadoLecturaAbastecimiento(false, "Error al procesar el archivo Excel para abastecimiento: " + e.getMessage(), new java.util.ArrayList<>());
+        }
+    }
+
+    /**
      * Genera un archivo Excel (.xlsx) con la plantilla modelo oficial ERP+ Business.
      */
     public static ResultadoOperacion generarPlantillaModelo(java.io.File archivoDestino) {

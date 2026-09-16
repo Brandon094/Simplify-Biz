@@ -58,7 +58,8 @@ views/
   │   │   └── ThemeToggleButton.java    Botón toggle (☀️/🌙) que conmuta la paleta en caliente
   │   ├── AutocompletePopup.java        Componente genérico DRY de autocompletado y sugerencias flotantes para JTextFields.
   │   ├── dialogs/
-  │   │   ├── ImportarProductosDialog.java Asistente modal en 4 pasos para importación y mapeo dinámico de Excel/CSV a la base de datos.
+  │   │   ├── ImportarProductosDialog.java Asistente modal dual en 4 pasos para importación y mapeo dinámico de Excel/CSV a la base de datos (Catálogo y Abastecimiento).
+  │   │   ├── RegistrarCompraDialog.java  Modal de registro de facturas de abastecimiento a proveedores con validación de factura, autocompletado de proveedor e importación masiva.
   │   │   ├── ManualUsuarioDialog.java  Centro de Ayuda e instructivo navegable con buscador, inicio en Sección 0 y paginador inferior fijo.
   │   │   ├── LicenciaDialog.java       Modal de licenciamiento con estatus (Demo/PRO), copia de Hardware ID y caja de token activable.
   │   │   ├── RegistrarAbonoDialog.java Modal para ingresar abonos a deudas de ventas a crédito con resumen financiero.
