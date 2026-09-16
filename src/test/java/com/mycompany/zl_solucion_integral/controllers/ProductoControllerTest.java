@@ -100,4 +100,32 @@ public class ProductoControllerTest {
         Producto actualizado = controller.buscarProductoPorCodigo("SKU-005");
         assertEquals(6, actualizado.getCantidad());
     }
+
+    @Test
+    void testObtenerProductosStockCritico() {
+        controller.agregarOActualizarProductoSiExiste(new Producto("Alto Stock", 1000.0, 20, "SKU-C1", "GRAL"));
+        controller.agregarOActualizarProductoSiExiste(new Producto("Bajo Stock 1", 2000.0, 2, "SKU-C2", "GRAL"));
+        controller.agregarOActualizarProductoSiExiste(new Producto("Bajo Stock 2", 3000.0, 0, "SKU-C3", "GRAL"));
+
+        java.util.List<Producto> criticos = controller.obtenerProductosStockCritico(5);
+        assertEquals(2, criticos.size());
+        assertEquals("Bajo Stock 2", criticos.get(0).getProducto(), "Debe ordenar por cantidad ascendente (0 unidades primero)");
+        assertEquals(0, criticos.get(0).getCantidad());
+        assertEquals("Bajo Stock 1", criticos.get(1).getProducto());
+        assertEquals(2, criticos.get(1).getCantidad());
+    }
+
+    @Test
+    void testObtenerDesgloseInversionInventario() {
+        Producto p1 = new Producto("Item A", 10000.0, 10, "SKU-D1", "CAT1");
+        p1.setPrecioCosto(5000.0);
+        controller.agregarOActualizarProductoSiExiste(p1);
+
+        double[] desglose = controller.obtenerDesgloseInversionInventario();
+        assertNotNull(desglose);
+        assertEquals(3, desglose.length);
+        assertEquals(50000.0, desglose[0], 0.01, "Total invertido = 10 * 5000 = 50000");
+        assertEquals(0.0, desglose[1], 0.01, "Sin abastecimiento = 0");
+        assertEquals(50000.0, desglose[2], 0.01, "Inversión directa = 50000");
+    }
 }

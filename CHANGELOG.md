@@ -23,7 +23,13 @@ Todas las modificaciones, mejoras, nuevas funcionalidades y correcciones de segu
   - Reorganización en dos niveles dentro del footer del carrito para evitar superposiciones visuales.
 - **Centro de Ayuda & Lector de Manual (`ManualUsuarioDialog`):** Lector e instructivo navegable con inicio automático en Sección 0 (Introducción), buscador por palabra clave y barra inferior fija de paginación.
 - **Gestión de Licencias & Evaluación Demo 30 Días (`LicenciaDialog`):** Sistema criptográfico con cálculo de Hardware ID, botón de copia en 1 clic y token de activación `ERPPRO-XXXX-XXXX-XXXX`.
-- **Suite Completa de 42 Pruebas Automatizadas:** Cobertura integral de controladores, motor de base de datos, parsers y gestor de Excel con JUnit 5 pasando al 100%.
+- **Ecosistema de Tooltips Inteligentes en Dashboard (4 Tarjetas KPI):**
+  - **Ventas Totales:** Radiografía flotante con el desglose por métodos de pago (Efectivo en Caja, Transferencias digitales Nequi/Banco y Crédito Comercial / Fiado con montos y porcentajes).
+  - **Utilidad Neta:** Radiografía ejecutiva de rentabilidad (Total Facturado, Costo COGS de Mercancía Vendida, Utilidad Neta Ganada y Retorno limpio por cada $1.000 vendidos).
+  - **Inversión Inventario:** Radiografía de patrimonio en bodega (Abastecimiento por Facturas de Proveedores vs. Carga Directa / Catálogo Propietario).
+  - **Stock Crítico:** Listado interactivo de los productos con existencias $\le 5$ unidades (destacando agotados en 0 unds).
+  - **Permanencia Extendida (20s):** Configuración global de `ToolTipManager` con visibilidad activa de 20 segundos para lectura sin afanes.
+- **Suite Completa de 45 Pruebas Automatizadas:** Cobertura integral de controladores, motor de base de datos, parsers y gestor de Excel con JUnit 5 pasando al 100%.
 
 ---
 

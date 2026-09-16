@@ -288,6 +288,24 @@ public class ProductoController {
         return 0.0;
     }
 
+    public double[] obtenerDesgloseInversionInventario() {
+        double total = obtenerInversionTotalInventario();
+        double abastecimiento = 0.0;
+        String sql = "SELECT COALESCE(SUM(precio_costo * cantidad), 0.0) FROM detalles_compra";
+        try (Statement st = conn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            if (rs.next()) {
+                abastecimiento = rs.getDouble(1);
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al obtener inversión por abastecimiento", e);
+        }
+        if (abastecimiento > total) {
+            abastecimiento = total;
+        }
+        double directa = Math.max(0.0, total - abastecimiento);
+        return new double[]{ total, abastecimiento, directa };
+    }
+
     public Producto buscarProductoPorCodigo(String codigoProducto) {
         Producto producto = null;
         final String sql = "SELECT * FROM productos WHERE codigo = ?";
@@ -418,6 +436,34 @@ public class ProductoController {
             logger.log(Level.SEVERE, "Error al obtener stock crítico", e);
         }
         return 0;
+    }
+
+    public java.util.List<Producto> obtenerProductosStockCritico(int limite) {
+        java.util.List<Producto> lista = new java.util.ArrayList<>();
+        String sql = "SELECT id, producto, precio, precio_costo, cantidad, codigo, categoria FROM productos WHERE cantidad <= ? ORDER BY cantidad ASC, producto ASC LIMIT 10";
+        try (PreparedStatement pstmt = conn().prepareStatement(sql)) {
+            pstmt.setInt(1, limite);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    double precio = rs.getDouble("precio");
+                    double precioCosto = rs.getDouble("precio_costo");
+                    int cantidad = rs.getInt("cantidad");
+                    lista.add(new Producto(
+                            rs.getInt("id"),
+                            rs.getString("producto"),
+                            precio,
+                            precioCosto,
+                            cantidad,
+                            rs.getString("codigo"),
+                            precio * cantidad,
+                            rs.getString("categoria")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al obtener lista de stock crítico", e);
+        }
+        return lista;
     }
 
     public java.util.List<String> obtenerCategorias() {

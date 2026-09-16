@@ -189,7 +189,7 @@ El motor de importación masiva soporta dos modos de operación parametrizados m
 
 ## 5. Suite de Pruebas Automatizadas (JUnit 5)
 
-La aplicación cuenta con **42 pruebas unitarias e integrales** que ejecutan contra bases de datos en memoria o aisladas en directorio temporal (`@TempDir`), garantizando que la suite sea **reproducible, libre de efectos secundarios y no altere la base de datos de producción**.
+La aplicación cuenta con **45 pruebas unitarias e integrales** que ejecutan contra bases de datos en memoria o aisladas en directorio temporal (`@TempDir`), garantizando que la suite sea **reproducible, libre de efectos secundarios y no altere la base de datos de producción**.
 
 ```bash
 # Ejecución oficial de tests
@@ -198,15 +198,15 @@ mvn test
 
 | Suite de Prueba | Capa | Cantidad | Descripción y Aspectos Evaluados |
 | :--- | :--- | :---: | :--- |
-| `VentasControllerTest` | Controller | 3 | Transacciones atómicas de POS, actualización de stock, rollback defensivo por stock insuficiente y filtro por rango de fechas. |
+| `VentasControllerTest` | Controller | 4 | Transacciones atómicas de POS, actualización de stock, desgloses por método de pago (Efectivo/Transferencia/Crédito) y utilidad por periodo. |
 | `ComprasControllerTest` | Controller | 4 | Orden de compra atómica, incremento de stock entrante, validaciones de factura de abastecimiento y recalculación de costo unitario. |
-| `ProductoControllerTest` | Controller | 5 | Creación/actualización de repuestos, cálculo de inversión total de bodega, alerta de stock crítico y búsqueda por SKU/categoría. |
+| `ProductoControllerTest` | Controller | 7 | Creación/actualización de repuestos, cálculo de inversión total, desglose de inversión (Abastecimiento vs Catálogo Directo), productos en stock crítico y búsqueda por SKU/categoría. |
 | `UsuarioControllerTest` | Controller | 5 | Autenticación con hash SHA-256, cambio de contraseña, roles (Admin/Vendedor/Cliente) y registro de clientes. |
 | `CarteraControllerTest` | Controller | 6 | Recaudo de abonos parciales, saldo pendiente de cuentas por cobrar y liquidación automática de facturas a crédito. |
 | `ProveedorControllerTest` | Controller | 4 | Alta, edición, eliminación y búsqueda reactiva de proveedores sugeridos por NIT o nombre. |
 | `ConexionDBTest` | Config | 3 | Verificación de esquema DDL, migraciones de columna seguras (`migrarColumnaSegura`) e inicialización SQLite. |
 | `ExcelSQLiteManagerTest` | Config | 2 | Generación de plantilla modelo `.xlsx`, lectura de cabeceras, importación en modo Catálogo y lectura en modo Abastecimiento con `ResultadoLecturaAbastecimiento`. |
-| Total | Complete | **42** | **Suite 100% verde (BUILD SUCCESS)** |
+| Total | Complete | **45** | **Suite 100% verde (BUILD SUCCESS)** |
 
 ---
 
@@ -216,7 +216,7 @@ mvn test
 # Compilar fuentes Java
 mvn clean compile
 
-# Ejecutar suite completa de 42 pruebas unitarias (JUnit 5)
+# Ejecutar suite completa de 45 pruebas unitarias (JUnit 5)
 mvn test
 
 # Empaquetar artefacto JAR ejecutable (Shaded Fat-JAR)

@@ -30,7 +30,11 @@ public class DashboardPage extends JPanel {
     private double totalVentas;
     private double utilidadNeta;
     private double inversionInventario;
+    private double[] desgloseInversion;
+    private Map<String, Double> desglosePagos;
+    private double[] desgloseUtilidad;
     private int stockCritico;
+    private List<com.mycompany.zl_solucion_integral.models.Producto> productosCriticos;
     private Object[][] ventasRecientes;
     private List<Double> ventas7Dias;
     private Map<String, Double> distribucionCategorias;
@@ -48,6 +52,13 @@ public class DashboardPage extends JPanel {
     public DashboardPage() {
         setOpaque(false);
         setLayout(new BorderLayout(18, 18));
+        
+        // Ajuste defensivo de permanencia de Tooltips (20 segundos activos)
+        ToolTipManager ttm = ToolTipManager.sharedInstance();
+        ttm.setInitialDelay(150);
+        ttm.setDismissDelay(20000);
+        ttm.setReshowDelay(100);
+
         JPanel topHeaderRow = new JPanel(new BorderLayout(12, 0));
         topHeaderRow.setOpaque(false);
 
@@ -93,7 +104,11 @@ public class DashboardPage extends JPanel {
                 totalVentas = ventasCtrl.obtenerVentasTotalesPorPeriodo(periodoSeleccionado);
                 utilidadNeta = ventasCtrl.obtenerUtilidadTotalPorPeriodo(periodoSeleccionado);
                 inversionInventario = productoCtrl.obtenerInversionTotalInventario();
+                desgloseInversion = productoCtrl.obtenerDesgloseInversionInventario();
+                desglosePagos = ventasCtrl.obtenerDesgloseMetodosPagoPorPeriodo(periodoSeleccionado);
+                desgloseUtilidad = ventasCtrl.obtenerDesgloseUtilidadNetaPorPeriodo(periodoSeleccionado);
                 stockCritico = productoCtrl.obtenerCantidadStockCritico(5);
+                productosCriticos = productoCtrl.obtenerProductosStockCritico(5);
                 ventasRecientes = ventasCtrl.obtenerUltimasVentas(5);
                 ventas7Dias = ventasCtrl.obtenerVentasUltimos7Dias();
                 distribucionCategorias = productoCtrl.obtenerDistribucionCategorias();
@@ -119,7 +134,11 @@ public class DashboardPage extends JPanel {
                 totalVentas = ventasCtrl.obtenerVentasTotalesPorPeriodo(periodoSeleccionado);
                 utilidadNeta = ventasCtrl.obtenerUtilidadTotalPorPeriodo(periodoSeleccionado);
                 inversionInventario = productoCtrl.obtenerInversionTotalInventario();
+                desgloseInversion = productoCtrl.obtenerDesgloseInversionInventario();
+                desglosePagos = ventasCtrl.obtenerDesgloseMetodosPagoPorPeriodo(periodoSeleccionado);
+                desgloseUtilidad = ventasCtrl.obtenerDesgloseUtilidadNetaPorPeriodo(periodoSeleccionado);
                 stockCritico = productoCtrl.obtenerCantidadStockCritico(5);
+                productosCriticos = productoCtrl.obtenerProductosStockCritico(5);
                 ventasRecientes = ventasCtrl.obtenerUltimasVentas(5);
                 ventas7Dias = ventasCtrl.obtenerVentasUltimos7Dias();
                 distribucionCategorias = productoCtrl.obtenerDistribucionCategorias();
@@ -151,6 +170,99 @@ public class DashboardPage extends JPanel {
         MetricCard cardUtilidad = new MetricCard("Utilidad Neta", cur.format(utilidadNeta), String.format("Margen real: %.1f%%", porcentajeMargen), ThemeConstants.NEON_CYAN, "icons/check-double.svg");
         MetricCard cardInversion = new MetricCard("Inversión Inventario", cur.format(inversionInventario), "Valor costo en bodega", ThemeConstants.NEON_PURPLE, "icons/boxes-stacked.svg");
         MetricCard cardStock = new MetricCard("Stock Crítico", stockCritico + " ítems", "Menos de 5 unidades", ThemeConstants.NEON_RED, "icons/triangle-exclamation.svg");
+        
+        if (desglosePagos != null && totalVentas > 0) {
+            double ef = desglosePagos.getOrDefault("Efectivo", 0.0);
+            double tr = desglosePagos.getOrDefault("Transferencia", 0.0);
+            double cr = desglosePagos.getOrDefault("Crédito", 0.0);
+            double pEf = (ef / totalVentas) * 100.0;
+            double pTr = (tr / totalVentas) * 100.0;
+            double pCr = (cr / totalVentas) * 100.0;
+
+            StringBuilder sbV = new StringBuilder();
+            sbV.append("<html><div style='padding: 6px; background-color: #1E293B;'>");
+            sbV.append("<b style='color: #22C55E;'>DESGLOSE DE VENTAS POR MÉTODOS DE PAGO:</b><br/>");
+            sbV.append("<table border='0' cellspacing='4' cellpadding='2' style='margin-top: 4px; color: #E2E8F0;'>");
+            sbV.append("<tr><td>• <b>Efectivo (Caja)</b></td><td align='right' style='color: #22C55E; font-weight: bold;'>")
+               .append(cur.format(ef)).append(String.format(" (%.1f%%)", pEf)).append("</td></tr>");
+            sbV.append("<tr><td>• <b>Transferencia (Nequi/Banco)</b></td><td align='right' style='color: #3B82F6; font-weight: bold;'>")
+               .append(cur.format(tr)).append(String.format(" (%.1f%%)", pTr)).append("</td></tr>");
+            sbV.append("<tr><td>• <b>Crédito Comercial (Fiado)</b></td><td align='right' style='color: #F59E0B; font-weight: bold;'>")
+               .append(cur.format(cr)).append(String.format(" (%.1f%%)", pCr)).append("</td></tr>");
+            sbV.append("<tr><td style='border-top: 1px solid #334155;'><b>Total Facturado</b></td><td align='right' style='border-top: 1px solid #334155; font-weight: bold; color: #FFFFFF;'>")
+               .append(cur.format(totalVentas)).append("</td></tr>");
+            sbV.append("</table></div></html>");
+            cardVentas.setCustomToolTip(sbV.toString());
+        } else {
+            cardVentas.setCustomToolTip("<html><div style='padding: 4px;'><b style='color: #94A3B8;'>Sin ventas registradas en este período.</b></div></html>");
+        }
+
+        if (desgloseUtilidad != null && desgloseUtilidad.length >= 3 && desgloseUtilidad[0] > 0) {
+            double facturado = desgloseUtilidad[0];
+            double cogs = desgloseUtilidad[1];
+            double utilidad = desgloseUtilidad[2];
+            double pctUtilidad = (utilidad / facturado) * 100.0;
+            double retornoPorMil = (utilidad / facturado) * 1000.0;
+
+            StringBuilder sbU = new StringBuilder();
+            sbU.append("<html><div style='padding: 6px; background-color: #1E293B;'>");
+            sbU.append("<b style='color: #06B6D4;'>ANÁLISIS DE RENTABILIDAD & MARGEN NETO:</b><br/>");
+            sbU.append("<table border='0' cellspacing='4' cellpadding='2' style='margin-top: 4px; color: #E2E8F0;'>");
+            sbU.append("<tr><td>• <b>Total Facturado (Bruto)</b></td><td align='right' style='color: #FFFFFF; font-weight: bold;'>")
+               .append(cur.format(facturado)).append("</td></tr>");
+            sbU.append("<tr><td>• <b>Costo Mercancía (COGS)</b></td><td align='right' style='color: #F43F5E; font-weight: bold;'>- ")
+               .append(cur.format(cogs)).append("</td></tr>");
+            sbU.append("<tr><td style='border-top: 1px solid #334155;'><b>Utilidad Neta Ganada</b></td><td align='right' style='border-top: 1px solid #334155; font-weight: bold; color: #06B6D4;'>")
+               .append(cur.format(utilidad)).append(String.format(" (%.1f%%)", pctUtilidad)).append("</td></tr>");
+            sbU.append("<tr><td colspan='2' style='color: #22C55E; font-size: 11px; font-weight: bold; padding-top: 4px;'>Ganancia limpia: ").append(cur.format(retornoPorMil)).append(" por cada $1.000 vendidos</td></tr>");
+            sbU.append("</table></div></html>");
+            cardUtilidad.setCustomToolTip(sbU.toString());
+        } else {
+            cardUtilidad.setCustomToolTip("<html><div style='padding: 4px;'><b style='color: #94A3B8;'>Sin utilidad calculada en el período.</b></div></html>");
+        }
+        
+        if (desgloseInversion != null && desgloseInversion.length >= 3 && desgloseInversion[0] > 0) {
+            double totalInv = desgloseInversion[0];
+            double abastInv = desgloseInversion[1];
+            double dirInv = desgloseInversion[2];
+            double pctAbast = (abastInv / totalInv) * 100.0;
+            double pctDir = (dirInv / totalInv) * 100.0;
+
+            StringBuilder sbInv = new StringBuilder();
+            sbInv.append("<html><div style='padding: 6px; background-color: #1E293B;'>");
+            sbInv.append("<b style='color: #A855F7;'>DESGLOSE DE INVERSIÓN EN BODEGA:</b><br/>");
+            sbInv.append("<table border='0' cellspacing='4' cellpadding='2' style='margin-top: 4px; color: #E2E8F0;'>");
+            sbInv.append("<tr><td>• <b>Abastecimiento (Facturas)</b></td><td align='right' style='color: #06B6D4; font-weight: bold;'>")
+                 .append(cur.format(abastInv)).append(String.format(" (%.1f%%)", pctAbast)).append("</td></tr>");
+            sbInv.append("<tr><td>• <b>Carga Directa / Catálogo</b></td><td align='right' style='color: #A855F7; font-weight: bold;'>")
+                 .append(cur.format(dirInv)).append(String.format(" (%.1f%%)", pctDir)).append("</td></tr>");
+            sbInv.append("<tr><td style='border-top: 1px solid #334155;'><b>Total Valorizado Bodega</b></td><td align='right' style='border-top: 1px solid #334155; font-weight: bold; color: #22C55E;'>")
+                 .append(cur.format(totalInv)).append("</td></tr>");
+            sbInv.append("</table></div></html>");
+            cardInversion.setCustomToolTip(sbInv.toString());
+        } else {
+            cardInversion.setCustomToolTip("<html><div style='padding: 4px;'><b style='color: #94A3B8;'>Sin productos valorizados en inventario.</b></div></html>");
+        }
+        
+        if (productosCriticos != null && !productosCriticos.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("<html><div style='padding: 6px; background-color: #1E293B;'>");
+            sb.append("<b style='color: #F43F5E;'>PRODUCTOS EN STOCK CRÍTICO (&le; 5 unds):</b><br/>");
+            sb.append("<table border='0' cellspacing='4' cellpadding='2' style='margin-top: 4px; color: #E2E8F0;'>");
+            for (com.mycompany.zl_solucion_integral.models.Producto p : productosCriticos) {
+                String colorQty = p.getCantidad() == 0 ? "#F43F5E" : "#F59E0B";
+                String tagQty = p.getCantidad() == 0 ? " (AGOTADO)" : "";
+                sb.append("<tr>")
+                  .append("<td>• ").append(escapeHtml(p.getProducto())).append("</td>")
+                  .append("<td align='right' style='color: ").append(colorQty).append("; font-weight: bold;'>")
+                  .append(p.getCantidad()).append(" und").append(tagQty).append("</td>")
+                  .append("</tr>");
+            }
+            sb.append("</table></div></html>");
+            cardStock.setCustomToolTip(sb.toString());
+        } else {
+            cardStock.setCustomToolTip("<html><div style='padding: 4px;'><b style='color: #22C55E;'>Excelente: Todo el stock está sobre 5 unidades.</b></div></html>");
+        }
         
         metricCards.clear();
         metricCards.add(cardVentas);
@@ -364,5 +476,10 @@ public class DashboardPage extends JPanel {
     private JPanel createEmptyState(String message, String iconPath) {
         return UIUtils.createEmptyState(iconPath, ThemeConstants.NEON_BLUE,
                 "Sin actividad por ahora", message, null, null);
+    }
+
+    private String escapeHtml(String text) {
+        if (text == null) return "";
+        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 }

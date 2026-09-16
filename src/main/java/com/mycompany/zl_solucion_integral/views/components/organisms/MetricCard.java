@@ -48,4 +48,20 @@ public class MetricCard extends RoundedPanel {
         lblTrend.setFont(ThemeConstants.FONT_SMALL);
         add(lblTrend, BorderLayout.SOUTH);
     }
+
+    public void setCustomToolTip(String text) {
+        setToolTipText(text);
+        for (Component c : getComponents()) {
+            if (c instanceof JComponent) {
+                ((JComponent) c).setToolTipText(text);
+            }
+            if (c instanceof Container) {
+                for (Component sub : ((Container) c).getComponents()) {
+                    if (sub instanceof JComponent) {
+                        ((JComponent) sub).setToolTipText(text);
+                    }
+                }
+            }
+        }
+    }
 }

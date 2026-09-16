@@ -7,7 +7,7 @@
 ![SQLite WAL Mode](https://img.shields.io/badge/SQLite_3.46-WAL_Mode-blue?style=for-the-badge&logo=sqlite)
 ![FlatLaf Cyberpunk](https://img.shields.io/badge/FlatLaf-3.5.1_Cyberpunk-purple?style=for-the-badge)
 ![Maven 3.8+](https://img.shields.io/badge/Maven-3.8+-red?style=for-the-badge&logo=apachemaven)
-![JUnit 5 Passed](https://img.shields.io/badge/Tests-42%2F42_Passed-brightgreen?style=for-the-badge&logo=junit5)
+![JUnit 5 Passed](https://img.shields.io/badge/Tests-45%2F45_Passed-brightgreen?style=for-the-badge&logo=junit5)
 ![Architecture](https://img.shields.io/badge/Architecture-MVC_%7C_Atomic_Design-informational?style=for-the-badge)
 
 ---
@@ -25,7 +25,7 @@
 - **[X] Fase 5 — Analítica Financiera & Abastecimiento:** Dashboard ejecutivo con widgets gráficos vectoriales 2D (`NeonPieChart`, `NeonLineChart`, `NeonBarChart`), módulo de Compras a Proveedores con incremento atómico de stock e historial 360° por cliente.
 - **[X] Fase 6 — Ecosistema SVG, Top Header & Sidebar Ergónomico:** Implementación de 51+ iconos vectoriales FlatSVG, Top Header dinámico contextual y menú lateral colapsable horizontalmente de 260px a 64px (+170px de espacio útil).
 - **[X] Fase 7 — Motor Dual de Importación Excel/CSV & UX POS Ergonométrica:** Engine `ExcelSQLiteManager` desacoplado que soporta dos modos de operación (`ModoImportacion.CATALOGO` y `ModoImportacion.ABASTECIMIENTO`). En Abastecimiento valida previamente Proveedor y Factura, precargando la orden para revisión visual antes del ingreso formal a bodega.
-- **[X] Fase 8 — Refactorización Atomic Design & Suite de Pruebas 2.0.0:** Reorganización centralizada de diálogos en `views/components/dialogs/`, estandarización de temas en `ThemeConstants` y suite completa de 42 pruebas unitarias e integración en JUnit 5 passing al 100%.
+- **[X] Fase 8 — Ecosistema de Tooltips Inteligentes en Dashboard & Tests 2.0.0:** Implementación de radiografías flotantes en las 4 tarjetas KPI (Desglose por método de pago con Crédito/Fiado, Análisis COGS/Utilidad por $1.000, Inversión Abastecimiento vs Catálogo y Productos en Stock Crítico) con permanencia extendida a 20 segundos y suite completa de 45 pruebas unitarias e integración en JUnit 5 passing al 100%.
 
 ---
 
@@ -38,7 +38,7 @@
 | **Vectorial SVG** | FlatSVG / JSVG | **JSVG 1.4.0** / **FlatLaf Extras 3.5.1** (51 SVG Icons) |
 | **Motor de Base de Datos** | SQLite JDBC | **SQLite 3.46.1.0** (Embebido, WAL Mode, Foreign Keys) |
 | **Procesamiento Hojas de Cálculo**| Apache POI | **Apache POI 5.2.3** (OOXML `.xlsx` export/import) |
-| **Testing Automatizado** | JUnit 5 | **JUnit Jupiter 5.10.0** (42 Tests unitarios/integración) |
+| **Testing Automatizado** | JUnit 5 | **JUnit Jupiter 5.10.0** (45 Tests unitarios/integración) |
 | **Build Manager** | Apache Maven | **Maven 3.8+** (Plugins Shader, Compiler, Antrun) |
 
 ---

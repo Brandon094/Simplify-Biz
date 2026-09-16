@@ -26,7 +26,9 @@ Capa de acceso a datos y reglas de negocio para el catálogo de inventario.
 | `mostrarProductos` | `JTable tabla` | `void` | Carga el catálogo completo aplicando `UIUtils.applyTableStyling`. |
 | `buscarProductosSugeridos` | `String query` | `List<Producto>` | Consulta optimizada (`LIKE %query%`) para el autocompletado en tiempo real. |
 | `obtenerInversionTotalInventario` | — | `double` | Calcula la inversión total a costo: `SELECT SUM(precio_costo * cantidad) FROM productos`. |
+| `obtenerDesgloseInversionInventario` | — | `double[]` | Retorna `[0] Total Invertido`, `[1] Inversión Abastecimiento (Facturas)` y `[2] Inversión Carga Directa / Catálogo`. |
 | `obtenerCantidadStockCritico` | `int limite` | `int` | Retorna el conteo de ítems con existencias `≤ limite`. |
+| `obtenerProductosStockCritico` | `int limite` | `List<Producto>` | Obtiene la lista de ítems con existencias `≤ limite` ordenados ascendentemente por cantidad (prioriza agotados en 0 unds). |
 | `obtenerDistribucionCategorias` | — | `Map<String, Double>` | Mapeo de categorías y volumen total de unidades para el gráfico donut. |
 | `obtenerCategorias` | — | `List<String>` | Obtiene el listado de categorías almacenadas en la base de datos. |
 
@@ -68,6 +70,8 @@ Transacciones comerciales, historial, reportes y cotizaciones.
 | `obtenerUtilidadTotal` | — | `double` | Calcula la ganancia neta real ($): `SELECT SUM(total - (precio_costo * cantidad)) FROM detalles_venta`. |
 | `obtenerVentasTotalesPorPeriodo` | `String periodo` | `double` | Calcula ventas totales por periodo ("Hoy", "Últimos 7 Días", "Este Mes", "Histórico Total"). |
 | `obtenerUtilidadTotalPorPeriodo` | `String periodo` | `double` | Calcula la utilidad neta total por periodo. |
+| `obtenerDesgloseMetodosPagoPorPeriodo` | `String periodo` | `Map<String, Double>` | Retorna acumulados por método de pago (`Efectivo`, `Transferencia`, `Crédito`). |
+| `obtenerDesgloseUtilidadNetaPorPeriodo` | `String periodo` | `double[]` | Retorna `[0] Total Facturado`, `[1] Costo Mercancía (COGS)` y `[2] Utilidad Neta Real`. |
 | `obtenerCogsPorVentaIds` | `List<Integer> ventaIds` | `double` | Calcula el Costo de Mercancía Vendida (COGS) para un listado de IDs de ventas visibles/filtrados. |
 | `obtenerVentasUltimos7Dias` | — | `List<Double>` | Totales acumulados diarios de los últimos 7 días. |
 | `exportarDatosTablaAExcel` | `JTable table, String path` | `void` | Exporta la tabla visible a formato Microsoft Excel `.xlsx` vía Apache POI con diseño ejecutivo corporativo, banner de título, cabeceras en azul oscuro `#1E293B`, formato `$#,##0.00` y fila de Gran Total. |

@@ -964,6 +964,53 @@ public class VentasController {
         return 0.0;
     }
 
+    public java.util.Map<String, Double> obtenerDesgloseMetodosPagoPorPeriodo(String periodo) {
+        java.util.Map<String, Double> map = new java.util.HashMap<>();
+        map.put("Efectivo", 0.0);
+        map.put("Transferencia", 0.0);
+        map.put("Crédito", 0.0);
+
+        String whereClause = getWhereClauseForPeriod(periodo, "fecha");
+        String sql = "SELECT metodo_pago, SUM(total) FROM ventas " + whereClause + " GROUP BY metodo_pago";
+        try (Statement st = conn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                String mp = rs.getString(1);
+                double val = rs.getDouble(2);
+                if (mp != null) {
+                    if (mp.toLowerCase().contains("efectivo")) {
+                        map.put("Efectivo", map.getOrDefault("Efectivo", 0.0) + val);
+                    } else if (mp.toLowerCase().contains("transf")) {
+                        map.put("Transferencia", map.getOrDefault("Transferencia", 0.0) + val);
+                    } else if (mp.toLowerCase().contains("crédito") || mp.toLowerCase().contains("credito")) {
+                        map.put("Crédito", map.getOrDefault("Crédito", 0.0) + val);
+                    } else {
+                        map.put("Efectivo", map.getOrDefault("Efectivo", 0.0) + val);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al obtener desglose de métodos de pago por periodo", e);
+        }
+        return map;
+    }
+
+    public double[] obtenerDesgloseUtilidadNetaPorPeriodo(String periodo) {
+        double totalFacturado = obtenerVentasTotalesPorPeriodo(periodo);
+        double cogs = 0.0;
+        String whereClause = getWhereClauseForPeriod(periodo, "v.fecha");
+        String sql = "SELECT SUM(d.precio_costo * d.cantidad) FROM detalles_venta d "
+                 + "JOIN ventas v ON d.venta_id = v.id " + whereClause;
+        try (Statement st = conn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            if (rs.next()) {
+                cogs = rs.getDouble(1);
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al obtener COGS por periodo", e);
+        }
+        double utilidadNeta = totalFacturado - cogs;
+        return new double[]{ totalFacturado, cogs, utilidadNeta };
+    }
+
     public double obtenerCogsPorVentaIds(List<Integer> ventaIds) {
         if (ventaIds == null || ventaIds.isEmpty()) return 0.0;
         StringBuilder sql = new StringBuilder("SELECT SUM(cantidad * precio_costo) FROM detalles_venta WHERE venta_id IN (");

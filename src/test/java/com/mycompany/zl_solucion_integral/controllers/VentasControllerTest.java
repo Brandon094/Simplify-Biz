@@ -128,4 +128,38 @@ public class VentasControllerTest {
         assertTrue(res.esExito());
         assertEquals(1, tabla.getModel().getRowCount(), "Debe encontrar la venta realizada hoy");
     }
+
+    @Test
+    void testObtenerDesgloseMetodosPagoYUtilidadPorPeriodo() {
+        Producto prod = new Producto("Overol Térmico", 100000.0, 10, "SKU-OVEROL", "ROPA");
+        prod.setPrecioCosto(50000.0);
+        productoCtrl.agregarOActualizarProductoSiExiste(prod);
+
+        Venta venta = new Venta();
+        Usuario cliente = new Usuario();
+        cliente.setNombre("Cliente Crédito");
+        cliente.setNoCc("77777");
+        venta.setCliente(cliente);
+        venta.setVendedor("Admin");
+        venta.setFecha(LocalDate.now());
+        venta.setTotal(200000.0);
+        venta.setMetodoPago("Crédito");
+
+        List<Producto> vendidos = new ArrayList<>();
+        Producto item = productoCtrl.buscarProductoPorCodigo("SKU-OVEROL");
+        item.setCantidadSolicitada(2);
+        vendidos.add(item);
+
+        ventasCtrl.guardarVenta(venta, vendidos, null);
+
+        java.util.Map<String, Double> desglosePagos = ventasCtrl.obtenerDesgloseMetodosPagoPorPeriodo("Histórico Total");
+        assertNotNull(desglosePagos);
+        assertEquals(200000.0, desglosePagos.getOrDefault("Crédito", 0.0), 0.01);
+
+        double[] desgloseUtilidad = ventasCtrl.obtenerDesgloseUtilidadNetaPorPeriodo("Histórico Total");
+        assertNotNull(desgloseUtilidad);
+        assertEquals(200000.0, desgloseUtilidad[0], 0.01, "Facturado = 200.000");
+        assertEquals(100000.0, desgloseUtilidad[1], 0.01, "COGS = 2 * 50.000 = 100.000");
+        assertEquals(100000.0, desgloseUtilidad[2], 0.01, "Utilidad neta = 100.000");
+    }
 }
