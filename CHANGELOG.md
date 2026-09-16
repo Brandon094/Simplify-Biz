@@ -7,6 +7,10 @@ Todas las modificaciones, mejoras, nuevas funcionalidades y correcciones de segu
 ## [2.0.0] - 2026-09-16 — Enterprise Major Release
 
 ### 🚀 Añadido (Enterprise Release)
+- **Mejora Integral de UX en Punto de Venta (POS - SalesPage):**
+  - **StockBadge Siempre Visible (`StockBadge.java`):** Componente atómico con dos estados (Neutro/Guía y Activo con semáforo verde/ámbar/rojo de disponibilidad) que elimina saltos de layout y orienta al usuario permanentemente.
+  - **Labels y Textos Conversacionales:** Redacción amigable de etiquetas y helpers contextuales en cada campo (`Buscar producto`, `¿Cuántas unidades va a llevar?`, `Descuento (%)`), eliminando términos técnicos en mayúsculas para permitir un uso intuitivo sin consultar manuales.
+  - **Placeholder Dinámico de Cantidad:** Muestra dinámicamente el límite permitido (`Max: N`) al seleccionar un producto para evitar ventas fallidas por falta de stock.
 - **Flujo Dual de Importación Excel/CSV (`ExcelSQLiteManager`):**
   - Introducción del enum `ModoImportacion` (`CATALOGO` y `ABASTECIMIENTO`).
   - **Modo Catálogo:** Importación masiva e inteligente directamente a la base de datos de productos desde la pantalla de Inventario con estrategia Upsert por SKU (crea o actualiza existencias).

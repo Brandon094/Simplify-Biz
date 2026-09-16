@@ -11,6 +11,7 @@ import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
 import com.mycompany.zl_solucion_integral.views.components.UIUtils;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonButton;
 import com.mycompany.zl_solucion_integral.views.components.atoms.RoundedPanel;
+import com.mycompany.zl_solucion_integral.views.components.atoms.StockBadge;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import javax.swing.*;
@@ -29,6 +30,7 @@ public class SalesPage extends JPanel {
 
     // UI Components
     private JTextField txtSearch, txtQty, txtDiscount;
+    private StockBadge stockBadge;
     private JTextField txtClientName, txtClientCC, txtClientTel, txtClientEmail;
     private JTextField txtCashGiven;
     private JLabel lblClientName, lblClientCC, lblClientTel, lblClientEmail;
@@ -119,28 +121,37 @@ public class SalesPage extends JPanel {
         gbc.gridy = 0; gbc.insets = new Insets(0, 0, 10, 0);
         p.add(title, gbc);
 
+        // --- Campo 1: Buscar producto ---
         gbc.gridy = 1; gbc.insets = new Insets(0, 0, 2, 0);
-        p.add(createLabel("BUSCAR PRODUCTO (CÓDIGO/NOMBRE)"), gbc);
-        txtSearch = createTextField("Ej: SKU-001...");
+        p.add(createLabel("Buscar producto"), gbc);
+        txtSearch = createTextField("Escribe el nombre o codigo del producto...");
         setupFieldIcon(txtSearch, "icons/products.svg");
         txtSearch.addActionListener(e -> searchProduct());
-        gbc.gridy = 2; gbc.insets = new Insets(0, 0, 8, 0);
-        p.add(txtSearch, gbc);
+        gbc.gridy = 2; gbc.insets = new Insets(0, 0, 4, 0);
+        p.add(UIUtils.createFieldWithHelper(txtSearch, "Ingresa el nombre o codigo y selecciona de la lista"), gbc);
 
-        gbc.gridy = 3; gbc.insets = new Insets(0, 0, 2, 0);
-        p.add(createLabel("CANTIDAD"), gbc);
+        // --- Badge de disponibilidad (siempre visible) ---
+        stockBadge = new StockBadge();
+        gbc.gridy = 3; gbc.insets = new Insets(0, 0, 8, 0);
+        p.add(stockBadge, gbc);
+
+        // --- Campo 2: Cantidad ---
+        gbc.gridy = 4; gbc.insets = new Insets(0, 0, 2, 0);
+        p.add(createLabel("Cuantas unidades va a llevar?"), gbc);
         txtQty = createTextField("1");
         setupFieldIcon(txtQty, "icons/dashboard.svg");
-        gbc.gridy = 4; gbc.insets = new Insets(0, 0, 8, 0);
-        p.add(txtQty, gbc);
+        gbc.gridy = 5; gbc.insets = new Insets(0, 0, 8, 0);
+        p.add(UIUtils.createFieldWithHelper(txtQty, "Escribe la cantidad que el cliente desea comprar"), gbc);
 
-        gbc.gridy = 5; gbc.insets = new Insets(0, 0, 2, 0);
-        p.add(createLabel("DESCUENTO %"), gbc);
+        // --- Campo 3: Descuento ---
+        gbc.gridy = 6; gbc.insets = new Insets(0, 0, 2, 0);
+        p.add(createLabel("Descuento (%)"), gbc);
         txtDiscount = createTextField("0");
         setupFieldIcon(txtDiscount, "icons/reports.svg");
-        gbc.gridy = 6; gbc.insets = new Insets(0, 0, 12, 0);
-        p.add(UIUtils.createFieldWithHelper(txtDiscount, "Deja 0 si no aplicas descuento"), gbc);
+        gbc.gridy = 7; gbc.insets = new Insets(0, 0, 12, 0);
+        p.add(UIUtils.createFieldWithHelper(txtDiscount, "Si no aplica descuento, deja este campo en 0"), gbc);
 
+        // --- Boton de accion ---
         NeonButton btnAdd = new NeonButton("Agregar al carrito");
         btnAdd.setNeonColor(ThemeConstants.NEON_PURPLE);
         btnAdd.setIcon(createIcon("icons/plus.svg", ThemeConstants.NEON_PURPLE, 15, 15));
@@ -148,7 +159,7 @@ public class SalesPage extends JPanel {
         btnAdd.setPreferredSize(new Dimension(0, 40));
         btnAdd.addActionListener(e -> addToCart());
         btnAdd.setToolTipText("Agrega el producto buscado al carrito con la cantidad y el descuento indicados");
-        gbc.gridy = 7; gbc.insets = new Insets(0, 0, 0, 0);
+        gbc.gridy = 8; gbc.insets = new Insets(0, 0, 0, 0);
         p.add(btnAdd, gbc);
 
         return p;
@@ -720,6 +731,10 @@ public class SalesPage extends JPanel {
         if (selectedProduct != null) {
             txtSearch.setText(selectedProduct.getProducto());
             txtSearch.setForeground(ThemeConstants.NEON_CYAN);
+            stockBadge.update(selectedProduct);
+            txtQty.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Max: " + selectedProduct.getCantidad());
+            txtQty.requestFocusInWindow();
+            txtQty.selectAll();
         } else {
             UIUtils.showError(this, "Producto no encontrado.");
         }
@@ -799,7 +814,9 @@ public class SalesPage extends JPanel {
         selectedProduct = null;
         txtSearch.setText("");
         txtSearch.setForeground(ThemeConstants.TEXT_PRIMARY);
+        stockBadge.clear();
         txtQty.setText("1");
+        txtQty.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "1");
         txtDiscount.setText("0");
     }
 
@@ -1042,6 +1059,8 @@ public class SalesPage extends JPanel {
                 selectedProduct = p;
                 txtSearch.setText(p.getProducto());
                 txtSearch.setForeground(ThemeConstants.NEON_CYAN);
+                stockBadge.update(p);
+                txtQty.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Max: " + p.getCantidad());
                 txtQty.requestFocusInWindow();
                 txtQty.selectAll();
             }
