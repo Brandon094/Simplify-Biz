@@ -15,16 +15,20 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 /**
- * Gestor de licenciamiento criptográfico (RSA-2048) y evaluación de período Demo (30 Días).
+ * Gestor de licenciamiento criptográfico estricto (RSA-2048) y evaluación de período Demo (30 Días).
  */
 public class LicenciaManager {
     private static final Logger LOGGER = Logger.getLogger(LicenciaManager.class.getName());
+    
+    // Clave Pública RSA-2048 oficial del Emisor ERP+ Business
     private static final String CLAVE_PUBLIC_RSA_BASE64 =
-            "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuX2Z3vL9Yy3k9W0Z" +
-            "b1a9mX8q0rT7N8V2P4Q1W6e5c9b7A3f1E9d2C5b8A2f1E9d2C5b8A2f1E9d2C5b8A2f" +
-            "1E9d2C5b8A2f1E9d2C5b8A2f1E9d2C5b8A2f1E9d2C5b8A2f1E9d2C5b8A2f1E9d2C" +
-            "5b8A2f1E9d2C5b8A2f1E9d2C5b8A2f1E9d2C5b8A2f1E9d2C5b8A2f1E9d2C5b8A2f" +
-            "1E9d2C5b8A2f1E9d2C5b8A2f1E9d2C5b8A2f1E9d2C5b8IDAQAB"; // Clave pública emisor ERP+ Business
+            "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAt6vt/SStLHf7RIkQ8O+e" +
+            "8iX5F0ZOAxNcwAH5TPsPXv6Hc3h2R9FXiQl1bX5UuXYOxRn66SjBtMSWV8KNcWbJ" +
+            "DA8rUZRUSjNqx2ujHP97J7U3TtLIVUyqX1T6L3OTrFDr/CJ0tObjiNY3QbGxi9jV" +
+            "wE0e4Lk+4MWT3zGpE62cCfQt2N1klHstdOw02LaNjaZ2PHyCAb7tlhPTj9wQkvxe" +
+            "UOE1Jt7JUOsGWet0GhQmsrzaWJHuZP9sN7r4PKbz5ZN0lLBZY6OA1gGVL65aHa04" +
+            "B+mEqhyRT1EDLd97e0MfykGAGcGEtOoOWfobqigPDUnMIbSjddOSBkj5z1gfuhd1" +
+            "MwIDAQAB";
 
     public enum EstadoLicencia {
         PRO_ACTIVA("Licencia Pro Activa", true),
@@ -132,7 +136,7 @@ public class LicenciaManager {
     }
 
     /**
-     * Parsea y verifica la firma criptográfica RSA del token de licencia.
+     * Parsea y verifica la firma criptográfica RSA-2048 del token de licencia.
      * Formato esperado del token Base64: payloadJSON|firmaBase64
      */
     public static InfoLicencia validarLicenciaToken(String token, String hwIdActual) {
@@ -140,13 +144,7 @@ public class LicenciaManager {
             return new InfoLicencia(EstadoLicencia.LICENCIA_INVALIDA, "Desconocido", hwIdActual, null, 0);
         }
 
-        // 1. Intentar validación de token estructurado directo (ERPPRO-XXXX-XXXX...)
-        InfoLicencia sim = validarTokenSimulado(token.trim(), hwIdActual);
-        if (sim.getEstado() == EstadoLicencia.PRO_ACTIVA) {
-            return sim;
-        }
-
-        // 2. Intentar validación de payload criptográfico Base64 (payload|firma)
+        // Validación estricta de payload criptográfico Base64 (payload|firma) mediante SHA256withRSA
         try {
             String decoded = new String(Base64.getDecoder().decode(token.trim()), StandardCharsets.UTF_8);
             String[] partes = decoded.split("\\|");
@@ -170,24 +168,6 @@ public class LicenciaManager {
             }
         } catch (Exception ignored) {}
 
-        return new InfoLicencia(EstadoLicencia.LICENCIA_INVALIDA, "Inválido", hwIdActual, null, 0);
-    }
-
-    private static InfoLicencia validarTokenSimulado(String token, String hwIdActual) {
-        // Generación/verificación de clave estructurada: PRO-HWID-YYYYMMDD-HASH
-        try {
-            if (token.startsWith("ERPPRO-")) {
-                String clean = token.replace("ERPPRO-", "");
-                String[] parts = clean.split("-");
-                if (parts.length >= 2) {
-                    String targetHw = parts[0] + "-" + parts[1];
-                    if (targetHw.equalsIgnoreCase(hwIdActual.substring(0, 9))) {
-                        LocalDate exp = LocalDate.now().plusYears(1);
-                        return new InfoLicencia(EstadoLicencia.PRO_ACTIVA, "Empresa Registrada", hwIdActual, exp, 365);
-                    }
-                }
-            }
-        } catch (Exception ignored) {}
         return new InfoLicencia(EstadoLicencia.LICENCIA_INVALIDA, "Inválido", hwIdActual, null, 0);
     }
 

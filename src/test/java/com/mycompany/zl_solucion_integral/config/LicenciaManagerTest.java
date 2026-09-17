@@ -1,5 +1,6 @@
 package com.mycompany.zl_solucion_integral.config;
 
+import com.mycompany.zl_solucion_integral.tools.GeneradorLicenciaAdmin;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,15 +29,25 @@ public class LicenciaManagerTest {
     }
 
     @Test
-    public void testActivarLicenciaSimuladaValida() {
+    public void testRechazarBypassLicenciaSimulada() {
         String hwId = HardwareUtils.getHardwareId();
         String prefix = hwId.substring(0, 9);
-        String tokenSimulado = "ERPPRO-" + prefix + "-20271231-HASH123";
+        String tokenSimuladoInseguro = "ERPPRO-" + prefix + "-20271231-HASH123";
 
-        ResultadoOperacion res = LicenciaManager.activarLicencia(tokenSimulado);
-        assertTrue(res.esExito(), "Una clave PRO simulada correspondiente al HWID debe ser exitosa");
+        ResultadoOperacion res = LicenciaManager.activarLicencia(tokenSimuladoInseguro);
+        assertFalse(res.esExito(), "Un token simulado ERPPRO- ya NO debe ser aceptado por seguridad");
+    }
+
+    @Test
+    public void testActivarLicenciaCriptograficaRsaValida() throws Exception {
+        String hwId = HardwareUtils.getHardwareId();
+        String tokenRsaValido = GeneradorLicenciaAdmin.generarTokenLicencia("Cliente Test Pro", hwId, "2099-12-31");
+
+        ResultadoOperacion res = LicenciaManager.activarLicencia(tokenRsaValido);
+        assertTrue(res.esExito(), "Una clave firmada con RSA-2048 correspondiente al HWID debe ser exitosa");
 
         LicenciaManager.InfoLicencia info = LicenciaManager.obtenerInfoLicencia();
         assertEquals(LicenciaManager.EstadoLicencia.PRO_ACTIVA, info.getEstado(), "El estado debe pasar a PRO_ACTIVA");
+        assertEquals("Cliente Test Pro", info.getCliente(), "El cliente debe coincidir");
     }
 }

@@ -7,6 +7,9 @@ Todas las modificaciones, mejoras, nuevas funcionalidades y correcciones de segu
 ## [2.0.0] - 2026-09-16 — Enterprise Major Release
 
 ### 🚀 Añadido (Enterprise Release)
+- **Endurecimiento de Licenciamiento Criptográfico RSA-2048 (`LicenciaManager` & `GeneradorLicenciaAdmin`):**
+  - **Firma Criptográfica Estricta:** Eliminación de tokens simulados derivados (`ERPPRO-`) para evitar cualquier intento de falsificación o bypass. Las licencias ahora requieren una firma digital SHA256withRSA válida codificada en Base64.
+  - **Generador de Licencias Comercial (`GeneradorLicenciaAdmin.java`):** Nueva herramienta ejecutable para el Administrador que genera y firma tokens con la clave privada de 2048 bits para licencias comerciales vitalicias ($800.000 COP / $1.000.000 COP) vinculadas al Hardware ID único del cliente.
 - **Mejora Integral de UX en Punto de Venta (POS - SalesPage):**
   - **StockBadge Siempre Visible (`StockBadge.java`):** Componente atómico con dos estados (Neutro/Guía y Activo con semáforo verde/ámbar/rojo de disponibilidad) que elimina saltos de layout y orienta al usuario permanentemente.
   - **Labels y Textos Conversacionales:** Redacción amigable de etiquetas y helpers contextuales en cada campo (`Buscar producto`, `¿Cuántas unidades va a llevar?`, `Descuento (%)`), eliminando términos técnicos en mayúsculas para permitir un uso intuitivo sin consultar manuales.
