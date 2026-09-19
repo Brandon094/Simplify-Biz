@@ -300,14 +300,33 @@ public class ConfigPage extends JPanel {
         link.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                try {
-                    Desktop.getDesktop().browse(java.net.URI.create("https://portafolio-brandon-daza.web.app/"));
-                } catch (Exception ex) {
-                    UIUtils.showError(ConfigPage.this, "No se pudo abrir el navegador web.");
-                }
+                abrirEnlaceWeb("https://portafolio-brandon-daza.web.app/");
             }
         });
         return createDataRow("Desarrollador Oficial", link, "icons/developer.svg", ThemeConstants.NEON_CYAN);
+    }
+
+    private void abrirEnlaceWeb(String url) {
+        try {
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                Desktop.getDesktop().browse(java.net.URI.create(url));
+                return;
+            }
+        } catch (Exception ignored) {}
+
+        // Fallback robusto para Linux (xdg-open) y Windows (cmd start)
+        try {
+            String os = System.getProperty("os.name").toLowerCase();
+            if (os.contains("win")) {
+                new ProcessBuilder("cmd.exe", "/c", "start", url).start();
+            } else if (os.contains("mac")) {
+                new ProcessBuilder("open", url).start();
+            } else {
+                new ProcessBuilder("xdg-open", url).start();
+            }
+        } catch (Exception ex) {
+            UIUtils.showError(ConfigPage.this, "No se pudo abrir el navegador web.");
+        }
     }
 
     private JLabel createBadge(String text, Color neonColor) {
