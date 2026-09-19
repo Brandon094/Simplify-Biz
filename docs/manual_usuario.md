@@ -119,7 +119,7 @@ $$\mathbf{R_{cartera}} = \sum (\text{total\_venta\_crédito} - \text{abonos\_rec
 Evita el dolor de perder mercancía por desorden o extravíos. Utiliza **Inventario** para cargar productos existentes en tu bodega que no cuentan con factura de proveedor o para ajustar existencias manualmente.
 
 ### Crear un Producto de Impacto
-1. Escribe el **Nombre Atractivo** y el código del artículo (o pásalo por tu lector láser).
+1. Escribe el **Nombre Atractivo** y el código SKU único del artículo.
 2. Asígnalo a su **Familia o Categoría** para que lo encuentres al segundo durante la venta.
 3. Define tu **Precio de Venta** y la cantidad que tienes en tu vitrina o bodega.
 4. Guarda y listo: tu artículo queda listo para venderse de inmediato.
@@ -153,7 +153,7 @@ Evita el dolor de perder mercancía por desorden o extravíos. Utiliza **Inventa
 Ofrécele a tus clientes una experiencia de compra rápida, moderna y sin filas molestas que los haga regresar siempre a tu negocio:
 
 ### El Arte del Cobro Ágil en 3 Pasos
-1. **Encuentra el Producto al Instante:** Escribe una letra o pasa el lector de código de barras. El artículo salta de inmediato al carrito de compras.
+1. **Encuentra el Producto al Instante:** Escribe el código SKU o las primeras letras del nombre del artículo. El producto se agregará de inmediato al carrito de compras.
 2. **Autocompletado Flotante Inteligente de Clientes:** Al cobrar por Transferencia o Crédito, escribe el **Nombre** o la **Cédula / NIT** de tu cliente. Una ventana flotante desplegará sugerencias instantáneas sin necesidad de presionar `Enter` ni cambiar de casilla, completando automáticamente los datos de contacto del cliente en 1 clic.
 3. **Adapta la Venta a la Medida:** Cambia cantidades o aplica promociones especiales con los botones de acción rápida directos en cada fila del carrito (`+`, `-`, `Quitar`). Al deslizar el mouse sobre cada botón, este se iluminará con su color neón correspondiente (`Verde` para sumar, `Púrpura` para restar y `Rojo` para eliminar).
 4. **Cierra el Cobro y Recibe el Dinero:**

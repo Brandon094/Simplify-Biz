@@ -541,13 +541,14 @@ public class ManualUsuarioDialog extends JDialog {
             sections.add(new ManualSection(
                     "Tu Centro de Mando y Ganancias al Instante",
                     "<p>Imagina tener un consultor de negocios a tu lado 24/7 que te dice exactamente cómo va tu dinero sin que tengas que hacer una sola suma:</p>" +
-                    "<h2>Tus Indicadores de Éxito Comercial:</h2>" +
+                    "<h2>Tus Indicadores de Éxito Comercial (KPIs):</h2>" +
                     "<ul>" +
-                    "<li><b>Ventas Totales:</b> Siente el orgullo de ver la suma total de dinero que ha ingresado a la caja de tu empresa. Mostrado en formato numérico elegante y compacto (ej: <b>$5.4M</b> o <b>$120K</b>) para lecturas ultrarrápidas.</li>" +
-                    "<li><b>Ganancia Limpia y Real:</b> El indicador estrella. Es el dinero real que queda en tu bolsillo una vez restado lo que te costó la mercancía.</li>" +
-                    "<li><b>Dinero Invertido en Bodega:</b> Descubre exactamente cuánto dinero tienes acumulado y listo para convertirse en ventas dentro de tu estantería.</li>" +
-                    "<li><b>Alertas de Mercancía por Agotarse:</b> Te avisa a tiempo qué productos estrella se están terminando para que nunca le digas <i>'no hay'</i> a un cliente.</li>" +
-                    "<li><b>Analítica de Negocio Inteligente (Filtro Este Año):</b> Selecciona el filtro de tiempo <i>'Este Año'</i> para comparar la línea de Ventas Totales vs. Ganancia Real mes a mes con insignias neón de crecimiento dinámico.</li>" +
+                    "<li><b>Ventas Totales (V):</b> Suma bruta facturada en el periodo seleccionado (ej: <b>$5.4M</b> o <b>$120K</b>).<br/><i>Fórmula: V = ∑ (Ventas Confirmadas)</i></li>" +
+                    "<li><b>Ganancia Limpia y Real (P):</b> La utilidad neta que te queda en el bolsillo deduciendo lo que costó la mercancía (COGS).<br/><i>Fórmula: P = V - COGS, donde COGS = ∑ (Precio Costo Unitario × Cantidad Vendida)</i></li>" +
+                    "<li><b>Margen de Ganancia (M):</b> Porcentaje de rentabilidad neta comercial.<br/><i>Fórmula: M = (Ganancia Limpia / Ventas Totales) × 100</i></li>" +
+                    "<li><b>Porcentaje de Crecimiento Interperiodo (Δ%):</b> Comparativa de ventas contra el periodo inmediatamente anterior equivalente.<br/><i>Fórmula: Δ% = ((Ventas Actuales - Ventas Anteriores) / Ventas Anteriores) × 100</i></li>" +
+                    "<li><b>Dinero Invertido en Bodega:</b> Valoración total de existencias en estantes a precio de costo.<br/><i>Fórmula: Inversión = ∑ (Precio Costo × Stock Disponible)</i></li>" +
+                    "<li><b>Cuentas por Cobrar (Cartera):</b> Acumulado de saldo pendiente de cobro en ventas a crédito.<br/><i>Fórmula: Cartera = ∑ (Ventas Crédito - Abonos Recibidos)</i></li>" +
                     "</ul>" +
                     "<div class='info'><span class='tag-info'>⚡ INTELIGENCIA FINANCIERA:</span> <b>Poder Comercial —</b> Observa en gráficos dinámicos qué meses y a qué horas vendes más para aplicar promociones irresistibles y multiplicar tus ingresos.</div>",
                     "icons/dashboard.svg"
@@ -559,9 +560,9 @@ public class ManualUsuarioDialog extends JDialog {
                 "<p>Evita el dolor de perder mercancía por desorden o extravíos. Utiliza <b>Inventario</b> para cargar productos existentes en tu bodega que no cuentan con factura de proveedor o para ajustar existencias manualmente:</p>" +
                 "<h2>Crear un Producto de Impacto:</h2>" +
                 "<ol>" +
-                "<li>Escribe el <b>Nombre Atractivo</b> y el código del artículo (o pásalo por tu lector láser).</li>" +
+                "<li>Escribe el <b>Nombre Atractivo</b> y el código SKU único del artículo.</li>" +
                 "<li>Asígnalo a su <b>Familia o Categoría</b> para que lo encuentres al segundo durante la venta.</li>" +
-                "<li>Define tu <b>Precio de Venta</b> y la cantidad que tienes en tu vitrina o bodega.</li>" +
+                "<li>Define tu <b>Precio de Venta</b>, tu <b>Precio de Costo</b> y la cantidad que tienes en tu vitrina o bodega.</li>" +
                 "<li>Guarda y listo: tu artículo queda listo para venderse de inmediato.</li>" +
                 "</ol>" +
                 "<div class='tip'><span class='tag-tip'>✔ CERO ERRORES:</span> <b>Suma Automática —</b> Si vuelves a registrar un producto que ya tenías, el sistema no crea duplicados molestos; simplemente suma las unidades nuevas a tu abundancia de stock.</div>" +
@@ -589,7 +590,7 @@ public class ManualUsuarioDialog extends JDialog {
                 "<h2>El Arte del Cobro Ágil en 3 Pasos:</h2>" +
                 "<ol>" +
                 "<li><b>Búsqueda y Autocompletado de Clientes Inteligente:</b> En el selector de cliente, escribe los primeros dígitos de la Cédula/NIT o las primeras letras del Nombre. Aparecerá un menú desplegable flotante con las coincidencia exactas de tus clientes registrados. Al seleccionar uno, se cargará su cédula, nombre, teléfono y correo automáticamente.</li>" +
-                "<li><b>Encuentra el Producto al Instante:</b> Escribe una letra o pasa el lector de código de barras. El artículo salta de inmediato al carrito de compras.</li>" +
+                "<li><b>Encuentra el Producto al Instante:</b> Escribe el código SKU o el nombre del artículo. El producto salta de inmediato al carrito de compras.</li>" +
                 "<li><b>Adapta la Venta a la Medida:</b> Cambia cantidades o aplica promociones especiales con botones amplios y cómodos diseñados para vender a toda prisa.</li>" +
                 "<li><b>Cierra el Cobro y Recibe el Dinero:</b>" +
                 "<ul>" +
