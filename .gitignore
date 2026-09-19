@@ -5,6 +5,7 @@
 /target/maven-archiver/
 /target/maven-status/
 /target/test-classes/
+.._.._.._.._.m2-tmp*
 
 db/
 *.deb
@@ -14,4 +15,5 @@ config.properties
 .vscode/
 .idea/
 *.iml
+
 
