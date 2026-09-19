@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://erp-plus-business.web.app/sitemap.xml
