@@ -128,6 +128,7 @@ bash scripts/package-app.sh
 - 🔌 [**API de Controladores & Contrato de Negocio**](docs/api_controladores.md) — Métodos de lectura/escritura, firmas, DTOs y manejo defensivo de excepciones.
 - 📐 [**Arquitectura UI/UX & Design System**](docs/arquitectura_ui.md) — Desglose Atomic Design, tokens neón, breakpoints y componentes 2D.
 - ⚙️ [**Manual de Mantenimiento & Onboarding para Desarrolladores**](docs/manual_mantenimiento.md) — Guía de extensión del sistema, ciclo de vida JVM y empaquetado nativo `jpackage`.
+- 🌐 [**Documentación del Sitio Web Landing & Firebase**](docs/documentacion_web.md) — Arquitectura de la landing page, componentes Atomic Design, Firebase Hosting, Cloud Firestore y SEO.
 - 📘 [**Manual de Usuario de la App**](docs/manual_usuario.md) — Instructivo de operación comercial para el usuario final.
 - 🗺️ [**Roadmap del Proyecto**](docs/roadmap/roadmap.md) — Historial de fases y planificación futura (Fase 8+).
 
