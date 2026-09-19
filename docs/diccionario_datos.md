@@ -1,4 +1,4 @@
-# Diccionario de Datos — ERP+ Business (v2.0.0)
+# Diccionario de Datos — ERP+ Business (v2.1.0)
 
 > **Especificación de Dominio de Datos & Diccionario Funcional SQL**  
 > Definición detallada de estructuras de datos, tipos, claves, snapshots y reglas de cálculo contable.
@@ -95,6 +95,7 @@ Bitácora de pagos parciales realizados por clientes a ventas con estado `pago_c
 | `fecha` | `TEXT` | No | Timestamp de registro (`yyyy-MM-dd HH:mm:ss`). |
 | `usuario_registro` | `TEXT` | No | Nombre del usuario/empleado que recibió y registró el dinero. |
 | `metodo_pago` | `TEXT` | No | Método utilizado para el abono (`Efectivo`, `Transferencia`). Default: `'Efectivo'`. |
+| `observacion` | `TEXT` | Sí | Comentario o nota opcional sobre la transacción de recaudo. |
 
 ---
 
@@ -132,7 +133,7 @@ Encabezados de órdenes de compra e ingresos de almacén.
 
 ## 9. Tabla `detalles_compra`
 
-Lineas de productos recibidos en una compra. Relación N:1 con `compras`.
+Líneas de productos recibidos en una compra. Relación N:1 con `compras`.
 
 | Campo | Tipo SQL | Nullable | Descripción Funcional |
 | :--- | :--- | :--- | :--- |

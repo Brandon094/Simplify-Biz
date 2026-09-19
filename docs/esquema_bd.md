@@ -1,4 +1,4 @@
-# Esquema de Base de Datos — ERP+ Business (v2.0.0)
+# Esquema de Base de Datos — ERP+ Business (v2.1.0)
 
 > **Definición de Arquitectura DDL, Relaciones y Estrategia de Migración**
 
