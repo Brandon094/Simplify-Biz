@@ -100,43 +100,117 @@ Para evitar los bloqueos `SQLITE_BUSY` (`database is locked`), la aplicación ma
 - `PRAGMA busy_timeout=5000;` (Espera defensiva de 5000 ms).
 - `PRAGMA foreign_keys=ON;` (Enforza integridad referencial).
 
-### 3.2 Motor Genérico de Autocompletado & Componentes Custom Table (`SalesPage.java`)
-- **`AutocompletePopup<T>`**: Implementado mediante un popup desacoplado que soporta interfaces funcionales (`SearchProvider<T>`, `DisplayFormatter<T>`, `SelectionListener<T>`).
-  - **Integración Dual de Clientes:** Vinculado simultáneamente a los campos `txtClientCC` (Cédula/NIT) y `txtClientName` (Nombre/Razón Social). Al escribir en cualquiera de los dos campos, consulta de forma reactiva `usuarioCtrl.buscarClientesSugeridos(query)` desplegando sugerencias flotantes.
-  - **Desacoplamiento de Eventos por Foco:** La remoción del listener `focusLost` directo en `txtClientCC` evita condiciones de carrera donde la pérdida de foco cerraba la ventana emergente antes de capturar el clic de selección en la lista.
-- **`CartRowActionsPanel` & `CartCellEditor`**: Renderizador y editor celda a celda en `JTable` para la columna de acciones del carrito POS. Emplea íconos vectoriales FlatSVG (`plus.svg`, `minus.svg`, `products.svg`, `trash.svg`) con desacoplamiento de eventos vía `TableCellEditor` e intercepción atómica del estado del modelo `cartItems`.
+### 3.2 Estructura Atomic Design & Componentes de Interfaz (`views`)
 
-### 3.3 Formateo Compacto Inteligente de Moneda (`UIUtils.formatCompactCurrency`)
-- **Estandarización DRY & Atomic Design:** Implementación centralizada en `UIUtils` para la capa de presentación Swing. Convierte montos monetarios extensos en representaciones compactas elegantes (`$100K`, `$5.4M`, `$1.2B`) evitando desbordamientos de texto y rotura de layout en tarjetas KPI (`MetricCard`) de Dashboard, Cartera y Reportes.
+La interfaz gráfica (`com.mycompany.zl_solucion_integral.views`) está construida siguiendo la metodología **Atomic Design**, garantizando el reuso de código (DRY) y desacoplamiento visual:
 
-### 3.4 Microcopy & Guía Contextual en Registro de Administrador (`ModernAdminRegistrationPage.java`)
-- **Estandarización de Helpers:** Implementación de etiquetas de ayuda permanentes mediante `createHelperLabel()` en `ModernAdminRegistrationPage`, mejorando el feedback operacional sin recargar la interfaz y respetando los tokens de `ThemeConstants`.
+#### Átomos (`components/atoms`)
+- **[NeonButton.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/views/components/atoms/NeonButton.java)**: Botón interactivo personalizable con soporte para iconos SVG vectoriales, variantes de color neón (`NEON_PURPLE`, `NEON_CYAN`, `NEON_GREEN`), bordes redondeados y efectos hover con sombras suaves.
+- **[RoundedPanel.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/views/components/atoms/RoundedPanel.java)**: Contenedor neumórfico con radio de curva configurable, color de fondo dinámico (`ThemeConstants.CARD_BACKGROUND`) y sombra perimetral.
+- **[NeonLineChart.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/views/components/atoms/NeonLineChart.java)**: Componente de renderizado de gráficos de línea continua y comparativa interperiodo mediante `Graphics2D` con suavizado Anti-Aliasing, curva de Bézier, grid adaptativo y badge de variación porcentual $\Delta \%$.
+- **[NeonBarChart.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/views/components/atoms/NeonBarChart.java)**: Gráfico de barras vectoriales neón para la comparativa macro (Ventas, Utilidad e Inversión) con valores contables en tooltips y animación al pasar el cursor.
+- **[NeonPieChart.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/views/components/atoms/NeonPieChart.java)**: Gráfico de dona polar interactivo para el Top 5 de categorías + "OTROS", con cálculo cartesiano `Math.atan2`, hover offset de 7px, conector Bézier y leyenda explícita.
+- **[ThemeToggleButton.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/views/components/atoms/ThemeToggleButton.java)**: Conmutador de tema visual (Modo Oscuro / Modo Claro) que reevalúa la paleta de color en tiempo real sin reiniciar la JVM.
 
-### 3.5 Autenticación Flexible por Primer Nombre o Correo (`UsuarioController.java` & `ModernLoginPage.java`)
-- **Extracción de Primer Token SQL:** Implementación en `validarCredencialesAdmin` y `validarCredencialesUsuarioRegular` utilizando la cláusula `LOWER(SUBSTR(nombre, 1, INSTR(nombre || ' ', ' ') - 1)) = LOWER(?)` o coincidencia por `email` y `nombre` completo.
-- **Transparencia en Sesión:** Tras validar la coincidencia del primer nombre o correo y verificar el hash SHA-256 de la contraseña, el controlador recupera y registra automáticamente el **Nombre Completo Oficial** del usuario en `Sesion.setUsuarioLogueado(...)`.
+#### Moléculas (`components/molecules` & `components`)
+- **[SidebarItem.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/views/components/molecules/SidebarItem.java)**: Fila de menú que combina icono SVG con texto, gestionando estados activo, normal e interactivo (hover).
+- **[SidebarSection.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/views/components/molecules/SidebarSection.java)**: Acordeón colapsable para submenús con persistencia de estado mediante `java.util.prefs.Preferences` e indicador visual dinámico (▲/▼).
+- **[AutocompletePopup.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/views/components/AutocompletePopup.java)**: Ventana flotante desacoplada basada en genéricos `<T>` para búsqueda y autocompletado reactivo en `JTextFields` sin bloquear el foco.
 
-### 3.4 Motor de Renderizado Gráfico 2D (`Graphics2D`)
-- **`NeonLineChart` & Comparativa Interperiodo**:
-  - **Serie Principal & Serie de Comparación:** Soporta renderizado dual en tiempo real. La serie actual se traza con una línea continua neón violeta y área de degradado semitransparente. La serie del periodo anterior (`ventasComparativas`) se renderiza con una línea discontinua (`Stroke` punteado) en gris/cyan tenue.
-  - **Badge de Crecimiento Neón Dinámico:** Si existe serie del periodo previo, el gráfico calcula de forma automática el porcentaje global de crecimiento o decrecimiento $$\Delta \% = \left( \frac{\text{Total Actual} - \text{Total Anterior}}{\text{Total Anterior}} \right) \times 100$$ y dibuja en la esquina superior derecha un badge redondeado neón verde (`+XX.X% vs per. anterior`) o neón rosa/rojo (`-XX.X% vs per. anterior`).
-  - **Eje X Inteligente Adaptativo (`VentasController.obtenerEtiquetasGraficaPorPeriodo`):**
-    - `Hoy`: Horas del día (`08:00`, `12:00`, `16:00`).
-    - `Esta Semana` / `Este Mes`: Días y meses en español (`15 Jul`, `16 Jul`).
-    - `Este Año`: Abreviaturas de meses (`Ene`, `Feb`, `Mar`, ..., `Dic`).
-    - `Histórico`: Años completos (`2024`, `2025`, `2026`).
-- **`NeonPieChart`**:
-  - Ordena y consolida categorías agrupando del Top 6 en adelante dentro de la etiqueta `"OTROS"`.
-  - **Cálculo Polar & Hover:** Mapea el ángulo cartesiano `(Math.atan2)` respecto al centro `(cx, cy)` y detecta colisión. Desplaza la rebanada seleccionada 7px hacia afuera y traza una curva de Bézier neón (`Path2D`) apuntando al ítem activo de la leyenda.
-- **`NeonBarChart`**:
-  - Grafica la comparativa macro (**Ventas Totales**, **Utilidad Neta**, **Inversión en Bodega**).
-  - Normalización de escala dinámica `maxVal * 1.15` y formateo compacto en eje Y (`$4.3M`, `$500K`).
+#### Organismos (`components/organisms`)
+- **[ModernSidebar.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/views/components/organisms/ModernSidebar.java)**: Menú de navegación principal con colapso horizontal dinámico (260px $\leftrightarrow$ 64px), perfil de usuario y conmutador de tema.
+- **[MetricCard.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/views/components/organisms/MetricCard.java)**: Tarjeta KPI ejecutiva compuesta por icono SVG con filtro neón, título, valor formateado compacto (`$100K`, `$5.4M`) y tendencia de variación porcentual.
+
+#### Páginas y Vistas Principales (`views/`)
+- **[DashboardPage.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/views/DashboardPage.java)**: Centro de mando BI con 4 tarjetas KPI, selector de periodo (`Hoy`, `Esta Semana`, `Este Mes`, `Este Año`, `Histórico`), gráfico de líneas comparativo interperiodo, gráfico de donas de categorías y gráfico de barras de presupuesto macro.
+- **[SalesPage.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/views/SalesPage.java)**: Punto de venta (POS 2.0) en 3 columnas (28% Catalogo, 44% Carrito, 28% Checkout), autocompletado en tiempo real de clientes, calculadora de vueltas exactas y selección de método de pago.
+- **[ProductPage.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/views/ProductPage.java)**: Gestión de catálogo e inventario, alertas de stock crítico, filtro por categorías e importación/exportación masiva Excel.
+- **[ComprasPage.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/views/ComprasPage.java)**: Módulo de abastecimiento e ingreso de compras a proveedores con incremento automático de inventario y registro de factura.
+- **[CarteraPage.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/views/CarteraPage.java)**: Gestión de créditos, cuentas por cobrar, registro de abonos parciales e historial de pagos por cliente.
+- **[ReportsPage.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/views/ReportsPage.java)**: Centro de inteligencia financiera con filtrado por rango de fechas, resumen de utilidad neta, COGS y exportación a Excel y PDF.
+- **[ConfigPage.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/views/ConfigPage.java)**: Ajustes del sistema, respaldo/restauración de base de datos SQLite, gestión de usuarios/roles y estado de licencia.
 
 ---
 
-## 4. Flujos Transaccionales & Fórmulas Financieras
+## 4. Modelos Matemáticos & Fórmulas del Dashboard BI
 
-### 4.1 Transacción Atómica POS (`VentasController.guardarVenta`)
+El motor analítico de **ERP+ Business** calcula en tiempo real los indicadores clave de rendimiento (KPIs) combinando consultas SQL optimizadas sobre SQLite con procesamiento numérico defensivo en Java (`VentasController.java` y `ProductoController.java`).
+
+### 4.1 Ingreso Total Facturado ($\mathbf{V_{total}}$)
+El ingreso bruto acumulado en un intervalo de tiempo parametrizado $[t_0, t_1]$ representa la suma de los valores totales de las ventas confirmadas:
+
+$$\mathbf{V_{total}} = \sum_{i \in \text{Ventas}(t_0, t_1)} \text{total}_i$$
+
+*Consulta SQL Equivalente (`VentasController.obtenerTotalVentasPorPeriodo`):*
+```sql
+SELECT COALESCE(SUM(total), 0.0) 
+FROM ventas 
+WHERE fecha >= ? AND fecha <= ?;
+```
+
+### 4.2 Costo de Mercancía Vendida (COGS $\mathbf{C_{total}}$)
+El costo total de la mercancía comercializada retiene el *snapshot* del precio de costo unitario ($C_{i,j}$) al momento exacto en que se efectuó la transacción, previniendo distorsiones por cambios futuros en la lista de precios:
+
+$$\mathbf{C_{total}} = \sum_{i=1}^{N} \sum_{j=1}^{M_i} (C_{i,j} \times Q_{i,j})$$
+
+Donde $N$ es el número de ventas, $M_i$ el número de renglones/detalles de la venta $i$, $C_{i,j}$ el precio de costo del producto $j$ (`precio_costo`), y $Q_{i,j}$ la cantidad vendida (`cantidad`).
+
+*Consulta SQL Equivalente (`VentasController.obtenerUtilidadPorPeriodo`):*
+```sql
+SELECT COALESCE(SUM(d.precio_costo * d.cantidad), 0.0)
+FROM detalles_venta d
+JOIN ventas v ON d.venta_id = v.id
+WHERE v.fecha >= ? AND v.fecha <= ?;
+```
+
+### 4.3 Utilidad Neta ($\mathbf{P_{net}}$) y Margen de Ganancia ($\mathbf{M_{net}}$)
+La ganancia líquida real del negocio descuenta el COGS del total facturado:
+
+$$\mathbf{P_{net}} = \mathbf{V_{total}} - \mathbf{C_{total}} = \sum_{i=1}^{N} \sum_{j=1}^{M_i} \left[ T_{i,j} - (C_{i,j} \times Q_{i,j}) \right]$$
+
+El margen de utilidad neta porcentual se define formalmente como:
+
+$$\mathbf{M_{net}} = \begin{cases} 
+\left( \frac{\mathbf{P_{net}}}{\mathbf{V_{total}}} \right) \times 100 & \text{si } \mathbf{V_{total}} > 0 \\ 
+0 & \text{si } \mathbf{V_{total}} = 0 
+\end{cases}$$
+
+### 4.4 Variación Porcentual Interperiodo ($\mathbf{\Delta \%}$)
+Para evaluar la tendencia de crecimiento o decrecimiento de ventas entre el periodo actual ($\mathbf{V_{actual}}$) y el periodo inmediatamente anterior de igual duración ($\mathbf{V_{anterior}}$), se utiliza la tasa de cambio relativa:
+
+$$\mathbf{\Delta \%} = \begin{cases} 
+\left( \frac{\mathbf{V_{actual}} - \mathbf{V_{anterior}}}{\mathbf{V_{anterior}}} \right) \times 100 & \text{si } \mathbf{V_{anterior}} > 0 \\
++100\% & \text{si } \mathbf{V_{actual}} > 0 \text{ y } \mathbf{V_{anterior}} = 0 \\
+0\% & \text{en cualquier otro caso}
+\end{cases}$$
+
+Esta ecuación alimenta dinámicamente el badge neón del componente `NeonLineChart.java` y las tarjetas `MetricCard.java`.
+
+### 4.5 Valor Total del Inventario en Bodega ($\mathbf{V_{inv}}$) e Inversión Total ($\mathbf{I_{total}}$)
+El capital inmovilizado en el almacén representa la valoración a precio de costo de todos los productos en existencias:
+
+$$\mathbf{V_{inv}} = \sum_{p=1}^{K} (C_p \times S_p)$$
+
+Donde $K$ es el total de productos en el catálogo, $C_p$ es el precio de costo del producto $p$ y $S_p$ es el stock actual disponible (`cantidad`).
+
+La **Inversión Total Histórica** $\mathbf{I_{total}}$ desglosa además los ingresos de mercancía realizados mediante facturas formales de abastecimiento a proveedores ($\mathbf{I_{abast}}$):
+
+$$\mathbf{I_{total}} = \mathbf{I_{abast}} + \mathbf{V_{inv\_directo}}$$
+
+$$\mathbf{I_{abast}} = \sum_{c=1}^{B} \sum_{r=1}^{L_c} (C_{c,r} \times Q_{c,r})$$
+
+Donde $B$ es el número de compras a proveedores y $L_c$ el número de ítems de la compra $c$.
+
+### 4.6 Cuotas de Cartera Pendiente ($\mathbf{R_{cartera}}$)
+El saldo total por cobrar acumulado en cuentas de crédito a clientes se calcula como la diferencia entre la suma facturada a crédito y la suma de abonos registrados:
+
+$$\mathbf{R_{cartera}} = \sum_{v \in \text{VentasCrédito}} \left( \text{total}_v - \sum_{a \in \text{Abonos}(v)} \text{monto}_a \right)$$
+
+---
+
+## 5. Flujos Transaccionales & Operaciones ACID
+
+### 5.1 Transacción Atómica POS (`VentasController.guardarVenta`)
 
 ```sql
 BEGIN TRANSACTION;
@@ -158,22 +232,7 @@ COMMIT; -- O ROLLBACK en caso de excepción
 
 - Si `metodoPago` es `"Crédito"`, `pago_confirmado` se establece en `'deudor'`. En `"Efectivo"` o `"Transferencia"`, en `'pagado'`.
 
-### 4.2 Métricas del Resumen Ejecutivo en Centro de Reportes & Exportaciones
-
-El **Centro de Reportes** (`ReportsPage.java`) incluye un módulo de inteligencia financiera en tiempo real que reevalúa automáticamente las ventas filtradas por fecha o búsqueda histórica:
-
-1. **Total Facturado ($)**: Suma de la columna `Precio Total` de todas las ventas seleccionadas.
-2. **Costo de Mercancía COGS ($)**: `SELECT SUM(cantidad * precio_costo) FROM detalles_venta WHERE venta_id IN (...)`.
-3. **Utilidad Neta ($) & Margen (%)**: `Ganancia = Total Facturado - COGS`; `Margen % = (Ganancia / Total Facturado) * 100.0`.
-4. **Desglose de Métodos de Pago**: Acumulado y proporción para **Efectivo**, **Transferencia** y **Crédito**.
-5. **Exportación a Excel con Apache POI (`VentasController.exportarDatosTablaAExcel`)**:
-   - Aplica estilos corporativos con banner de título ("ERP+ BUSINESS - Reporte Oficial de Ventas").
-   - Cabeceras con relleno azul oscuro (`#1E293B`) y texto en negrita.
-   - Formato numérico `$#,##0.00` en celdas de moneda y fila final de **Gran Total**.
-6. **Exportación a PDF / Impresión Nativa**:
-   - Invocación nativa a `JTable.print(JTable.PrintMode.FIT_WIDTH, header, footer)` que permite previsualizar e imprimir o generar un PDF vectorizado.
-
-### 4.3 Módulo de Cartera & Recaudo de Abonos (`CarteraController.registrarAbono`)
+### 5.2 Módulo de Cartera & Recaudo de Abonos (`CarteraController.registrarAbono`)
 
 ```sql
 BEGIN TRANSACTION;
@@ -193,7 +252,7 @@ UPDATE ventas SET pago_confirmado = 'pagado' WHERE id = ?;
 COMMIT; -- O ROLLBACK si el monto supera el saldo pendiente o falla la conexión
 ```
 
-### 4.4 Motor Dual de Importación Excel/CSV (`ExcelSQLiteManager`)
+### 5.3 Motor Dual de Importación Excel/CSV (`ExcelSQLiteManager`)
 
 El motor de importación masiva soporta dos modos de operación parametrizados mediante la enumeración `ModoImportacion`:
 
