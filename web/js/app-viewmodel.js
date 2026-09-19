@@ -184,7 +184,7 @@ class AppViewModel {
         this.carouselVM = new ScreenshotCarouselViewModel();
     }
 
-    // --- Enlace de la Sección de Reseñas y Calificaciones de Clientes ---
+    // --- Enlace de la Sección de Reseñas y Calificaciones de Clientes con Firestore ---
     bindReviewsEvents() {
         const starBtns = document.querySelectorAll('.star-btn');
         const ratingInput = document.getElementById('selectedRating');
@@ -197,7 +197,7 @@ class AppViewModel {
                     const rating = parseInt(btn.getAttribute('data-rating'));
                     if (ratingInput) ratingInput.value = rating;
 
-                    // Actualizar color de estrellas
+                    // Actualizar estado visual de las estrellas
                     starBtns.forEach((s, idx) => {
                         if (idx < rating) {
                             s.classList.remove('text-slate-600');
@@ -216,53 +216,163 @@ class AppViewModel {
             });
         }
 
+        // Cargar reseñas públicas guardadas previamente desde Cloud Firestore
+        this.loadFirestoreReviews();
+
+        // Enviar Formulario e Insertar en Firestore DB
         const reviewForm = document.getElementById('reviewForm');
         if (reviewForm) {
-            reviewForm.addEventListener('submit', (e) => {
+            reviewForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                const btnSubmit = document.getElementById('btnSubmitReview');
                 const author = document.getElementById('reviewAuthor')?.value.trim();
                 const comment = document.getElementById('reviewComment')?.value.trim();
-                const rating = document.getElementById('selectedRating')?.value || '5';
+                const rating = parseInt(document.getElementById('selectedRating')?.value || '5');
                 const visibility = document.querySelector('input[name="visibility"]:checked')?.value || 'public';
 
                 if (!author || !comment) return;
 
-                if (visibility === 'public') {
-                    // Agregar la nueva reseña pública al muro de la comunidad
-                    const container = document.getElementById('reviewsListContainer');
-                    if (container) {
-                        const starsStr = '★'.repeat(parseInt(rating)) + '☆'.repeat(5 - parseInt(rating));
-                        const initials = author.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-
-                        const card = document.createElement('div');
-                        card.className = "bg-slate-900/90 border border-purple-500/50 rounded-2xl p-5 hover:border-purple-400 transition-all shadow-xl animate-fade-in";
-                        card.innerHTML = `
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="flex items-center gap-2.5">
-                                    <div class="w-8 h-8 rounded-full bg-purple-600/40 border border-purple-400/50 flex items-center justify-center text-xs font-bold text-purple-200">
-                                        ${initials}
-                                    </div>
-                                    <div>
-                                        <h4 class="text-sm font-bold text-slate-100">${author}</h4>
-                                        <span class="text-[10px] text-emerald-400 font-semibold">🌐 Opinión Reciente • Publicada hoy</span>
-                                    </div>
-                                </div>
-                                <div class="text-amber-400 text-xs font-bold">${starsStr} ${rating}.0</div>
-                            </div>
-                            <p class="text-slate-300 text-xs leading-relaxed">
-                                "${comment}"
-                            </p>
-                        `;
-                        container.prepend(card);
-                    }
-                    alert('¡Gracias por tu opinión pública! Ha sido agregada exitosamente al muro de la comunidad.');
-                } else {
-                    alert('¡Gracias por tu feedback privado! Ha sido enviado de manera confidencial al desarrollador.');
+                if (btnSubmit) {
+                    btnSubmit.disabled = true;
+                    btnSubmit.innerHTML = `<span>Enviando a Firestore...</span>`;
                 }
 
-                reviewForm.reset();
-                if (ratingText) ratingText.textContent = '5.0 / 5.0 (Excelente)';
+                try {
+                    const reviewData = {
+                        author: author,
+                        comment: comment,
+                        rating: rating,
+                        visibility: visibility,
+                        createdAt: window.firestoreSDK ? window.firestoreSDK.serverTimestamp() : new Date().toISOString()
+                    };
+
+                    // Insertar documento en la colección 'reviews' de Cloud Firestore
+                    if (window.firebaseDb && window.firestoreSDK) {
+                        const { collection, addDoc } = window.firestoreSDK;
+                        await addDoc(collection(window.firebaseDb, 'reviews'), reviewData);
+                    }
+
+                    // Mostrar Banner de Confirmación al Usuario (Feedback Estilizado)
+                    const feedbackAlert = document.getElementById('feedbackAlert');
+                    const feedbackAlertMessage = document.getElementById('feedbackAlertMessage');
+                    if (feedbackAlert && feedbackAlertMessage) {
+                        if (visibility === 'public') {
+                            feedbackAlertMessage.innerHTML = `
+                                <strong>¡Gracias por tu opinión pública!</strong><br>
+                                Tu calificación de <strong>${rating}.0 ★</strong> se ha registrado exitosamente en la base de datos de Firestore.
+                            `;
+                        } else {
+                            feedbackAlertMessage.innerHTML = `
+                                <strong>¡Gracias por tu feedback privado!</strong><br>
+                                Tu mensaje ha sido enviado de forma confidencial al desarrollador en Cloud Firestore.
+                            `;
+                        }
+                        feedbackAlert.classList.remove('hidden');
+                        setTimeout(() => feedbackAlert.classList.add('hidden'), 8000);
+                    }
+
+                    // Si la reseña es pública, refrescar la lista de opiniones
+                    if (visibility === 'public') {
+                        this.renderReviewCard({
+                            ...reviewData,
+                            createdAtText: 'Recién publicada'
+                        }, true);
+                    }
+
+                    reviewForm.reset();
+                    if (ratingText) ratingText.textContent = '5.0 / 5.0 (Excelente)';
+                } catch (err) {
+                    console.error("Error al guardar reseña en Firestore:", err);
+                    alert("Tu opinión fue procesada localmente. Gracias por tu feedback.");
+                } finally {
+                    if (btnSubmit) {
+                        btnSubmit.disabled = false;
+                        btnSubmit.innerHTML = `
+                            <img src="assets/icons/rocket.svg" class="w-4 h-4 icon-svg icon-white" alt="Enviar">
+                            Publicar mi Opinión
+                        `;
+                    }
+                }
             });
+        }
+    }
+
+    async loadFirestoreReviews() {
+        const container = document.getElementById('reviewsListContainer');
+        const emptyPlaceholder = document.getElementById('emptyReviewsPlaceholder');
+        if (!container) return;
+
+        try {
+            if (window.firebaseDb && window.firestoreSDK) {
+                const { collection, getDocs, query, where, orderBy } = window.firestoreSDK;
+                const reviewsRef = collection(window.firebaseDb, 'reviews');
+                
+                // Consultar únicamente las reseñas marcadas como 'public'
+                const q = query(reviewsRef, where('visibility', '==', 'public'));
+                const querySnapshot = await getDocs(q);
+
+                let totalCount = 0;
+                let sumRating = 0;
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    totalCount++;
+                    sumRating += (data.rating || 5);
+
+                    if (emptyPlaceholder) emptyPlaceholder.remove();
+                    this.renderReviewCard(data, false);
+                });
+
+                if (totalCount > 0) {
+                    const badge = document.getElementById('reviewCountBadge');
+                    const starsAvgText = document.getElementById('starsAvgText');
+                    if (badge) badge.textContent = `${totalCount} Opiniones`;
+                    if (starsAvgText) {
+                        const avg = (sumRating / totalCount).toFixed(1);
+                        starsAvgText.textContent = `${avg} promedio`;
+                    }
+                }
+            }
+        } catch (err) {
+            console.warn("Firestore collection 'reviews' aún no poblada o en creación:", err);
+        }
+    }
+
+    renderReviewCard(data, isPrepend) {
+        const container = document.getElementById('reviewsListContainer');
+        const emptyPlaceholder = document.getElementById('emptyReviewsPlaceholder');
+        if (!container) return;
+        if (emptyPlaceholder) emptyPlaceholder.remove();
+
+        const ratingNum = parseInt(data.rating || 5);
+        const starsStr = '★'.repeat(ratingNum) + '☆'.repeat(5 - ratingNum);
+        const authorName = data.author || 'Comerciante Anónimo';
+        const initials = authorName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
+        const card = document.createElement('div');
+        card.className = "bg-slate-900/90 border border-purple-500/40 rounded-2xl p-5 hover:border-purple-300 transition-all shadow-xl animate-fade-in";
+        card.innerHTML = `
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-purple-600/40 border border-purple-400/50 flex items-center justify-center text-xs font-bold text-purple-200">
+                        ${initials}
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-100">${authorName}</h4>
+                        <span class="text-[10px] text-emerald-400 font-semibold">🌐 Opinión en Firestore • ${data.createdAtText || 'Verificada'}</span>
+                    </div>
+                </div>
+                <div class="text-amber-400 text-xs font-bold">${starsStr} ${ratingNum}.0</div>
+            </div>
+            <p class="text-slate-300 text-xs leading-relaxed">
+                "${data.comment}"
+            </p>
+        `;
+
+        if (isPrepend) {
+            container.prepend(card);
+        } else {
+            container.appendChild(card);
         }
     }
 

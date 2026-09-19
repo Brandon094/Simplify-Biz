@@ -101,70 +101,32 @@
       <div class="flex items-center justify-between mb-2">
         <h3 class="text-lg font-bold text-white flex items-center gap-2">
           <span>Reseñas de Usuarios</span>
-          <span id="reviewCountBadge" class="text-xs font-extrabold bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2.5 py-0.5 rounded-full">3 Opiniones</span>
+          <span id="reviewCountBadge" class="text-xs font-extrabold bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2.5 py-0.5 rounded-full">0 Opiniones</span>
         </h3>
         <div class="flex items-center gap-1 text-amber-400 text-sm font-bold">
-          <span>★★★★★</span>
-          <span class="text-slate-300 text-xs font-medium ml-1">4.9 promedio</span>
+          <span id="starsAvgStars">★★★★★</span>
+          <span id="starsAvgText" class="text-slate-300 text-xs font-medium ml-1">5.0 promedio</span>
         </div>
       </div>
 
-      <!-- Lista de Reseñas (Renderizado Dinámico desde Firebase / Fallback) -->
+      <!-- Banner de Feedback / Confirmación al enviar reseña -->
+      <div id="feedbackAlert" class="hidden bg-emerald-500/15 border border-emerald-500/40 rounded-2xl p-4 text-emerald-300 text-xs font-semibold flex items-center gap-3 animate-fade-in">
+        <span class="text-xl">🎉</span>
+        <div id="feedbackAlertMessage">
+          ¡Gracias por tu opinión! Se ha guardado en la base de datos de Cloud Firestore.
+        </div>
+      </div>
+
+      <!-- Lista de Reseñas (Renderizado Dinámico en Tiempo Real desde Cloud Firestore) -->
       <div id="reviewsListContainer" class="space-y-4 max-h-[520px] overflow-y-auto pr-1 scrollbar-none">
-        <!-- Reseña Demo 1 -->
-        <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-5 hover:border-purple-500/30 transition-all shadow-lg">
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-full bg-purple-600/30 border border-purple-400/40 flex items-center justify-center text-xs font-bold text-purple-200">
-                CM
-              </div>
-              <div>
-                <h4 class="text-sm font-bold text-slate-100">Carlos Mendoza</h4>
-                <span class="text-[10px] text-slate-400">Ferretería El Carmen • Hace 2 días</span>
-              </div>
-            </div>
-            <div class="text-amber-400 text-xs font-bold">★★★★★ 5.0</div>
+        <!-- Estado Vacío Inicial cuando no hay comentarios en Firestore -->
+        <div id="emptyReviewsPlaceholder" class="bg-slate-900/60 border border-dashed border-white/15 rounded-2xl p-8 text-center flex flex-col items-center justify-center">
+          <div class="w-12 h-12 rounded-full bg-purple-500/15 border border-purple-500/30 flex items-center justify-center mb-3">
+            <img src="assets/icons/star.svg" class="w-6 h-6 icon-svg icon-amber" alt="Estrella">
           </div>
-          <p class="text-slate-300 text-xs leading-relaxed">
-            "Excelente programa. Lo compré para mi ferretería porque no quería seguir pagando $120 mil mensuales en otro software. El autocompletado en caja vuela y el soporte por WhatsApp fue inmediato."
-          </p>
-        </div>
-
-        <!-- Reseña Demo 2 -->
-        <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-5 hover:border-purple-500/30 transition-all shadow-lg">
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-full bg-emerald-600/30 border border-emerald-400/40 flex items-center justify-center text-xs font-bold text-emerald-200">
-                DR
-              </div>
-              <div>
-                <h4 class="text-sm font-bold text-slate-100">Droguería La Rebaja Local</h4>
-                <span class="text-[10px] text-slate-400">Neiva • Hace 5 días</span>
-              </div>
-            </div>
-            <div class="text-amber-400 text-xs font-bold">★★★★★ 5.0</div>
-          </div>
-          <p class="text-slate-300 text-xs leading-relaxed">
-            "Súper recomendado. La importación de listas en Excel me ahorró días metiendo productos. Me sirvió mucho la función de cuentas por cobrar para fiados."
-          </p>
-        </div>
-
-        <!-- Reseña Demo 3 -->
-        <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-5 hover:border-purple-500/30 transition-all shadow-lg">
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-full bg-blue-600/30 border border-blue-400/40 flex items-center justify-center text-xs font-bold text-blue-200">
-                AR
-              </div>
-              <div>
-                <h4 class="text-sm font-bold text-slate-100">Almacén Repuestos MotoRider</h4>
-                <span class="text-[10px] text-slate-400">Pitalito • Hace 1 semana</span>
-              </div>
-            </div>
-            <div class="text-amber-400 text-xs font-bold">★★★★☆ 4.8</div>
-          </div>
-          <p class="text-slate-300 text-xs leading-relaxed">
-            "Muy práctico y rápido. Funciona perfecto sin internet cuando falla la luz en la zona. El reporte de ganancia limpia es lo que más uso al final del día."
+          <h4 class="text-sm font-bold text-slate-200 mb-1">¡Sé el primero en dejar tu opinión!</h4>
+          <p class="text-xs text-slate-400 max-w-sm">
+            Aún no hay reseñas registradas en la base de datos. Comparte tu experiencia probando ERP+ Business en el formulario de la izquierda.
           </p>
         </div>
       </div>

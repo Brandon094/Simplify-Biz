@@ -111,6 +111,16 @@
   <!-- Firebase App & Cloud Firestore SDKs (v12.19.0) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    import { 
+      getFirestore, 
+      collection, 
+      addDoc, 
+      getDocs, 
+      query, 
+      where, 
+      orderBy, 
+      serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
     // Configuración oficial del proyecto Firebase: erp-plus-business
     const firebaseConfig = {
@@ -122,9 +132,21 @@
       appId: "1:1064071375061:web:d94b89a4ee78f740ec1a5c"
     };
 
-    // Inicialización global de Firebase App
+    // Inicialización global de Firebase App y Firestore DB
     const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     window.firebaseApp = app;
+    window.firebaseDb = db;
+    window.firestoreSDK = {
+      collection,
+      addDoc,
+      getDocs,
+      query,
+      where,
+      orderBy,
+      serverTimestamp
+    };
   </script>
 
   <!-- JS Scripts (MVVM ViewModels & Atomic Component Loader) -->
