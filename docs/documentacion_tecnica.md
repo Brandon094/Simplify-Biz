@@ -208,7 +208,109 @@ $$\mathbf{R_{cartera}} = \sum_{v \in \text{VentasCrédito}} \left( \text{total}_
 
 ---
 
-## 5. Flujos Transaccionales & Operaciones ACID
+## 5. Especificación Minuciosa de la Capa de Controladores (`controllers`)
+
+Los controladores actúan como el núcleo de lógica de negocio (Business Logic Layer) en el patrón MVC. Interceptan las acciones del usuario desde la interfaz Swing, gestionan la integridad transaccional ACID vía JDBC contra SQLite y retornan los resultados empaquetados en DTOs inmutables `ResultadoOperacion`.
+
+### 5.1 `VentasController` ([VentasController.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/controllers/VentasController.java))
+Administra el ciclo de vida completo de la facturación en el punto de venta (POS), reportes financieros ejecutivos, exportaciones multiformato y agregaciones del Dashboard BI.
+
+* **Responsabilidades Principales:**
+  - Garantizar transacciones atómicas multi-tabla (`ventas`, `detalles_venta`, `productos`).
+  - Calcular utilidades netas reales deduciendo el snapshot de costo de mercancía (COGS).
+  - Generar la serie de datos histórica y la serie de comparativa interperiodo para los gráficos neón.
+  - Exportar reportes contables oficiales a Microsoft Excel (`.xlsx`) y PDF nativo de alta resolución.
+
+* **Métodos Clave & Firma Técnica:**
+  - `ResultadoOperacion guardarVenta(Venta venta, List<Producto> productosVendidos, JTable tablaVentas)`: Ejecuta una transacción atómica `BEGIN TRANSACTION` / `COMMIT`. Valida disponibilidad previa de existencias. Si `metodoPago` es `"Crédito"`, clasifica el registro en `pago_confirmado = 'deudor'`; de lo contrario, `'pagado'`. Resta atómicamente el stock con la clausula guardiana `WHERE codigo = ? AND cantidad >= ?`.
+  - `double obtenerTotalVentasPorPeriodo(String periodo)`: Retorna la suma bruta facturada filtrada por ventana de tiempo (`Hoy`, `Esta Semana`, `Este Mes`, `Este Año`, `Histórico`).
+  - `double obtenerUtilidadPorPeriodo(String periodo)`: Realiza el cálculo preciso de la ganancia líquida deduciendo el costo unitario snapshot (`SUM(d.total - (d.precio_costo * d.cantidad))`).
+  - `Map<String, List<Double>> obtenerDatosGraficaVentasComparativas(String periodo)`: Retorna un mapa con dos series temporales sincronizadas: `"actual"` y `"anterior"`, permitiendo trazar la comparativa interperiodo en `NeonLineChart`.
+  - `List<String> obtenerEtiquetasGraficaPorPeriodo(String periodo)`: Genera dinámicamente las etiquetas adaptativas del Eje X (Horas, Días/Meses en español, o Años).
+  - `ResultadoOperacion exportarDatosTablaAExcel(JTable tabla, File archivoDestino)`: Genera un archivo `.xlsx` estilizado con Apache POI conteniendo estilos corporativos, fuentes personalizadas y totales formateados.
+
+---
+
+### 5.2 `ProductoController` ([ProductoController.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/controllers/ProductoController.java))
+Gestor centralizado del catálogo de mercancías, valoración de existencias en almacén y monitoreo de inventarios críticos.
+
+* **Responsabilidades Principales:**
+  - Operaciones CRUD completas para el maestro de artículos y categorías de productos.
+  - Gestión defensiva de stock e incremento automático en importación/abastecimiento.
+  - Cálculo contable del capital inmovilizado en bodega a precio de costo.
+  - Detección reactiva de repuestos/artículos en stock crítico ($\le 5$ unidades).
+
+* **Métodos Clave & Firma Técnica:**
+  - `ResultadoOperacion agregarOActualizarProductoSiExiste(Producto producto)`: Implementa la estrategia Upsert. Si el código SKU ya existe en la base de datos, incrementa la cantidad existente (`cantidad = cantidad + ?`) y actualiza precios de venta y costo; si no existe, inserta el nuevo registro.
+  - `ResultadoOperacion modificarProducto(Producto producto)`: Actualiza los atributos de un producto verificando previamente que no se duplique el código SKU con otro registro existente (`SELECT COUNT(*) WHERE codigo = ? AND id != ?`).
+  - `ResultadoOperacion eliminarProducto(int idProducto)`: Elimina un producto por su ID primario impidiendo la eliminación si el ID es inválido (`-1`).
+  - `void cargarProductosEnTabla(JTable tabla, String filtroNombre)`: Puebla un `DefaultTableModel` con la lista de productos filtrados reactivamente por coincidencia parcial en nombre o SKU.
+  - `double obtenerInversionTotalBodega()`: Calcula la suma global del valor del inventario actual $\mathbf{V_{inv}} = \sum (C_p \times S_p)$.
+  - `double obtenerInversionTotalAbastecimiento()`: Calcula el acumulado histórico ingresado formalmente a través de facturas de compras a proveedores.
+  - `int obtenerCantidadProductosStockCritico()`: Retorna el conteo total de ítems con `cantidad <= 5`.
+
+---
+
+### 5.3 `CarteraController` ([CarteraController.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/controllers/CarteraController.java))
+Gobernanza financiera del módulo de cuentas por cobrar, seguimiento a clientes deudores y procesamiento de abonos parciales.
+
+* **Responsabilidades Principales:**
+  - Control de ventas con `pago_confirmado = 'deudor'`.
+  - Registro auditable de pagos parciales en la tabla `abonos_cartera`.
+  - Liquidación y cambio automático de estado a `'pagado'` cuando la deuda se liquida en su totalidad.
+  - Cálculo de KPIs de cartera (Total Deuda Activa, Recaudo Acumulado y Clientes Deudores).
+
+* **Métodos Clave & Firma Técnica:**
+  - `ResultadoOperacion registrarAbono(int ventaId, double monto, String metodoPago, String observacion)`: Registra de forma transaccional un pago parcial. Inicia comprobando que $monto > 0$ y $monto \le \text{saldoPendiente}$. Inserta la entrada en `abonos_cartera` y, si el saldo remanente es menor o igual a \$0.01, ejecuta `UPDATE ventas SET pago_confirmado = 'pagado'`.
+  - `List<Map<String, Object>> obtenerCuentasPorCobrar(String filtro)`: Recupera el listado de facturas a crédito pendientes indicando cliente, cédula, fecha, total venta, acumulado abonado y saldo pendiente.
+  - `List<Map<String, Object>> obtenerHistorialAbonosVenta(int ventaId)`: Retorna la bitácora cronológica de abonos realizados a una factura específica.
+  - `double obtenerTotalCarteraPendiente()`: Suma global del saldo pendiente por cobrar en todo el sistema.
+
+---
+
+### 5.4 `ComprasController` ([ComprasController.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/controllers/ComprasController.java))
+Administrador de órdenes de abastecimiento e ingreso masivo de mercancías desde proveedores.
+
+* **Responsabilidades Principales:**
+  - Registrar compras formales asociadas a un número de factura de proveedor y NIT.
+  - Incrementar de manera atómica las existencias físicas en el almacén.
+  - Actualizar los costos de compra (`precio_costo`) en el maestro de productos.
+
+* **Métodos Clave & Firma Técnica:**
+  - `ResultadoOperacion registrarCompra(Compra compra, List<DetalleCompra> detalles)`: Ejecuta una transacción atómica en 3 pasos: (1) Inserta la cabecera en `compras`, (2) Inserta cada renglón en `detalles_compra`, y (3) Ejecuta Upsert en `productos` sumando las cantidades ingresadas y actualizando el costo unitario de compra.
+
+---
+
+### 5.5 `UsuarioController` ([UsuarioController.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/controllers/UsuarioController.java))
+Gestor de identidad, autenticación flexible, perfiles de usuario y catálogo de clientes.
+
+* **Responsabilidades Principales:**
+  - Autenticar credenciales mediante verificación de hash de contraseña SHA-256 (`Seguridad.hashPassword`).
+  - Permitir inicio de sesión flexible ingresando el correo electrónico o el primer nombre de pila.
+  - Gestionar el catálogo maestro de clientes para la facturación nominativa.
+
+* **Métodos Clave & Firma Técnica:**
+  - `ResultadoOperacion validarCredencialesAdmin(String usuarioOCorreo, String password)`: Autentica usuarios con rol Administrador. Emplea la función SQL `SUBSTR(nombre, 1, INSTR(nombre || ' ', ' ') - 1)` para comparar el primer token del nombre o coincidencia por email.
+  - `ResultadoOperacion validarCredencialesUsuarioRegular(String usuarioOCorreo, String password)`: Valida el acceso para empleados/vendedores regulares.
+  - `List<Usuario> buscarClientesSugeridos(String query)`: Realiza una consulta reactiva de clientes por cédula o nombre para el componente de autocompletado en tiempo real (`AutocompletePopup`).
+  - `ResultadoOperacion registrarCliente(Usuario cliente)`: Da de alta un nuevo cliente verificando la no duplicidad de la cédula/NIT.
+
+---
+
+### 5.6 `ProveedorController` ([ProveedorController.java](file:///home/brandond/Datos_Proyectos/Documentos/Desarrollo/Desarrollo%20Desktop/src/main/java/com/mycompany/zl_solucion_integral/controllers/ProveedorController.java))
+Administrador del directorio corporativo de proveedores.
+
+* **Responsabilidades Principales:**
+  - Altas, bajas, modificaciones y consultas del maestro de proveedores (`proveedores`).
+  - Proveer sugerencias dinámicas de autocompletado en el módulo de compras.
+
+* **Métodos Clave & Firma Técnica:**
+  - `ResultadoOperacion guardarProveedor(Proveedor proveedor)`: Registra un proveedor validando la unicidad del NIT.
+  - `List<Proveedor> buscarProveedoresSugeridos(String query)`: Retorna coincidencias por NIT o Razón Social para el desplegable emergente de abastecimiento.
+
+---
+
+## 6. Flujos Transaccionales & Operaciones ACID
 
 ### 5.1 Transacción Atómica POS (`VentasController.guardarVenta`)
 
