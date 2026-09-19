@@ -1,14 +1,25 @@
-# ERP+ BUSINESS — Next-Gen Enterprise POS & Inventory Platform
+# ERP+ BUSINESS — Next-Gen Enterprise POS & Inventory Platform (v2.1.0)
 
 > **Plataforma ERP de Escritorio de Alto Rendimiento para Pequeñas y Medianas Empresas**  
-> Solución integral de gestión comercial desarrollada bajo estándar de ingeniería de Silicon Valley: arquitectura desacoplada MVC, interfaz responsiva Atomic Design con estética Cyberpunk/Neon (FlatLaf), motor de persistencia relacional transaccional SQLite WAL, motor de importación masiva inteligente dual Excel/CSV (Inventario y Abastecimiento) y analítica financiera en tiempo real.
+> Solución integral de gestión comercial desarrollada bajo estándar de ingeniería de Silicon Valley: arquitectura desacoplada MVC, interfaz responsiva Atomic Design con estética Cyberpunk/Neon (FlatLaf), motor de persistencia relacional transaccional SQLite WAL, motor de importación masiva inteligente dual Excel/CSV (Inventario y Abastecimiento), analítica financiera BI en tiempo real respaldada por ecuaciones matemáticas en LaTeX y portal web comercial con descargas nativas.
 
 ![Java 25](https://img.shields.io/badge/Java-25-orange?style=for-the-badge&logo=openjdk)
 ![SQLite WAL Mode](https://img.shields.io/badge/SQLite_3.46-WAL_Mode-blue?style=for-the-badge&logo=sqlite)
 ![FlatLaf Cyberpunk](https://img.shields.io/badge/FlatLaf-3.5.1_Cyberpunk-purple?style=for-the-badge)
 ![Maven 3.8+](https://img.shields.io/badge/Maven-3.8+-red?style=for-the-badge&logo=apachemaven)
-![JUnit 5 Passed](https://img.shields.io/badge/Tests-46%2F46_Passed-brightgreen?style=for-the-badge&logo=junit5)
+![JUnit 5 Passed](https://img.shields.io/badge/Tests-47%2F47_Passed-brightgreen?style=for-the-badge&logo=junit5)
 ![Architecture](https://img.shields.io/badge/Architecture-MVC_%7C_Atomic_Design-informational?style=for-the-badge)
+![Website](https://img.shields.io/badge/Web-https%3A%2F%2Ferp--plus--business.web.app-cyan?style=for-the-badge)
+
+---
+
+## 🌐 Portal Web & Descargas Nativas en Producción
+
+El ecosistema ERP+ Business incluye un portal web comercial optimizado (Mobile-First) con descargas directas de instaladores binarios compilados:
+
+- 🔗 **Sitio Web Oficial:** [https://erp-plus-business.web.app](https://erp-plus-business.web.app)
+- 🐧 **Instalador Nativo Linux (Debian/Ubuntu):** [`erp-plus-business_2.1.0_amd64.deb`](https://erp-plus-business.web.app/downloads/erp-plus-business_2.1.0_amd64.deb) (67 MB)
+- 🪟 **Paquete Portable Windows (ZIP):** [`ERP-Plus-Business-Windows-Portable.zip`](https://erp-plus-business.web.app/downloads/ERP-Plus-Business-Windows-Portable.zip)
 
 ---
 
@@ -25,18 +36,16 @@
 - **[X] Fase 5 — Analítica Financiera & Abastecimiento:** Dashboard ejecutivo con widgets gráficos vectoriales 2D (`NeonPieChart`, `NeonLineChart`, `NeonBarChart`), módulo de Compras a Proveedores con incremento atómico de stock e historial 360° por cliente.
 - **[X] Fase 6 — Ecosistema SVG, Top Header & Sidebar Ergónomico:** Implementación de 51+ iconos vectoriales FlatSVG, Top Header dinámico contextual y menú lateral colapsable horizontalmente de 260px a 64px (+170px de espacio útil).
 - **[X] Fase 7 — Motor Dual de Importación Excel/CSV & UX POS Ergonométrica:** Engine `ExcelSQLiteManager` desacoplado que soporta dos modos de operación (`ModoImportacion.CATALOGO` y `ModoImportacion.ABASTECIMIENTO`). En Abastecimiento valida previamente Proveedor y Factura, precargando la orden para revisión visual antes del ingreso formal a bodega.
-- **[X] Fase 8 — BI Analítico Avanzado, Ergonomía POS & Formateo Compacto:**
-  - **Microcopy & Guía Contextual en Registro de Administrador (`ModernAdminRegistrationPage.java`):** Implementación de etiquetas de ayuda permanentes y explicativas bajo todos los campos del formulario de onboarding inicial.
-  - **Autocompletado Dual de Clientes (`AutocompletePopup<Usuario>`):** Integración del componente flotante de autocompletado en los campos de **Cédula/NIT** y **Nombre del cliente** en el POS (`SalesPage.java`), desplegando sugerencias reactivas al escribir sin requerir `Enter` o cambio de foco.
-  - **Desacoplamiento de Eventos por Foco:** Remoción de la dependencia de `focusLost` directo en `txtClientCC`, garantizando una selección de sugerencias fluida y sin bloqueos de interfaz.
-  - **Reset Defensivo de Formulario:** Limpieza atómica de datos y restauración del color de texto por defecto (`TEXT_PRIMARY`) al alternar entre *Consumidor Final* y *Cliente Registrado*.
-  - **Tooltips Radiográficos Adaptativos:** Radiografías flotantes en tarjetas KPI adaptadas dinámicamente al tema claro/oscuro.
-  - **Formateo Compacto Inteligente de Moneda (`UIUtils.formatCompactCurrency`):** Estandarización de cifras grandes en tarjetas KPI de Dashboard, Cartera y Reportes (`$100K`, `$5.4M`, `$1.2B`) para evitar desbordamientos visuales, conservando la precisión contable completa (`$ 128.450.000,00`) en tooltips y punto de venta (POS).
-  - **Filtro Anual Completo ("Este Año"):** Extensión del selector temporal a 4 dimensiones (Hoy, Esta Semana, Este Mes, Este Año).
-  - **Gráfico Comparativo Dual & Badge Neón (% vs Per. Anterior):** Renderizado vectorial en `NeonLineChart` con serie discontinua trazada punto a punto del periodo previo y badge neón reactivo con tasa de crecimiento/decrecimiento (`+18.5% vs per. anterior`).
-  - **Etiquetado Inteligente de Eje X:** Formateador inteligente que alterna etiquetas de días (`15 Jul`), meses (`Ene`, `Feb`) y años (`2024`, `2025`).
-  - **Dataset Maestro Demo Multiaño (3 Años):** Script SQL con 1,225+ ventas realistas y 400+ abonos distribuidos entre 2024 y 2026.
-  - **Suite de Pruebas Automatizadas:** 46 tests unitarios e integrales en JUnit 5 pasando al 100%.
+- **[X] Fase 8 — BI Analítico Avanzado, Ecuaciones Matemáticas en LaTeX & Portal Web (v2.1.0):**
+  - **Fórmulas de Precision Financiera en LaTeX:** Especificación completa de los modelos matemáticos ($\mathbf{V_{total}}$, COGS $\mathbf{C_{total}}$, Utilidad Neta $\mathbf{P_{net}}$, Margen $\mathbf{M_{net}}$, Crecimiento Interperiodo $\mathbf{\Delta \%}$, Valoración de Bodega $\mathbf{V_{inv}}$ y Cartera $\mathbf{R_{cartera}}$) en `docs/documentacion_tecnica.md` y en el lector de ayuda de la app.
+  - **Microcopy & Guía Contextual en Registro de Administrador (`ModernAdminRegistrationPage.java`):** Etiquetas de ayuda permanentes bajo los campos de onboarding inicial.
+  - **Autocompletado Dual de Clientes (`AutocompletePopup<Usuario>`):** Integración del componente flotante de autocompletado en Cédula/NIT y Nombre en el POS (`SalesPage.java`), sin bloquear el foco.
+  - **Autenticación Flexible por Primer Nombre o Correo (`UsuarioController.java`):** Permite ingresar únicamente el primer nombre (ej. `"Brandon"`) o correo electrónico en el login.
+  - **Formateo Compacto Inteligente de Moneda (`UIUtils.formatCompactCurrency`):** Estandarización de cifras grandes en tarjetas KPI (`$100K`, `$5.4M`, `$1.2B`) evitando desbordamientos de texto.
+  - **Gráfico Comparativo Dual & Badge Neón (% vs Per. Anterior):** Renderizado vectorial en `NeonLineChart` con serie del periodo previo y badge neón reactivo con tasa de crecimiento/decrecimiento (`+18.5% vs per. anterior`).
+  - **Dataset Maestro Demo Multiaño (3 Años):** Script SQL `poblar_master_demo.sql` con 1,225+ ventas realistas y 400+ abonos distribuidos entre 2024 y 2026.
+  - **Portal Web & Despliegue en Firebase Hosting:** Desarrollo del sitio comercial responsivo con Firebase Hosting, Cloud Firestore para opiniones de clientes y reglas de seguridad (`firestore.rules`).
+  - **Suite de Pruebas Automatizadas:** 47 tests unitarios e integrales en JUnit 5 pasando al 100%.
 
 ---
 
@@ -49,8 +58,9 @@
 | **Vectorial SVG** | FlatSVG / JSVG | **JSVG 1.4.0** / **FlatLaf Extras 3.5.1** (51 SVG Icons) |
 | **Motor de Base de Datos** | SQLite JDBC | **SQLite 3.46.1.0** (Embebido, WAL Mode, Foreign Keys) |
 | **Procesamiento Hojas de Cálculo**| Apache POI | **Apache POI 5.2.3** (OOXML `.xlsx` export/import) |
-| **Testing Automatizado** | JUnit 5 | **JUnit Jupiter 5.10.0** (45 Tests unitarios/integración) |
+| **Testing Automatizado** | JUnit 5 | **JUnit Jupiter 5.10.0** (47 Tests unitarios/integración) |
 | **Build Manager** | Apache Maven | **Maven 3.8+** (Plugins Shader, Compiler, Antrun) |
+| **Ecosistema Web** | Firebase Cloud Services | **Firebase Hosting & Cloud Firestore** (`erp-plus-business`) |
 
 ---
 
@@ -102,7 +112,7 @@ com.mycompany.zl_solucion_integral/
 # 1. Compilar fuentes Java
 mvn clean compile
 
-# 2. Ejecutar la suite completa de 46 pruebas automatizadas de integración/unidad
+# 2. Ejecutar la suite completa de 47 pruebas automatizadas de integración/unidad
 mvn test
 
 # 3. Generar una Licencia Comercial RSA-2048 (Herramienta Admin / Privada)
@@ -111,10 +121,10 @@ mvn compile exec:java -Dexec.mainClass="com.mycompany.zl_solucion_integral.tools
 # 4. Construir el paquete Shaded Fat-JAR de producción (Genera ejecutable en dist/)
 mvn clean package -DskipTests=false
 
-# 4. Ejecución del artefacto generado
-java -jar dist/ERP-Plus-Business-2.0.0.jar
+# 5. Ejecución del artefacto generado
+java -jar dist/ERP-Plus-Business-2.1.0.jar
 
-# 5. Generar paquete ejecutable portable oficial (Linux / Windows)
+# 6. Generar paquete ejecutable portable oficial (Linux / Windows)
 bash scripts/package-app.sh
 ```
 
@@ -122,15 +132,15 @@ bash scripts/package-app.sh
 
 ## 📄 Mapa de Documentación Técnica
 
-- 💻 [**Documentación Técnica General & Guía de Ingeniería**](docs/documentacion_tecnica.md) — Arquitectura detallada, patrones de diseño, pipeline de datos y suite de pruebas.
+- 💻 [**Documentación Técnica General & Guía de Ingeniería**](docs/documentacion_tecnica.md) — Arquitectura detallada, modelos matemáticos en LaTeX, patrones de diseño y suite de pruebas.
 - 🗄️ [**Esquema de Base de Datos & Estrategia SQL**](docs/esquema_bd.md) — DDL oficial, llaves foráneas, índices, concurrencia WAL e hilos de Shutdown Hook.
 - 📖 [**Diccionario de Datos**](docs/diccionario_datos.md) — Definición detallada campo por campo de las 9 tablas relacionales y reglas de snapshot.
 - 🔌 [**API de Controladores & Contrato de Negocio**](docs/api_controladores.md) — Métodos de lectura/escritura, firmas, DTOs y manejo defensivo de excepciones.
-- 📐 [**Arquitectura UI/UX & Design System**](docs/arquitectura_ui.md) — Desglose Atomic Design, tokens neón, breakpoints y componentes 2D.
-- ⚙️ [**Manual de Mantenimiento & Onboarding para Desarrolladores**](docs/manual_mantenimiento.md) — Guía de extensión del sistema, ciclo de vida JVM y empaquetado nativo `jpackage`.
+- 📐 [**Arquitectura UI/UX & Design System**](docs/arquitectura_ui.md) — Desglose Atomic Design, tokens neón, matemáticas de renderizado 2D y componentes adaptativos.
+- ⚙️ [**Manual de Mantenimiento & Onboarding para Desarrolladores**](docs/manual_mantenimiento.md) — Guía de extensión del sistema, ciclo de vida JVM y empaquetado nativo.
 - 🌐 [**Documentación del Sitio Web Landing & Firebase**](docs/documentacion_web.md) — Arquitectura de la landing page, componentes Atomic Design, Firebase Hosting, Cloud Firestore y SEO.
-- 📘 [**Manual de Usuario de la App**](docs/manual_usuario.md) — Instructivo de operación comercial para el usuario final.
-- 🗺️ [**Roadmap del Proyecto**](docs/roadmap/roadmap.md) — Historial de fases y planificación futura (Fase 8+).
+- 📘 [**Manual de Usuario de la App**](docs/manual_usuario.md) — Instructivo de operación comercial e indicación transparente de fórmulas de KPIs.
+- 🗺️ [**Roadmap del Proyecto**](docs/roadmap/roadmap.md) — Historial de fases y planificación futura.
 
 ---
 
