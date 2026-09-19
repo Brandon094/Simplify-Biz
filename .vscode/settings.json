@@ -1,4 +1,3 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive",
-    "CodeGPT.apiKey": "CodeGPT Plus Beta"
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
