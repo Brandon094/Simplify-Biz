@@ -25,6 +25,13 @@ Todas las modificaciones, mejoras, nuevas funcionalidades y correcciones de segu
 - **Rediseño Compacto de Tarjetas KPI (`MetricCard`, `CarteraPage`, `ReportsPage`):** Optimización de padding interno (insets reducidos a `10, 14`) y tipografía, otorgando mayor respiro visual y espacio para los gráficos y tablas centrales.
 - **Dataset Maestro Demo Multiaño (3 Años - `poblar_master_demo.sql`):** Script SQL realista con 1,225+ ventas y 400+ abonos distribuidos entre 2024 y 2026 para pruebas exhaustivas de comparativas interanuales.
 
+### 📚 Documentación Técnica Empresarial & Transparencia Matemática (BI Analytics & UX)
+- **Documentación de Ecuaciones Matemáticas de KPIs en LaTeX:** Incorporación formal en `docs/documentacion_tecnica.md` y en el manual de usuario (`docs/manual_usuario.md` y `ManualUsuarioDialog.java`) de las 6 ecuaciones financieras fundamentales ($\mathbf{V_{total}}$, COGS $\mathbf{C_{total}}$, Utilidad Neta $\mathbf{P_{net}}$, Margen $\mathbf{M_{net}}$, Crecimiento Interperiodo $\mathbf{\Delta \%}$, Valoración de Bodega $\mathbf{V_{inv}}$ y Cartera $\mathbf{R_{cartera}}$).
+- **Actualización Integral del Manual de Usuario Integrado (`ManualUsuarioDialog.java`):** Sincronización del Centro de Ayuda e instructivo navegable dentro del software Java Swing. Se eliminaron referencias obsoletas a lectores láser/escáneres de código de barras para garantizar 100% de fidelidad con las funciones activas del sistema (búsqueda por código SKU o nombre del artículo).
+- **Desglose de Componentes de Interfaz por Atomic Design (`docs/arquitectura_ui.md`):** Clasificación exhaustiva por código de Átomos (`NeonButton`, `NeonLineChart`, `NeonPieChart`, `NeonBarChart`, `RoundedPanel`, `ThemeToggleButton`), Moléculas (`SidebarItem`, `SidebarSection`, `AutocompletePopup`), Organismos (`ModernSidebar`, `MetricCard`) y Diálogos Modales.
+- **Sincronización de API de Controladores (`docs/api_controladores.md`):** Actualización de las firmas técnicas de los 7 controladores y managers (`VentasController`, `ProductoController`, `CarteraController`, `ComprasController`, `UsuarioController`, `ProveedorController`, `ExcelSQLiteManager`).
+- **Infraestructura & PRAGMAs SQLite (`docs/configuraciones.md`):** Especificación del patrón Singleton `GestorConexion`, resolutor de rutas protegidas por sistema operativo (`%APPDATA%`, `~/.config`, `~/Library/Application Support`) y script demo multiaño `poblar_master_demo.sql`.
+
 ---
 
 ## [2.0.0] - 2026-09-16 — Enterprise Major Release
