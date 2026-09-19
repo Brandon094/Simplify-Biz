@@ -37,6 +37,8 @@ public class DashboardPage extends JPanel {
     private List<com.mycompany.zl_solucion_integral.models.Producto> productosCriticos;
     private Object[][] ventasRecientes;
     private List<Double> ventas7Dias;
+    private List<Double> ventasComparativas;
+    private List<String> etiquetasVentasGrafica;
     private Map<String, Double> distribucionCategorias;
 
     // Referencias para el reflow adaptable.
@@ -62,7 +64,7 @@ public class DashboardPage extends JPanel {
         JPanel topHeaderRow = new JPanel(new BorderLayout(12, 0));
         topHeaderRow.setOpaque(false);
 
-        cbPeriodo = new JComboBox<>(new String[]{"Histórico Total", "Hoy", "Últimos 7 Días", "Este Mes"});
+        cbPeriodo = new JComboBox<>(new String[]{"Histórico Total", "Hoy", "Últimos 7 Días", "Este Mes", "Este Año"});
         cbPeriodo.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
         cbPeriodo.setFocusable(false);
         cbPeriodo.setSelectedItem(periodoSeleccionado);
@@ -110,7 +112,9 @@ public class DashboardPage extends JPanel {
                 stockCritico = productoCtrl.obtenerCantidadStockCritico(5);
                 productosCriticos = productoCtrl.obtenerProductosStockCritico(5);
                 ventasRecientes = ventasCtrl.obtenerUltimasVentas(5);
-                ventas7Dias = ventasCtrl.obtenerVentasUltimos7Dias();
+                ventas7Dias = ventasCtrl.obtenerVentasGraficaPorPeriodo(periodoSeleccionado);
+                ventasComparativas = ventasCtrl.obtenerVentasGraficaPeriodoAnterior(periodoSeleccionado);
+                etiquetasVentasGrafica = ventasCtrl.obtenerEtiquetasGraficaPorPeriodo(periodoSeleccionado);
                 distribucionCategorias = productoCtrl.obtenerDistribucionCategorias();
                 return null;
             }
@@ -140,7 +144,9 @@ public class DashboardPage extends JPanel {
                 stockCritico = productoCtrl.obtenerCantidadStockCritico(5);
                 productosCriticos = productoCtrl.obtenerProductosStockCritico(5);
                 ventasRecientes = ventasCtrl.obtenerUltimasVentas(5);
-                ventas7Dias = ventasCtrl.obtenerVentasUltimos7Dias();
+                ventas7Dias = ventasCtrl.obtenerVentasGraficaPorPeriodo(periodoSeleccionado);
+                ventasComparativas = ventasCtrl.obtenerVentasGraficaPeriodoAnterior(periodoSeleccionado);
+                etiquetasVentasGrafica = ventasCtrl.obtenerEtiquetasGraficaPorPeriodo(periodoSeleccionado);
                 distribucionCategorias = productoCtrl.obtenerDistribucionCategorias();
                 return null;
             }
@@ -164,11 +170,17 @@ public class DashboardPage extends JPanel {
         // Grid de Métricas con hgap ampliado para evitar compresión lateral
         metricsPanel = new JPanel(new GridLayout(1, 4, 18, 0));
         metricsPanel.setOpaque(false);
-        MetricCard cardVentas = new MetricCard("Ventas Totales", cur.format(totalVentas), "Acumulado histórico", ThemeConstants.NEON_GREEN, "icons/sales.svg");
+        String subtiVentas = "En " + periodoSeleccionado.toLowerCase();
+        if ("Histórico Total".equalsIgnoreCase(periodoSeleccionado)) {
+            subtiVentas = "Acumulado histórico";
+        } else if ("Hoy".equalsIgnoreCase(periodoSeleccionado)) {
+            subtiVentas = "Ventas del día";
+        }
+        MetricCard cardVentas = new MetricCard("Ventas Totales", UIUtils.formatCompactCurrency(totalVentas), subtiVentas, ThemeConstants.NEON_GREEN, "icons/sales.svg");
         
         double porcentajeMargen = totalVentas > 0 ? (utilidadNeta / totalVentas) * 100.0 : 0.0;
-        MetricCard cardUtilidad = new MetricCard("Utilidad Neta", cur.format(utilidadNeta), String.format("Margen real: %.1f%%", porcentajeMargen), ThemeConstants.NEON_CYAN, "icons/check-double.svg");
-        MetricCard cardInversion = new MetricCard("Inversión Inventario", cur.format(inversionInventario), "Valor costo en bodega", ThemeConstants.NEON_PURPLE, "icons/boxes-stacked.svg");
+        MetricCard cardUtilidad = new MetricCard("Utilidad Neta", UIUtils.formatCompactCurrency(utilidadNeta), String.format("Margen real: %.1f%%", porcentajeMargen), ThemeConstants.NEON_CYAN, "icons/check-double.svg");
+        MetricCard cardInversion = new MetricCard("Inversión Inventario", UIUtils.formatCompactCurrency(inversionInventario), "Valor costo en bodega", ThemeConstants.NEON_PURPLE, "icons/boxes-stacked.svg");
         MetricCard cardStock = new MetricCard("Stock Crítico", stockCritico + " ítems", "Menos de 5 unidades", ThemeConstants.NEON_RED, "icons/triangle-exclamation.svg");
         
         if (desglosePagos != null && totalVentas > 0) {
@@ -179,22 +191,26 @@ public class DashboardPage extends JPanel {
             double pTr = (tr / totalVentas) * 100.0;
             double pCr = (cr / totalVentas) * 100.0;
 
+            String bgHex = String.format("#%06X", (ThemeConstants.CARD_BACKGROUND.getRGB() & 0xFFFFFF));
+            String textHex = String.format("#%06X", (ThemeConstants.TEXT_PRIMARY.getRGB() & 0xFFFFFF));
+            String borderHex = String.format("#%06X", (ThemeConstants.CARD_BORDER.getRGB() & 0xFFFFFF));
+
             StringBuilder sbV = new StringBuilder();
-            sbV.append("<html><div style='padding: 6px; background-color: #1E293B;'>");
-            sbV.append("<b style='color: #22C55E;'>DESGLOSE DE VENTAS POR MÉTODOS DE PAGO:</b><br/>");
-            sbV.append("<table border='0' cellspacing='4' cellpadding='2' style='margin-top: 4px; color: #E2E8F0;'>");
+            sbV.append("<html><div style='padding: 6px; background-color: ").append(bgHex).append(";'>");
+            sbV.append("<b style='color: #22C55E;'>MÉTODOS DE PAGO (").append(periodoSeleccionado.toUpperCase()).append("):</b><br/>");
+            sbV.append("<table border='0' cellspacing='4' cellpadding='2' style='margin-top: 4px; color: ").append(textHex).append(";'>");
             sbV.append("<tr><td>• <b>Efectivo (Caja)</b></td><td align='right' style='color: #22C55E; font-weight: bold;'>")
                .append(cur.format(ef)).append(String.format(" (%.1f%%)", pEf)).append("</td></tr>");
             sbV.append("<tr><td>• <b>Transferencia (Nequi/Banco)</b></td><td align='right' style='color: #3B82F6; font-weight: bold;'>")
                .append(cur.format(tr)).append(String.format(" (%.1f%%)", pTr)).append("</td></tr>");
             sbV.append("<tr><td>• <b>Crédito Comercial (Fiado)</b></td><td align='right' style='color: #F59E0B; font-weight: bold;'>")
                .append(cur.format(cr)).append(String.format(" (%.1f%%)", pCr)).append("</td></tr>");
-            sbV.append("<tr><td style='border-top: 1px solid #334155;'><b>Total Facturado</b></td><td align='right' style='border-top: 1px solid #334155; font-weight: bold; color: #FFFFFF;'>")
+            sbV.append("<tr><td style='border-top: 1px solid ").append(borderHex).append(";'><b>Total Facturado</b></td><td align='right' style='border-top: 1px solid ").append(borderHex).append("; font-weight: bold; color: ").append(textHex).append(";'>")
                .append(cur.format(totalVentas)).append("</td></tr>");
             sbV.append("</table></div></html>");
             cardVentas.setCustomToolTip(sbV.toString());
         } else {
-            cardVentas.setCustomToolTip("<html><div style='padding: 4px;'><b style='color: #94A3B8;'>Sin ventas registradas en este período.</b></div></html>");
+            cardVentas.setCustomToolTip("<html><div style='padding: 4px;'><b style='color: #94A3B8;'>Sin ventas registradas en el período '" + escapeHtml(periodoSeleccionado) + "'.</b></div></html>");
         }
 
         if (desgloseUtilidad != null && desgloseUtilidad.length >= 3 && desgloseUtilidad[0] > 0) {
@@ -204,21 +220,25 @@ public class DashboardPage extends JPanel {
             double pctUtilidad = (utilidad / facturado) * 100.0;
             double retornoPorMil = (utilidad / facturado) * 1000.0;
 
+            String bgHex = String.format("#%06X", (ThemeConstants.CARD_BACKGROUND.getRGB() & 0xFFFFFF));
+            String textHex = String.format("#%06X", (ThemeConstants.TEXT_PRIMARY.getRGB() & 0xFFFFFF));
+            String borderHex = String.format("#%06X", (ThemeConstants.CARD_BORDER.getRGB() & 0xFFFFFF));
+
             StringBuilder sbU = new StringBuilder();
-            sbU.append("<html><div style='padding: 6px; background-color: #1E293B;'>");
-            sbU.append("<b style='color: #06B6D4;'>ANÁLISIS DE RENTABILIDAD & MARGEN NETO:</b><br/>");
-            sbU.append("<table border='0' cellspacing='4' cellpadding='2' style='margin-top: 4px; color: #E2E8F0;'>");
-            sbU.append("<tr><td>• <b>Total Facturado (Bruto)</b></td><td align='right' style='color: #FFFFFF; font-weight: bold;'>")
+            sbU.append("<html><div style='padding: 6px; background-color: ").append(bgHex).append(";'>");
+            sbU.append("<b style='color: #06B6D4;'>RENTABILIDAD & MARGEN (").append(periodoSeleccionado.toUpperCase()).append("):</b><br/>");
+            sbU.append("<table border='0' cellspacing='4' cellpadding='2' style='margin-top: 4px; color: ").append(textHex).append(";'>");
+            sbU.append("<tr><td>• <b>Total Facturado (Bruto)</b></td><td align='right' style='color: ").append(textHex).append("; font-weight: bold;'>")
                .append(cur.format(facturado)).append("</td></tr>");
             sbU.append("<tr><td>• <b>Costo Mercancía (COGS)</b></td><td align='right' style='color: #F43F5E; font-weight: bold;'>- ")
                .append(cur.format(cogs)).append("</td></tr>");
-            sbU.append("<tr><td style='border-top: 1px solid #334155;'><b>Utilidad Neta Ganada</b></td><td align='right' style='border-top: 1px solid #334155; font-weight: bold; color: #06B6D4;'>")
+            sbU.append("<tr><td style='border-top: 1px solid ").append(borderHex).append(";'><b>Utilidad Neta Ganada</b></td><td align='right' style='border-top: 1px solid ").append(borderHex).append("; font-weight: bold; color: #06B6D4;'>")
                .append(cur.format(utilidad)).append(String.format(" (%.1f%%)", pctUtilidad)).append("</td></tr>");
             sbU.append("<tr><td colspan='2' style='color: #22C55E; font-size: 11px; font-weight: bold; padding-top: 4px;'>Ganancia limpia: ").append(cur.format(retornoPorMil)).append(" por cada $1.000 vendidos</td></tr>");
             sbU.append("</table></div></html>");
             cardUtilidad.setCustomToolTip(sbU.toString());
         } else {
-            cardUtilidad.setCustomToolTip("<html><div style='padding: 4px;'><b style='color: #94A3B8;'>Sin utilidad calculada en el período.</b></div></html>");
+            cardUtilidad.setCustomToolTip("<html><div style='padding: 4px;'><b style='color: #94A3B8;'>Sin utilidad calculada en el período '" + escapeHtml(periodoSeleccionado) + "'.</b></div></html>");
         }
         
         if (desgloseInversion != null && desgloseInversion.length >= 3 && desgloseInversion[0] > 0) {
@@ -228,15 +248,19 @@ public class DashboardPage extends JPanel {
             double pctAbast = (abastInv / totalInv) * 100.0;
             double pctDir = (dirInv / totalInv) * 100.0;
 
+            String bgHex = String.format("#%06X", (ThemeConstants.CARD_BACKGROUND.getRGB() & 0xFFFFFF));
+            String textHex = String.format("#%06X", (ThemeConstants.TEXT_PRIMARY.getRGB() & 0xFFFFFF));
+            String borderHex = String.format("#%06X", (ThemeConstants.CARD_BORDER.getRGB() & 0xFFFFFF));
+
             StringBuilder sbInv = new StringBuilder();
-            sbInv.append("<html><div style='padding: 6px; background-color: #1E293B;'>");
+            sbInv.append("<html><div style='padding: 6px; background-color: ").append(bgHex).append(";'>");
             sbInv.append("<b style='color: #A855F7;'>DESGLOSE DE INVERSIÓN EN BODEGA:</b><br/>");
-            sbInv.append("<table border='0' cellspacing='4' cellpadding='2' style='margin-top: 4px; color: #E2E8F0;'>");
+            sbInv.append("<table border='0' cellspacing='4' cellpadding='2' style='margin-top: 4px; color: ").append(textHex).append(";'>");
             sbInv.append("<tr><td>• <b>Abastecimiento (Facturas)</b></td><td align='right' style='color: #06B6D4; font-weight: bold;'>")
                  .append(cur.format(abastInv)).append(String.format(" (%.1f%%)", pctAbast)).append("</td></tr>");
             sbInv.append("<tr><td>• <b>Carga Directa / Catálogo</b></td><td align='right' style='color: #A855F7; font-weight: bold;'>")
                  .append(cur.format(dirInv)).append(String.format(" (%.1f%%)", pctDir)).append("</td></tr>");
-            sbInv.append("<tr><td style='border-top: 1px solid #334155;'><b>Total Valorizado Bodega</b></td><td align='right' style='border-top: 1px solid #334155; font-weight: bold; color: #22C55E;'>")
+            sbInv.append("<tr><td style='border-top: 1px solid ").append(borderHex).append(";'><b>Total Valorizado Bodega</b></td><td align='right' style='border-top: 1px solid ").append(borderHex).append("; font-weight: bold; color: #22C55E;'>")
                  .append(cur.format(totalInv)).append("</td></tr>");
             sbInv.append("</table></div></html>");
             cardInversion.setCustomToolTip(sbInv.toString());
@@ -245,10 +269,13 @@ public class DashboardPage extends JPanel {
         }
         
         if (productosCriticos != null && !productosCriticos.isEmpty()) {
+            String bgHex = String.format("#%06X", (ThemeConstants.CARD_BACKGROUND.getRGB() & 0xFFFFFF));
+            String textHex = String.format("#%06X", (ThemeConstants.TEXT_PRIMARY.getRGB() & 0xFFFFFF));
+
             StringBuilder sb = new StringBuilder();
-            sb.append("<html><div style='padding: 6px; background-color: #1E293B;'>");
+            sb.append("<html><div style='padding: 6px; background-color: ").append(bgHex).append(";'>");
             sb.append("<b style='color: #F43F5E;'>PRODUCTOS EN STOCK CRÍTICO (&le; 5 unds):</b><br/>");
-            sb.append("<table border='0' cellspacing='4' cellpadding='2' style='margin-top: 4px; color: #E2E8F0;'>");
+            sb.append("<table border='0' cellspacing='4' cellpadding='2' style='margin-top: 4px; color: ").append(textHex).append(";'>");
             for (com.mycompany.zl_solucion_integral.models.Producto p : productosCriticos) {
                 String colorQty = p.getCantidad() == 0 ? "#F43F5E" : "#F59E0B";
                 String tagQty = p.getCantidad() == 0 ? " (AGOTADO)" : "";
@@ -280,9 +307,10 @@ public class DashboardPage extends JPanel {
         mainContainer.setOpaque(false);
 
         // FILA 1: Gráficos de Alto Valor Visual y Ejecutivo (Arriba)
+        String tituloGrafica = "Tendencia de Ventas (" + periodoSeleccionado + ")";
         RoundedPanel lineChartCard = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
         lineChartCard.setLayout(new BorderLayout());
-        lineChartCard.add(new NeonLineChart("Ventas Últimos 7 Días ($)", "icons/chart-line.svg", ventas7Dias), BorderLayout.CENTER);
+        lineChartCard.add(new NeonLineChart(tituloGrafica, "icons/chart-line.svg", ventas7Dias, etiquetasVentasGrafica, ventasComparativas), BorderLayout.CENTER);
 
         RoundedPanel pieChartCard = new RoundedPanel(20, ThemeConstants.CARD_BACKGROUND);
         pieChartCard.setLayout(new BorderLayout());
@@ -383,7 +411,7 @@ public class DashboardPage extends JPanel {
         content.add(createStatusRow("Sesión Activa", "icons/clients.svg", usuario, ThemeConstants.NEON_CYAN));
 
         // 5. Versión del Sistema
-        content.add(createStatusRow("Motor ERP+", "icons/settings.svg", "v2.0.0 Activo", ThemeConstants.NEON_PURPLE));
+        content.add(createStatusRow("Motor ERP+", "icons/settings.svg", "v2.1.0 Activo", ThemeConstants.NEON_PURPLE));
 
         card.add(content, BorderLayout.CENTER);
         return card;

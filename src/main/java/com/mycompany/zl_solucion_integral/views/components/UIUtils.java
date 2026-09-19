@@ -503,6 +503,24 @@ public class UIUtils {
     }
 
     /**
+     * Formatea valores monetarios a notación compacta inteligente ($1.2M, $450K, $5K).
+     * Ideal para tarjetas KPI y vistas ejecutivas donde números largos desbordan visualmente.
+     */
+    public static String formatCompactCurrency(double amount) {
+        double abs = Math.abs(amount);
+        java.util.Locale locale = new java.util.Locale("es", "CO");
+        if (abs >= 1_000_000_000.0) {
+            return String.format(locale, "$%.2fB", amount / 1_000_000_000.0);
+        } else if (abs >= 1_000_000.0) {
+            return String.format(locale, "$%.2fM", amount / 1_000_000.0);
+        } else if (abs >= 1_000.0) {
+            return String.format(locale, "$%.1fK", amount / 1_000.0);
+        } else {
+            return String.format(locale, "$%.0f", amount);
+        }
+    }
+
+    /**
      * Formatea cualquier objeto de fecha (Date, LocalDate, Timestamp o cadena 'yyyy-MM-dd')
      * al formato estándar unificado 'dd/MM/yyyy'.
      */

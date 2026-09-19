@@ -11,10 +11,8 @@ import com.formdev.flatlaf.extras.FlatSVGIcon;
 import javax.swing.*;
 import java.awt.*;
 import java.text.MessageFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 
 public class ReportsPage extends JPanel {
@@ -146,8 +144,8 @@ public class ReportsPage extends JPanel {
 
     private JPanel createSummaryCard(String titleText, JLabel valLabel, Color accentColor, String iconPath) {
         RoundedPanel card = new RoundedPanel(18, ThemeConstants.CARD_BACKGROUND);
-        card.setLayout(new BorderLayout(10, 8));
-        card.setBorder(BorderFactory.createEmptyBorder(12, 14, 12, 14));
+        card.setLayout(new BorderLayout(8, 4));
+        card.setBorder(BorderFactory.createEmptyBorder(10, 12, 10, 12));
 
         JPanel top = new JPanel(new BorderLayout());
         top.setOpaque(false);
@@ -362,21 +360,27 @@ public class ReportsPage extends JPanel {
         double gananciaNeta = totalFacturado - cogs;
         double margenPct = totalFacturado > 0 ? (gananciaNeta / totalFacturado) * 100.0 : 0.0;
 
-        NumberFormat fmt = NumberFormat.getCurrencyInstance(new Locale("es", "CO"));
-        fmt.setMaximumFractionDigits(0);
-
-        if (lblValTotalFacturado != null) lblValTotalFacturado.setText(fmt.format(totalFacturado));
-        if (lblValCostoCOGS != null) lblValCostoCOGS.setText(fmt.format(cogs));
+        if (lblValTotalFacturado != null) {
+            lblValTotalFacturado.setText(UIUtils.formatCompactCurrency(totalFacturado));
+            lblValTotalFacturado.setToolTipText("Total facturado exacto: " + UIUtils.formatCurrency(totalFacturado));
+        }
+        if (lblValCostoCOGS != null) {
+            lblValCostoCOGS.setText(UIUtils.formatCompactCurrency(cogs));
+            lblValCostoCOGS.setToolTipText("Costo total de mercancía (COGS): " + UIUtils.formatCurrency(cogs));
+        }
         if (lblValGananciaNeta != null) {
-            lblValGananciaNeta.setText(String.format("%s (%.1f%%)", fmt.format(gananciaNeta), margenPct));
+            lblValGananciaNeta.setText(String.format("%s (%.1f%%)", UIUtils.formatCompactCurrency(gananciaNeta), margenPct));
+            lblValGananciaNeta.setToolTipText("Utilidad neta real: " + UIUtils.formatCurrency(gananciaNeta));
         }
         if (lblValMetodosPago != null) {
             lblValMetodosPago.setText(String.format(
                     "<html><div style='line-height:1.25; font-size:11px; color:#F8FAFC;'>" +
-                    "<b>Efectivo:</b> %s &nbsp;|&nbsp; <b>Transf:</b> %s<br>" +
-                    "<span style='color:#A855F7;'><b>Crédito (Deudor):</b> %s</span>" +
+                    "<b>Ef:</b> %s &nbsp;|&nbsp; <b>Tr:</b> %s<br>" +
+                    "<span style='color:#A855F7;'><b>Cr:</b> %s</span>" +
                     "</div></html>",
-                    fmt.format(totalEfectivo), fmt.format(totalTransf), fmt.format(totalCredito)));
+                    UIUtils.formatCompactCurrency(totalEfectivo), UIUtils.formatCompactCurrency(totalTransf), UIUtils.formatCompactCurrency(totalCredito)));
+            lblValMetodosPago.setToolTipText(String.format("Efectivo: %s | Transf: %s | Crédito: %s",
+                    UIUtils.formatCurrency(totalEfectivo), UIUtils.formatCurrency(totalTransf), UIUtils.formatCurrency(totalCredito)));
         }
 
     }

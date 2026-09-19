@@ -2,6 +2,7 @@ package com.mycompany.zl_solucion_integral.views.components.atoms;
 
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
+import com.mycompany.zl_solucion_integral.views.components.UIUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -214,12 +215,6 @@ public class NeonBarChart extends JPanel {
     }
 
     private String formatCompactCurrency(double val) {
-        if (val >= 1_000_000) {
-            return String.format(new Locale("es", "CO"), "$%.1fM", val / 1_000_000.0);
-        } else if (val >= 1_000) {
-            return String.format(new Locale("es", "CO"), "$%.0fK", val / 1_000.0);
-        } else {
-            return String.format(new Locale("es", "CO"), "$%.0f", val);
-        }
+        return UIUtils.formatCompactCurrency(val);
     }
 }

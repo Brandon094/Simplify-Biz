@@ -9,25 +9,25 @@ import java.awt.*;
 public class MetricCard extends RoundedPanel {
     public MetricCard(String title, String value, String trend, Color trendColor, String icon) {
         super(20, ThemeConstants.CARD_BACKGROUND);
-        setLayout(new BorderLayout(0, 6));
+        setLayout(new BorderLayout(0, 4));
         setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(ThemeConstants.CARD_BORDER, 1),
-                BorderFactory.createEmptyBorder(16, 18, 16, 18)
+                BorderFactory.createEmptyBorder(10, 14, 10, 14)
         ));
         
         // Header con Título e Icono
-        JPanel header = new JPanel(new BorderLayout(6, 0));
+        JPanel header = new JPanel(new BorderLayout(4, 0));
         header.setOpaque(false);
         
         JLabel lblTitle = new JLabel(title);
         lblTitle.setForeground(ThemeConstants.TEXT_SECONDARY);
-        lblTitle.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD, 12f));
+        lblTitle.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD, 11f));
         header.add(lblTitle, BorderLayout.WEST);
 
         JPanel iconBadge = new JPanel(new GridBagLayout());
         iconBadge.setOpaque(false);
 
-        FlatSVGIcon metricIcon = new FlatSVGIcon(icon, 18, 18);
+        FlatSVGIcon metricIcon = new FlatSVGIcon(icon, 16, 16);
         metricIcon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, trendColor));
         JLabel lblIcon = new JLabel(metricIcon);
         lblIcon.setForeground(trendColor);
@@ -40,12 +40,12 @@ public class MetricCard extends RoundedPanel {
         
         JLabel lblValue = new JLabel(value);
         lblValue.setForeground(ThemeConstants.TEXT_PRIMARY);
-        lblValue.setFont(ThemeConstants.FONT_TITLE.deriveFont(Font.BOLD, 21f));
+        lblValue.setFont(ThemeConstants.FONT_TITLE.deriveFont(Font.BOLD, 18f));
         add(lblValue, BorderLayout.CENTER);
         
         JLabel lblTrend = new JLabel(trend);
         lblTrend.setForeground(trendColor);
-        lblTrend.setFont(ThemeConstants.FONT_SMALL);
+        lblTrend.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.PLAIN, 11f));
         add(lblTrend, BorderLayout.SOUTH);
     }
 

@@ -24,7 +24,7 @@ public class ModernSidebar extends JPanel {
     public ModernSidebar() {
         setLayout(new BorderLayout(0, 18));
         setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
-        setPreferredSize(new Dimension(260, 0));
+        setPreferredSize(new Dimension(270, 0));
         setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 1));
 
         JPanel header = new JPanel(new BorderLayout());

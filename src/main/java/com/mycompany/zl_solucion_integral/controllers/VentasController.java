@@ -851,11 +851,63 @@ public class VentasController {
      * @return Lista de totales de ventas.
      */
     public List<Double> obtenerVentasUltimos7Dias() {
-        List<Double> ventas = new java.util.ArrayList<>();
-        java.util.Map<String, Double> mapaVentas = new java.util.HashMap<>();
+        return obtenerVentasGraficaPorPeriodo("Últimos 7 Días");
+    }
 
-        // 1. Consultar ventas agregadas por fecha
-        String sql = "SELECT fecha, SUM(total) as total_dia FROM ventas GROUP BY fecha";
+    /**
+     * Obtiene la serie temporal de ventas adaptada al período seleccionado para graficación dinámica.
+     */
+    /**
+     * Obtiene la serie temporal de ventas adaptada al período seleccionado para graficación dinámica.
+     */
+    public List<Double> obtenerVentasGraficaPorPeriodo(String periodo) {
+        List<Double> ventas = new java.util.ArrayList<>();
+        java.util.Map<String, Double> mapaVentas = new java.util.LinkedHashMap<>();
+
+        if ("Este Año".equalsIgnoreCase(periodo)) {
+            // Agrupar por mes (YYYY-MM)
+            String sql = "SELECT strftime('%Y-%m', fecha) as mes, SUM(total) as total_mes FROM ventas "
+                       + "WHERE fecha >= date('now', 'start of year') GROUP BY mes ORDER BY mes ASC";
+            try (Statement st = conn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
+                while (rs.next()) {
+                    String m = rs.getString("mes");
+                    if (m != null) mapaVentas.put(m.trim(), rs.getDouble("total_mes"));
+                }
+            } catch (SQLException e) {
+                logger.log(Level.SEVERE, "Error al obtener ventas anuales por mes", e);
+            }
+            int mesActual = java.time.LocalDate.now().getMonthValue();
+            int anioActual = java.time.LocalDate.now().getYear();
+            for (int m = 1; m <= mesActual; m++) {
+                String claveMes = String.format("%04d-%02d", anioActual, m);
+                ventas.add(mapaVentas.getOrDefault(claveMes, 0.0));
+            }
+            if (ventas.size() == 1) ventas.add(0, 0.0);
+            return ventas;
+        } else if ("Histórico Total".equalsIgnoreCase(periodo)) {
+            // Agrupar por año (YYYY)
+            String sql = "SELECT strftime('%Y', fecha) as anio, SUM(total) as total_anio FROM ventas GROUP BY anio ORDER BY anio ASC";
+            try (Statement st = conn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
+                while (rs.next()) {
+                    String a = rs.getString("anio");
+                    if (a != null) mapaVentas.put(a.trim(), rs.getDouble("total_anio"));
+                }
+            } catch (SQLException e) {
+                logger.log(Level.SEVERE, "Error al obtener ventas históricas por año", e);
+            }
+            if (mapaVentas.isEmpty()) {
+                ventas.add(0.0);
+                ventas.add(0.0);
+            } else {
+                ventas.addAll(mapaVentas.values());
+                if (ventas.size() == 1) ventas.add(0, 0.0);
+            }
+            return ventas;
+        }
+
+        String whereClause = getWhereClauseForPeriod(periodo, "fecha");
+        String sql = "SELECT fecha, SUM(total) as total_dia FROM ventas " + whereClause + " GROUP BY fecha ORDER BY fecha ASC";
+
         try (Statement st = conn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {
                 String f = rs.getString("fecha");
@@ -866,33 +918,183 @@ public class VentasController {
                 }
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al obtener ventas diarias", e);
+            logger.log(Level.SEVERE, "Error al obtener ventas para gráfica por período", e);
         }
 
-        // 2. Intentar armar la serie temporal para los 7 días continuos hasta el día de hoy
-        java.time.LocalDate hoy = java.time.LocalDate.now();
-        for (int i = 6; i >= 0; i--) {
-            String claveFecha = hoy.minusDays(i).toString(); // YYYY-MM-DD
-            ventas.add(mapaVentas.getOrDefault(claveFecha, 0.0));
-        }
-
-        // 3. Si las ventas registradas corresponden a fechas de prueba diferentes (ej. fechas pasadas o importadas),
-        // y la lista resultante está vacía en valores positivos pero mapaVentas no lo está,
-        // devolvemos directamente las últimas 7 ventas acumuladas para asegurar que la gráfica se pinte.
-        boolean tieneValores = ventas.stream().anyMatch(v -> v != null && v > 0);
-        if (!tieneValores && !mapaVentas.isEmpty()) {
-            ventas.clear();
-            java.util.List<Double> valoresEncontrados = new java.util.ArrayList<>(mapaVentas.values());
-            int inicio = Math.max(0, valoresEncontrados.size() - 7);
-            for (int i = inicio; i < valoresEncontrados.size(); i++) {
-                ventas.add(valoresEncontrados.get(i));
+        if ("Hoy".equalsIgnoreCase(periodo)) {
+            if (mapaVentas.isEmpty()) {
+                ventas.add(0.0);
+                ventas.add(0.0);
+            } else {
+                ventas.addAll(mapaVentas.values());
+                if (ventas.size() == 1) ventas.add(0, 0.0);
             }
-            while (ventas.size() < 7) {
-                ventas.add(0, 0.0);
+        } else if ("Últimos 7 Días".equalsIgnoreCase(periodo)) {
+            java.time.LocalDate hoy = java.time.LocalDate.now();
+            for (int i = 6; i >= 0; i--) {
+                String claveFecha = hoy.minusDays(i).toString();
+                ventas.add(mapaVentas.getOrDefault(claveFecha, 0.0));
+            }
+        } else if ("Este Mes".equalsIgnoreCase(periodo)) {
+            java.time.LocalDate hoy = java.time.LocalDate.now();
+            int diaActual = hoy.getDayOfMonth();
+            for (int d = 1; d <= diaActual; d++) {
+                String claveFecha = hoy.withDayOfMonth(d).toString();
+                ventas.add(mapaVentas.getOrDefault(claveFecha, 0.0));
+            }
+            if (ventas.size() == 1) ventas.add(0, 0.0);
+        } else {
+            if (mapaVentas.isEmpty()) {
+                ventas.add(0.0);
+                ventas.add(0.0);
+            } else {
+                ventas.addAll(mapaVentas.values());
+                if (ventas.size() == 1) ventas.add(0, 0.0);
             }
         }
 
         return ventas;
+    }
+
+    /**
+     * Obtiene la serie temporal comparativa del período inmediatamente anterior (ej: Ayer, Mes Pasado, Año Pasado).
+     */
+    public List<Double> obtenerVentasGraficaPeriodoAnterior(String periodo) {
+        List<Double> ventasAnteriores = new java.util.ArrayList<>();
+        java.util.Map<String, Double> mapaVentas = new java.util.LinkedHashMap<>();
+
+        String sql = "";
+        if ("Hoy".equalsIgnoreCase(periodo)) {
+            sql = "SELECT fecha, SUM(total) FROM ventas WHERE fecha = date('now', '-1 day') GROUP BY fecha";
+        } else if ("Últimos 7 Días".equalsIgnoreCase(periodo)) {
+            java.time.LocalDate hoy = java.time.LocalDate.now();
+            sql = "SELECT fecha, SUM(total) as tot FROM ventas WHERE fecha >= date('now', '-13 days') AND fecha <= date('now', '-7 days') GROUP BY fecha";
+            try (Statement st = conn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
+                while (rs.next()) {
+                    String f = rs.getString(1);
+                    if (f != null) mapaVentas.put(f.trim().substring(0, Math.min(10, f.trim().length())), rs.getDouble(2));
+                }
+            } catch (SQLException e) {
+                logger.log(Level.SEVERE, "Error al consultar período anterior 7 días", e);
+            }
+            for (int i = 13; i >= 7; i--) {
+                String claveFecha = hoy.minusDays(i).toString();
+                ventasAnteriores.add(mapaVentas.getOrDefault(claveFecha, 0.0));
+            }
+            return ventasAnteriores;
+        } else if ("Este Mes".equalsIgnoreCase(periodo)) {
+            // Mes pasado
+            java.time.LocalDate hoy = java.time.LocalDate.now();
+            java.time.LocalDate mesPasado = hoy.minusMonths(1);
+            int diasAMapear = Math.min(hoy.getDayOfMonth(), mesPasado.lengthOfMonth());
+            sql = "SELECT fecha, SUM(total) FROM ventas WHERE fecha >= date('now', 'start of month', '-1 month') AND fecha < date('now', 'start of month') GROUP BY fecha";
+            try (Statement st = conn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
+                while (rs.next()) {
+                    String f = rs.getString(1);
+                    if (f != null) mapaVentas.put(f.trim().substring(0, Math.min(10, f.trim().length())), rs.getDouble(2));
+                }
+            } catch (SQLException e) {
+                logger.log(Level.SEVERE, "Error al consultar período anterior mes", e);
+            }
+            for (int d = 1; d <= diasAMapear; d++) {
+                String claveFecha = mesPasado.withDayOfMonth(d).toString();
+                ventasAnteriores.add(mapaVentas.getOrDefault(claveFecha, 0.0));
+            }
+            if (ventasAnteriores.size() == 1) ventasAnteriores.add(0, 0.0);
+            return ventasAnteriores;
+        } else if ("Este Año".equalsIgnoreCase(periodo)) {
+            // Año pasado agrupado por meses 1..12
+            int anioAnterior = java.time.LocalDate.now().getYear() - 1;
+            int mesActual = java.time.LocalDate.now().getMonthValue();
+            sql = "SELECT strftime('%Y-%m', fecha) as mes, SUM(total) FROM ventas WHERE strftime('%Y', fecha) = '" + anioAnterior + "' GROUP BY mes";
+            try (Statement st = conn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
+                while (rs.next()) {
+                    String m = rs.getString("mes");
+                    if (m != null) mapaVentas.put(m.trim(), rs.getDouble(2));
+                }
+            } catch (SQLException e) {
+                logger.log(Level.SEVERE, "Error al consultar período anterior año", e);
+            }
+            for (int m = 1; m <= mesActual; m++) {
+                String claveMes = String.format("%04d-%02d", anioAnterior, m);
+                ventasAnteriores.add(mapaVentas.getOrDefault(claveMes, 0.0));
+            }
+            if (ventasAnteriores.size() == 1) ventasAnteriores.add(0, 0.0);
+            return ventasAnteriores;
+        }
+
+        return ventasAnteriores;
+    }
+
+    /**
+     * Obtiene las etiquetas legibles (ej: "Lun 11", "15 Jul", "Ene", "2025") para el eje X de la gráfica.
+     */
+    public List<String> obtenerEtiquetasGraficaPorPeriodo(String periodo) {
+        List<String> labels = new java.util.ArrayList<>();
+        java.util.Locale localeEs = new java.util.Locale("es", "CO");
+
+        if ("Hoy".equalsIgnoreCase(periodo)) {
+            labels.add("Mañana");
+            labels.add("Tarde");
+        } else if ("Últimos 7 Días".equalsIgnoreCase(periodo)) {
+            java.time.LocalDate hoy = java.time.LocalDate.now();
+            java.time.format.DateTimeFormatter dtfDia = java.time.format.DateTimeFormatter.ofPattern("EEE", localeEs);
+            for (int i = 6; i >= 0; i--) {
+                java.time.LocalDate d = hoy.minusDays(i);
+                String diaNom = d.format(dtfDia);
+                diaNom = diaNom.substring(0, 1).toUpperCase() + diaNom.substring(1).toLowerCase();
+                labels.add(diaNom + " " + d.getDayOfMonth());
+            }
+        } else if ("Este Mes".equalsIgnoreCase(periodo)) {
+            java.time.LocalDate hoy = java.time.LocalDate.now();
+            java.time.format.DateTimeFormatter dtfMes = java.time.format.DateTimeFormatter.ofPattern("MMM", localeEs);
+            String nomMes = hoy.format(dtfMes);
+            nomMes = nomMes.substring(0, 1).toUpperCase() + nomMes.substring(1).toLowerCase();
+            int diaActual = hoy.getDayOfMonth();
+
+            for (int d = 1; d <= diaActual; d++) {
+                // Para no saturar el eje X en meses largos, rotular días clave (o cada 3-5 días)
+                if (diaActual > 15 && (d % 3 != 1 && d != diaActual && d != 1)) {
+                    labels.add("");
+                } else {
+                    labels.add(d + " " + nomMes);
+                }
+            }
+            if (labels.size() == 1) labels.add(0, "1 " + nomMes);
+        } else if ("Este Año".equalsIgnoreCase(periodo)) {
+            java.time.LocalDate hoy = java.time.LocalDate.now();
+            int mesActual = hoy.getMonthValue();
+            java.time.format.DateTimeFormatter dtfMes = java.time.format.DateTimeFormatter.ofPattern("MMM", localeEs);
+
+            for (int m = 1; m <= mesActual; m++) {
+                java.time.LocalDate d = hoy.withMonth(m).withDayOfMonth(1);
+                String nomMes = d.format(dtfMes);
+                nomMes = nomMes.substring(0, 1).toUpperCase() + nomMes.substring(1).toLowerCase();
+                labels.add(nomMes);
+            }
+            if (labels.size() == 1) labels.add(0, "Ene");
+        } else {
+            // Histórico Total por Años
+            String sql = "SELECT DISTINCT strftime('%Y', fecha) as anio FROM ventas ORDER BY anio ASC";
+            try (Statement st = conn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
+                while (rs.next()) {
+                    String a = rs.getString("anio");
+                    if (a != null && !a.trim().isEmpty()) {
+                        labels.add(a.trim());
+                    }
+                }
+            } catch (SQLException e) {
+                logger.log(Level.SEVERE, "Error al obtener etiquetas de años", e);
+            }
+            if (labels.isEmpty()) {
+                labels.add("2025");
+                labels.add("2026");
+            } else if (labels.size() == 1) {
+                labels.add(0, String.valueOf(Integer.parseInt(labels.get(0)) - 1));
+            }
+        }
+
+        return labels;
     }
     
     public double obtenerVentasTotales() {
@@ -1037,6 +1239,8 @@ public class VentasController {
             return "WHERE " + campoFecha + " >= date('now', '-6 days')";
         } else if ("Este Mes".equalsIgnoreCase(periodo)) {
             return "WHERE " + campoFecha + " >= date('now', 'start of month')";
+        } else if ("Este Año".equalsIgnoreCase(periodo)) {
+            return "WHERE " + campoFecha + " >= date('now', 'start of year')";
         }
         return ""; // Histórico Total (sin WHERE)
     }

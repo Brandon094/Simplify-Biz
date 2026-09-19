@@ -12,8 +12,6 @@ import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import javax.swing.*;
 import java.awt.*;
-import java.text.NumberFormat;
-import java.util.Locale;
 
 /**
  * Módulo de Cartera y Cuentas por Cobrar (CxC).
@@ -104,8 +102,8 @@ public class CarteraPage extends JPanel {
 
     private JPanel createSummaryCard(String titleText, JLabel valLabel, Color accentColor, String iconPath) {
         RoundedPanel card = new RoundedPanel(18, ThemeConstants.CARD_BACKGROUND);
-        card.setLayout(new BorderLayout(10, 8));
-        card.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
+        card.setLayout(new BorderLayout(8, 4));
+        card.setBorder(BorderFactory.createEmptyBorder(10, 14, 10, 14));
 
         JPanel top = new JPanel(new BorderLayout());
         top.setOpaque(false);
@@ -234,12 +232,18 @@ public class CarteraPage extends JPanel {
 
     private void actualizarMétricas() {
         double[] res = carteraCtrl.obtenerResumenCartera();
-        NumberFormat fmt = NumberFormat.getCurrencyInstance(new Locale("es", "CO"));
-        fmt.setMaximumFractionDigits(0);
 
-        if (lblValCarteraPendiente != null) lblValCarteraPendiente.setText(fmt.format(res[0]));
-        if (lblValRecaudadoMes != null) lblValRecaudadoMes.setText(fmt.format(res[1]));
-        if (lblValDeudoresActivos != null) lblValDeudoresActivos.setText(String.format("%.0f Clientes", res[2]));
+        if (lblValCarteraPendiente != null) {
+            lblValCarteraPendiente.setText(UIUtils.formatCompactCurrency(res[0]));
+            lblValCarteraPendiente.setToolTipText("Valor total en cartera: " + UIUtils.formatCurrency(res[0]));
+        }
+        if (lblValRecaudadoMes != null) {
+            lblValRecaudadoMes.setText(UIUtils.formatCompactCurrency(res[1]));
+            lblValRecaudadoMes.setToolTipText("Recaudado este mes: " + UIUtils.formatCurrency(res[1]));
+        }
+        if (lblValDeudoresActivos != null) {
+            lblValDeudoresActivos.setText(String.format("%.0f Clientes", res[2]));
+        }
     }
 
     private void abrirDialogoAbonar() {
