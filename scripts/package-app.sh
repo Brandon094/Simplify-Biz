@@ -1,15 +1,15 @@
 #!/bin/bash
 # ==============================================================================
-# Script de Empaquetado y Distribución Oficial — ERP+ Business v2.0.0
+# Script de Empaquetado y Distribución Oficial — ERP+ Business v2.1.0
 # ==============================================================================
 
 set -e
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST_DIR="$PROJECT_DIR/dist"
-BUNDLE_DIR="$DIST_DIR/ERP_Plus_Business_v2.0.0_Portable"
+BUNDLE_DIR="$DIST_DIR/ERP_Plus_Business_v2.1.0_Portable"
 
-echo "🚀 Iniciando proceso de empaquetado de ERP+ Business v2.0.0..."
+echo "🚀 Iniciando proceso de empaquetado de ERP+ Business v2.1.0..."
 
 # 1. Limpieza y Creación de Carpetas
 rm -rf "$BUNDLE_DIR"
@@ -21,10 +21,10 @@ cd "$PROJECT_DIR"
 mvn clean package -DskipTests
 
 # 3. Copiar ejecutable JAR
-JAR_FILE=$(find "$DIST_DIR" target/ -name "ERP-Plus-Business-2.0.0.jar" -o -name "ERP-Plus-Business-*.jar" 2>/dev/null | head -n 1)
+JAR_FILE=$(find "$DIST_DIR" target/ -name "ERP-Plus-Business-2.1.0.jar" -o -name "ERP-Plus-Business-*.jar" 2>/dev/null | head -n 1)
 if [ -f "$JAR_FILE" ]; then
-    cp "$JAR_FILE" "$BUNDLE_DIR/ERP-Plus-Business-2.0.0.jar"
-    echo "✅ Executable JAR copiado a $BUNDLE_DIR/ERP-Plus-Business-2.0.0.jar"
+    cp "$JAR_FILE" "$BUNDLE_DIR/ERP-Plus-Business-2.1.0.jar"
+    echo "✅ Executable JAR copiado a $BUNDLE_DIR/ERP-Plus-Business-2.1.0.jar"
 else
     echo "❌ Error: No se encontró el JAR compilado."
     exit 1
@@ -38,8 +38,8 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$DIR"
 
 if command -v java &> /dev/null; then
-    echo "🚀 Iniciando ERP+ Business v2.0.0..."
-    java -jar ERP-Plus-Business-2.0.0.jar
+    echo "🚀 Iniciando ERP+ Business v2.1.0..."
+    java -jar ERP-Plus-Business-2.1.0.jar
 else
     echo "❌ Error: Java no está instalado o no se encuentra en el PATH del sistema."
     echo "Por favor instala Java OpenJDK 21+ o utiliza el instalador embebido con JRE."
@@ -51,12 +51,12 @@ chmod +x "$BUNDLE_DIR/run.sh"
 # 5. Generar Script Lanzador para Windows (run.bat)
 cat << 'EOF' > "$BUNDLE_DIR/run.bat"
 @echo off
-title ERP+ Business v2.0.0
+title ERP+ Business v2.1.0
 cd /d "%~dp0"
 echo ---------------------------------------------------
-echo  Iniciando ERP+ Business v2.0.0 - ERP Intelligent
+echo  Iniciando ERP+ Business v2.1.0 - ERP Intelligent
 echo ---------------------------------------------------
-java -jar ERP-Plus-Business-2.0.0.jar
+java -jar ERP-Plus-Business-2.1.0.jar
 if %ERRORLEVEL% NEQ 0 (
     echo.
     echo Error al iniciar la aplicación. Verifica que Java 21+ esté instalado.
@@ -71,9 +71,9 @@ fi
 
 # 7. Crear Guía de Distribución
 cat << 'EOF' > "$BUNDLE_DIR/README_DISTRIBUCION.md"
-# ERP+ Business v2.0.0 — Guía de Distribución e Instalación
+# ERP+ Business v2.1.0 — Guía de Distribución e Instalación
 
-Bienvenido al paquete ejecutable portable de **ERP+ Business v2.0.0**.
+Bienvenido al paquete ejecutable portable de **ERP+ Business v2.1.0**.
 
 ---
 
@@ -90,7 +90,7 @@ Bienvenido al paquete ejecutable portable de **ERP+ Business v2.0.0**.
 ```bash
 ./run.sh
 ```
-*(O ejecuta directamente en terminal: `java -jar ERP-Plus-Business-2.0.0.jar`)*
+*(O ejecuta directamente en terminal: `java -jar ERP-Plus-Business-2.1.0.jar`)*
 
 ### En Windows:
 Doble clic sobre el archivo **`run.bat`** o ejecuta en CMD:
@@ -119,9 +119,9 @@ Si deseas generar un instalador nativo (`.deb`, `.rpm`, `.exe`) con el JRE embeb
 ```bash
 jpackage \
   --name "ERP-Plus-Business" \
-  --app-version "2.0.0" \
+  --app-version "2.1.0" \
   --input . \
-  --main-jar ERP-Plus-Business-2.0.0.jar \
+  --main-jar ERP-Plus-Business-2.1.0.jar \
   --main-class com.mycompany.zl_solucion_integral.Main \
   --type deb \
   --vendor "ChopCode Solutions" \
@@ -132,9 +132,9 @@ jpackage \
 ```cmd
 jpackage ^
   --name "ERP-Plus-Business" ^
-  --app-version "2.0.0" ^
+  --app-version "2.1.0" ^
   --input . ^
-  --main-jar ERP-Plus-Business-2.0.0.jar ^
+  --main-jar ERP-Plus-Business-2.1.0.jar ^
   --main-class com.mycompany.zl_solucion_integral.Main ^
   --type msi ^
   --win-shortcut ^

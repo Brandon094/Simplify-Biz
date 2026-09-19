@@ -63,6 +63,8 @@ com.mycompany.zl_solucion_integral/
 │   ├── Validaciones.java          # Parsers defensivos (previene NumberFormatException)
 │   ├── ResultadoOperacion.java    # DTO inmutable (éxito, mensaje, datos)
 │   └── ExcelSQLiteManager.java    # Importación y exportación de datos masivos
+├── tools/              # Herramientas Administrativas Privadas
+│   └── GeneradorLicenciaAdmin.java # Generador y firmador de licencias criptográficas RSA-2048
 ├── controllers/         # Reglas de negocio y transacciones (DAOs embebidos)
 │   ├── ProductoController.java    # Gestión de inventario, stock crítico e inversión
 │   ├── VentasController.java      # Transacciones ACID de POS y utilidad neta
@@ -100,9 +102,29 @@ Para evitar los bloqueos `SQLITE_BUSY` (`database is locked`), la aplicación ma
 
 ### 3.2 Motor Genérico de Autocompletado & Componentes Custom Table (`SalesPage.java`)
 - **`AutocompletePopup<T>`**: Implementado mediante un popup desacoplado que soporta interfaces funcionales (`SearchProvider<T>`, `DisplayFormatter<T>`, `SelectionListener<T>`).
+  - **Integración Dual de Clientes:** Vinculado simultáneamente a los campos `txtClientCC` (Cédula/NIT) y `txtClientName` (Nombre/Razón Social). Al escribir en cualquiera de los dos campos, consulta de forma reactiva `usuarioCtrl.buscarClientesSugeridos(query)` desplegando sugerencias flotantes.
+  - **Desacoplamiento de Eventos por Foco:** La remoción del listener `focusLost` directo en `txtClientCC` evita condiciones de carrera donde la pérdida de foco cerraba la ventana emergente antes de capturar el clic de selección en la lista.
 - **`CartRowActionsPanel` & `CartCellEditor`**: Renderizador y editor celda a celda en `JTable` para la columna de acciones del carrito POS. Emplea íconos vectoriales FlatSVG (`plus.svg`, `minus.svg`, `products.svg`, `trash.svg`) con desacoplamiento de eventos vía `TableCellEditor` e intercepción atómica del estado del modelo `cartItems`.
 
-### 3.3 Motor de Renderizado Gráfico 2D (`Graphics2D`)
+### 3.3 Formateo Compacto Inteligente de Moneda (`UIUtils.formatCompactCurrency`)
+- **Estandarización DRY & Atomic Design:** Implementación centralizada en `UIUtils` para la capa de presentación Swing. Convierte montos monetarios extensos en representaciones compactas elegantes (`$100K`, `$5.4M`, `$1.2B`) evitando desbordamientos de texto y rotura de layout en tarjetas KPI (`MetricCard`) de Dashboard, Cartera y Reportes.
+
+### 3.4 Microcopy & Guía Contextual en Registro de Administrador (`ModernAdminRegistrationPage.java`)
+- **Estandarización de Helpers:** Implementación de etiquetas de ayuda permanentes mediante `createHelperLabel()` en `ModernAdminRegistrationPage`, mejorando el feedback operacional sin recargar la interfaz y respetando los tokens de `ThemeConstants`.
+
+### 3.5 Autenticación Flexible por Primer Nombre o Correo (`UsuarioController.java` & `ModernLoginPage.java`)
+- **Extracción de Primer Token SQL:** Implementación en `validarCredencialesAdmin` y `validarCredencialesUsuarioRegular` utilizando la cláusula `LOWER(SUBSTR(nombre, 1, INSTR(nombre || ' ', ' ') - 1)) = LOWER(?)` o coincidencia por `email` y `nombre` completo.
+- **Transparencia en Sesión:** Tras validar la coincidencia del primer nombre o correo y verificar el hash SHA-256 de la contraseña, el controlador recupera y registra automáticamente el **Nombre Completo Oficial** del usuario en `Sesion.setUsuarioLogueado(...)`.
+
+### 3.4 Motor de Renderizado Gráfico 2D (`Graphics2D`)
+- **`NeonLineChart` & Comparativa Interperiodo**:
+  - **Serie Principal & Serie de Comparación:** Soporta renderizado dual en tiempo real. La serie actual se traza con una línea continua neón violeta y área de degradado semitransparente. La serie del periodo anterior (`ventasComparativas`) se renderiza con una línea discontinua (`Stroke` punteado) en gris/cyan tenue.
+  - **Badge de Crecimiento Neón Dinámico:** Si existe serie del periodo previo, el gráfico calcula de forma automática el porcentaje global de crecimiento o decrecimiento $$\Delta \% = \left( \frac{\text{Total Actual} - \text{Total Anterior}}{\text{Total Anterior}} \right) \times 100$$ y dibuja en la esquina superior derecha un badge redondeado neón verde (`+XX.X% vs per. anterior`) o neón rosa/rojo (`-XX.X% vs per. anterior`).
+  - **Eje X Inteligente Adaptativo (`VentasController.obtenerEtiquetasGraficaPorPeriodo`):**
+    - `Hoy`: Horas del día (`08:00`, `12:00`, `16:00`).
+    - `Esta Semana` / `Este Mes`: Días y meses en español (`15 Jul`, `16 Jul`).
+    - `Este Año`: Abreviaturas de meses (`Ene`, `Feb`, `Mar`, ..., `Dic`).
+    - `Histórico`: Años completos (`2024`, `2025`, `2026`).
 - **`NeonPieChart`**:
   - Ordena y consolida categorías agrupando del Top 6 en adelante dentro de la etiqueta `"OTROS"`.
   - **Cálculo Polar & Hover:** Mapea el ángulo cartesiano `(Math.atan2)` respecto al centro `(cx, cy)` y detecta colisión. Desplaza la rebanada seleccionada 7px hacia afuera y traza una curva de Bézier neón (`Path2D`) apuntando al ítem activo de la leyenda.

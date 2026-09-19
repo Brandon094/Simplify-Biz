@@ -38,8 +38,16 @@ Este documento define el orden recomendado para continuar el desarrollo. La regl
   - Consolidación y reubicación de todos los diálogos en `views/components/dialogs/`.
   - Refactorización de todos los colores hardcodeados a tokens de `ThemeConstants`.
   - Suite de pruebas JUnit 5 en **42/42 pruebas automatizadas pasando al 100% (BUILD SUCCESS)**.
-* [x] **Calculadora de Vueltas Exactas en POS (v2.0.3):** Integración de campo interactivo "Paga con ($)" con icono `wallet.svg` en la parte inferior del carrito de compras (`SalesPage`), realizando cálculo automático de vueltas exactas en verde neón o dinero faltante en rojo en tiempo real sin calculadoras externas.
-* [x] Documentación técnica, funcional, de arquitectura y de base de datos totalmente actualizada para la **versión 2.0.3**.
+* [x] **BI Analytics Avanzado, Comparativas Interperiodo & Formateo Compacto (v2.1.0):**
+  - **Filtro Anual Completo ("Este Año"):** Extensión del selector temporal a 4 dimensiones temporales (Hoy, Esta Semana, Este Mes y Este Año).
+  - **Gráfico Comparativo Dual & Tasa de Crecimiento (`NeonLineChart`):** Renderizado vectorial 2D en tiempo real con línea continua neón para la serie actual y línea discontinua punteada para el periodo anterior equivalente (ej. *Este Mes vs Mes Anterior* o *Este Año vs Año Anterior*).
+  - **Badge Neón Dinámico (% vs Per. Anterior):** Cálculo automático del porcentaje de crecimiento o decrecimiento $$\Delta \%$$ desplegado en una etiqueta neón verde o rosa (`+18.5% vs per. anterior`).
+  - **Etiquetado Adaptativo de Eje X (`VentasController`):** Formateador inteligente que alterna horas (`08:00`), días/meses (`15 Jul`), meses (`Ene`, `Feb`) y años (`2024`, `2025`).
+  - **Formateo Compacto Inteligente de Moneda (`UIUtils.formatCompactCurrency`):** Estandarización de cifras grandes en tarjetas KPI (`$100K`, `$5.4M`, `$1.2B`) en Dashboard, Cartera y Reportes para evitar desbordamiento de texto, conservando la precisión contable exacta (`$ 128.450.000,00`) en tooltips y punto de venta (POS).
+  - **Rediseño Compacto de Tarjetas KPI (`MetricCard`, `CarteraPage`, `ReportsPage`):** Optimización de padding interno (insets reducidos a `10, 14`) y tipografía, otorgando mayor respiro visual y espacio para los gráficos y tablas centrales.
+  - **Dataset Maestro Demo Multiaño (3 Años - `poblar_master_demo.sql`):** Script SQL realista con 1,225+ ventas y 400+ abonos distribuidos entre 2024 y 2026 para pruebas exhaustivas de comparativas interanuales.
+  - **Suite de Pruebas Automatizadas:** 46 tests unitarios e integrales en JUnit 5 pasando al 100%.
+* [x] Documentación técnica, funcional, de arquitectura y de base de datos totalmente actualizada para la **versión 2.1.0**.
 
 ---
 
@@ -80,6 +88,22 @@ Este documento define el orden recomendado para continuar el desarrollo. La regl
   - Conteo físico de efectivo al cierre de turno con conciliación de diferencias y reporte en recibo.
 * [ ] **Respaldos Automáticos en la Nube (Cloud Backup):**
   - Copia de seguridad cifrada del archivo `ventas.db` en Google Drive / Dropbox desde la pestaña de Configuración.
+
+* [x] **Optimización & Corrección de Búsqueda de Clientes en POS (`SalesPage.java`):**
+  - **Búsqueda Reactiva Multicriterio:** Extensión de la búsqueda de clientes tanto por **Cédula / NIT** como por **Nombre / Razón Social** directamente en el Punto de Venta.
+  - **Autocompletado con `AutocompletePopup`:** Integración del componente desacoplado `AutocompletePopup<Usuario>` en `txtClientCC` y `txtClientName` para desplegar sugerencias flotantes en tiempo real sin requerir `Enter` o cambio de foco explícito.
+  - **Reset Defensivo de Formulario:** Limpieza atómica de los campos de teléfono/correo y restauración del estado de coloración de texto (`TEXT_PRIMARY`) al alternar entre *Consumidor Final* y *Cliente Registrado*.
+
+* [x] **Flexibilización & Estandarización de Autenticación en Login (`UsuarioController.java` & `ModernLoginPage.java`):**
+  - **Acceso por Primer Nombre / Email / Nombre Completo:** Refactorización de `validarCredencialesAdmin` y `validarCredencialesUsuarioRegular` en `UsuarioController` para permitir iniciar sesión ingresando únicamente el **primer nombre** (ej. `"Brandon"` para `"Brandon Daza"`), el **nombre completo** o el **correo electrónico**.
+  - **Normalización SQL Case-Insensitive & Trimming:** Consultas SQL avanzadas con extracción del primer token (`LOWER(SUBSTR(nombre, 1, INSTR(nombre || ' ', ' ') - 1)) = LOWER(?)` y coincidencia por correo).
+  - **Preservación Criptográfica & Registro en Sesión:** Hash asimétrico SHA-256 intacto y almacenamiento del nombre completo oficial en la sesión activa.
+
+## Tareas Prioritarias / Incidencias Programadas para Mañana
+
+* [ ] **Actualización del Manual de Usuario In-App (`ManualUsuarioDialog.java`):**
+  - **Sincronización de Contenidos BI & Moneda:** Actualizar los textos y explicaciones HTML internas del manual navegable in-app para incluir el uso del filtro *"Este Año"*, el análisis de gráficas comparativas interperiodo con badges neón ($\Delta \% \text{ vs per. anterior}$) y el comportamiento del formateo compacto inteligente ($100K, $5.4M) con tooltips de inspección de centavos exactos.
+  - **Revisión de Flujos de Abastecimiento & Compras:** Sincronizar el instructivo interactivo del manual modal con la importación dual de Excel/CSV en modo Abastecimiento.
 
 ---
 

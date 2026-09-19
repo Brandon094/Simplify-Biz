@@ -9,13 +9,14 @@ Este documento detalla el sistema de diseño, la estructura de componentes Swing
 ERP+ Business adopta una estética **Neon/Glassmorphism Cyberpunk**, priorizando la jerarquía visual, la claridad operacional y la velocidad de trabajo diaria.
 
 ### Principios Fundamentales
-1. **Consistencia Total (DRY Visual):** Todos los colores, fuentes y dimensiones derivan centralizadamente de `ThemeConstants`.
+1. **Consistencia Total (DRY Visual):** Todos los colores, fuentes, dimensiones y formateos derivan centralizadamente de `ThemeConstants` y `UIUtils`.
 2. **Respiro Visual y Accesibilidad:**
    - Blancos y paddings adaptativos de mínimo 15–30px.
    - Objetivos táctiles/clicables mínimos de `44px` de altura (`ThemeConstants.TOUCH_TARGET_MIN`).
    - Filas de tabla de `36px` (`ThemeConstants.TABLE_ROW_HEIGHT`).
    - Anillos de foco explícitos para navegación por teclado.
 3. **Alternancia de Tema sin Reinicio:** Soporte nativo para paleta oscura (predeterminada) y clara.
+4. **Formateo de Moneda Compacto Inteligente (`UIUtils.formatCompactCurrency`):** Estandarización visual en tarjetas KPI (`$100K`, `$5.4M`, `$1.2B`) evitando desbordamientos de texto, manteniendo la precisión contable completa en tooltips y tablas (`$ 128.450.000,00`).
 
 ---
 
@@ -105,8 +106,23 @@ Barra de encabezado superior unificada que elimina la duplicidad visual en cada 
   - **Subtotal sin descuento** (bruto acumulado).
   - **Ahorro / Descuento total** en neón cyan (`-$` ahorrado y `%` efectivo).
   - **TOTAL VENTA final** (neto cobrado).
-- **Venta Ágil sin Fricción (`syncClientState`):** Gestión centralizada del estado del cliente basada en el método de pago seleccionado.
+- **Venta Ágil sin Fricción (`syncClientState` & `AutocompletePopup`):** Gestión centralizada del estado del cliente basada en el método de pago seleccionado.
   - En **Efectivo** u **Otro**, los campos de cliente se ocultan dinámicamente (`clientFieldsContainer.setVisible(false)`) permitiendo la venta inmediata en 2 clics a `CONSUMIDOR FINAL`.
+  - En **Transferencia** o **Crédito**, se despliegan automáticamente los campos con autocompletado en tiempo real mediante `AutocompletePopup<Usuario>` integrado simultáneamente en los campos de **Cédula/NIT** (`txtClientCC`) y **Nombre del cliente** (`txtClientName`).
+  - **Experiencia sin bloqueos por foco:** Selección fluida de sugerencias sin cierres prematuros al remover la dependencia del evento `focusLost`.
+  - **Reset defensivo de datos:** Limpieza automática de datos y restauración del color de texto (`TEXT_PRIMARY`) al alternar entre *Consumidor Final* y cliente registrado.
   - En **Transferencia** o **Crédito**, el contenedor reaparece automáticamente (`setVisible(true)`), deshabilitando la opción de consumidor final para exigir los datos del titular o comprobante.
 - **Calculadora de Vueltas Exactas en Tiempo Real (`updateChangeCalculation`):** El footer del carrito incluye un campo interactivo `Paga con ($)` con icono SVG `icons/wallet.svg` que parsea defensivamente cualquier importe digitado por el tendero y calcula instantáneamente las vueltas exactas a entregar (`Vueltas: $ XX.XXX,XX` en verde neón o `Falta: $ XX.XXX,XX` en rojo neón), recalculándose automáticamente ante cambios en las existencias o productos del carrito.
 - **Resguardo contra Desbordamientos (`JScrollPane`):** El panel de checkout está envuelto en un `JScrollPane` silencioso (sin bordes y con viewport transparente), garantizando que en pantallas pequeñas o al desplegar campos el botón **Confirmar venta** nunca se corte.
+
+---
+
+## 7. Registro Inicial del Administrador — Microcopy & Guía Contextual (`ModernAdminRegistrationPage`)
+
+- **Diseño Neumórfico Responsivo:** Tarjeta central redondeada (`RoundedPanel`) de 500px de ancho en escritorio con reflow fluido al 100% en pantallas móviles (`< 480px`).
+- **Guía Contextual Permanente:** Cada campo incluye una etiqueta de ayuda (`createHelperLabel`) con color secundario neón semitransparente que orienta al usuario sin interferir visualmente:
+  - *Nombre Completo:* "Ingresa tu nombre y apellido para identificarte".
+  - *Teléfono:* "Número móvil de 10 dígitos para recuperación de cuenta".
+  - *Correo:* "Servirá para recibir notificaciones y recuperar tu acceso".
+  - *Contraseña:* "Utiliza al menos 6 caracteres con letras y números".
+- **Navegación por Teclado:** Avance fluido con `Enter` entre campos y registro por defecto con la tecla `Enter` en el campo de contraseña.

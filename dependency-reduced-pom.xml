@@ -4,7 +4,7 @@
   <groupId>com.mycompany</groupId>
   <artifactId>ERP-Plus-Business</artifactId>
   <name>Simplify-Biz</name>
-  <version>2.0.0</version>
+  <version>2.1.0</version>
   <build>
     <resources>
       <resource>
@@ -35,6 +35,19 @@
               <goal>shade</goal>
             </goals>
             <configuration>
+              <artifactSet>
+                <excludes>
+                  <exclude>com.mycompany.zl_solucion_integral.tools:*</exclude>
+                </excludes>
+              </artifactSet>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>com/mycompany/zl_solucion_integral/tools/**</exclude>
+                  </excludes>
+                </filter>
+              </filters>
               <transformers>
                 <transformer>
                   <mainClass>${exec.mainClass}</mainClass>

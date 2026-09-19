@@ -29,8 +29,8 @@
 │ email           │     │ precio_costo         │
 │ rol             │     │ cantidad             │
 │ contraseña      │     │ codigo (SKU)         │
-└─────────────────┘     │ categoria (TEXT)     │
-                        └──────────────────────┘
+│ no_cc           │     │ categoria (TEXT)     │
+└─────────────────┘     └──────────────────────┘
 
 ┌─────────────────────┐      ┌─────────────────────────┐
 │       ventas        │      │     detalles_venta      │
@@ -69,7 +69,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
     telefono    TEXT    NOT NULL,
     email       TEXT    NOT NULL,
     rol         INTEGER NOT NULL,
-    contraseña  TEXT    NOT NULL
+    contraseña  TEXT    NOT NULL,
+    no_cc       TEXT
 );
 ```
 

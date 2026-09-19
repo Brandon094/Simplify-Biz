@@ -7,7 +7,7 @@
 ![SQLite WAL Mode](https://img.shields.io/badge/SQLite_3.46-WAL_Mode-blue?style=for-the-badge&logo=sqlite)
 ![FlatLaf Cyberpunk](https://img.shields.io/badge/FlatLaf-3.5.1_Cyberpunk-purple?style=for-the-badge)
 ![Maven 3.8+](https://img.shields.io/badge/Maven-3.8+-red?style=for-the-badge&logo=apachemaven)
-![JUnit 5 Passed](https://img.shields.io/badge/Tests-45%2F45_Passed-brightgreen?style=for-the-badge&logo=junit5)
+![JUnit 5 Passed](https://img.shields.io/badge/Tests-46%2F46_Passed-brightgreen?style=for-the-badge&logo=junit5)
 ![Architecture](https://img.shields.io/badge/Architecture-MVC_%7C_Atomic_Design-informational?style=for-the-badge)
 
 ---
@@ -25,7 +25,18 @@
 - **[X] Fase 5 — Analítica Financiera & Abastecimiento:** Dashboard ejecutivo con widgets gráficos vectoriales 2D (`NeonPieChart`, `NeonLineChart`, `NeonBarChart`), módulo de Compras a Proveedores con incremento atómico de stock e historial 360° por cliente.
 - **[X] Fase 6 — Ecosistema SVG, Top Header & Sidebar Ergónomico:** Implementación de 51+ iconos vectoriales FlatSVG, Top Header dinámico contextual y menú lateral colapsable horizontalmente de 260px a 64px (+170px de espacio útil).
 - **[X] Fase 7 — Motor Dual de Importación Excel/CSV & UX POS Ergonométrica:** Engine `ExcelSQLiteManager` desacoplado que soporta dos modos de operación (`ModoImportacion.CATALOGO` y `ModoImportacion.ABASTECIMIENTO`). En Abastecimiento valida previamente Proveedor y Factura, precargando la orden para revisión visual antes del ingreso formal a bodega.
-- **[X] Fase 8 — Ecosistema de Tooltips Inteligentes en Dashboard & Tests 2.0.0:** Implementación de radiografías flotantes en las 4 tarjetas KPI (Desglose por método de pago con Crédito/Fiado, Análisis COGS/Utilidad por $1.000, Inversión Abastecimiento vs Catálogo y Productos en Stock Crítico) con permanencia extendida a 20 segundos y suite completa de 45 pruebas unitarias e integración en JUnit 5 passing al 100%.
+- **[X] Fase 8 — BI Analítico Avanzado, Ergonomía POS & Formateo Compacto:**
+  - **Microcopy & Guía Contextual en Registro de Administrador (`ModernAdminRegistrationPage.java`):** Implementación de etiquetas de ayuda permanentes y explicativas bajo todos los campos del formulario de onboarding inicial.
+  - **Autocompletado Dual de Clientes (`AutocompletePopup<Usuario>`):** Integración del componente flotante de autocompletado en los campos de **Cédula/NIT** y **Nombre del cliente** en el POS (`SalesPage.java`), desplegando sugerencias reactivas al escribir sin requerir `Enter` o cambio de foco.
+  - **Desacoplamiento de Eventos por Foco:** Remoción de la dependencia de `focusLost` directo en `txtClientCC`, garantizando una selección de sugerencias fluida y sin bloqueos de interfaz.
+  - **Reset Defensivo de Formulario:** Limpieza atómica de datos y restauración del color de texto por defecto (`TEXT_PRIMARY`) al alternar entre *Consumidor Final* y *Cliente Registrado*.
+  - **Tooltips Radiográficos Adaptativos:** Radiografías flotantes en tarjetas KPI adaptadas dinámicamente al tema claro/oscuro.
+  - **Formateo Compacto Inteligente de Moneda (`UIUtils.formatCompactCurrency`):** Estandarización de cifras grandes en tarjetas KPI de Dashboard, Cartera y Reportes (`$100K`, `$5.4M`, `$1.2B`) para evitar desbordamientos visuales, conservando la precisión contable completa (`$ 128.450.000,00`) en tooltips y punto de venta (POS).
+  - **Filtro Anual Completo ("Este Año"):** Extensión del selector temporal a 4 dimensiones (Hoy, Esta Semana, Este Mes, Este Año).
+  - **Gráfico Comparativo Dual & Badge Neón (% vs Per. Anterior):** Renderizado vectorial en `NeonLineChart` con serie discontinua trazada punto a punto del periodo previo y badge neón reactivo con tasa de crecimiento/decrecimiento (`+18.5% vs per. anterior`).
+  - **Etiquetado Inteligente de Eje X:** Formateador inteligente que alterna etiquetas de días (`15 Jul`), meses (`Ene`, `Feb`) y años (`2024`, `2025`).
+  - **Dataset Maestro Demo Multiaño (3 Años):** Script SQL con 1,225+ ventas realistas y 400+ abonos distribuidos entre 2024 y 2026.
+  - **Suite de Pruebas Automatizadas:** 46 tests unitarios e integrales en JUnit 5 pasando al 100%.
 
 ---
 
@@ -91,10 +102,13 @@ com.mycompany.zl_solucion_integral/
 # 1. Compilar fuentes Java
 mvn clean compile
 
-# 2. Ejecutar la suite completa de 42 pruebas automatizadas de integración/unidad
+# 2. Ejecutar la suite completa de 46 pruebas automatizadas de integración/unidad
 mvn test
 
-# 3. Construir el paquete Shaded Fat-JAR de producción (Genera ejecutable en dist/)
+# 3. Generar una Licencia Comercial RSA-2048 (Herramienta Admin / Privada)
+mvn compile exec:java -Dexec.mainClass="com.mycompany.zl_solucion_integral.tools.GeneradorLicenciaAdmin"
+
+# 4. Construir el paquete Shaded Fat-JAR de producción (Genera ejecutable en dist/)
 mvn clean package -DskipTests=false
 
 # 4. Ejecución del artefacto generado

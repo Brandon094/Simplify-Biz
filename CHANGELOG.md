@@ -4,6 +4,29 @@ Todas las modificaciones, mejoras, nuevas funcionalidades y correcciones de segu
 
 ---
 
+## [2.1.0] - 2026-09-17 — BI Analytics, Ergonomics & Autocomplete Release
+
+### 🛠️ Correcciones & Mejoras de Ergonomía (POS Autocomplete & Client DB Refactoring)
+- **Hover Aislado y Respuesta Inmediata en Botones del Carrito (`SalesPage.java`):** Incorporación de un listener `MouseMotionAdapter` en la tabla del carrito (`tbCart`) que activa automáticamente la edición de celda al deslizar el mouse sobre la columna de acciones. Se aislaron los efectos hover de los botones **+**, **-** y **Trash** para que cada uno responda de forma independiente con su color neón correspondiente (`NEON_GREEN`, `NEON_PURPLE`, `NEON_RED`) y se restablezca su estado neutro al cambiar de fila.
+- **Definición de Columna Dedicada `no_cc` en Tabla `usuarios`:** Migración DDL y actualización del controlador para almacenar el número de Cédula/NIT en un campo nativo en texto plano para clientes (`rol = 2`), desacoplando la cédula del campo `contraseña`.
+- **Eliminación Definitiva de Filtración de Hashes SHA-256:** Refactorización de la consulta `buscarClientesSugeridos()` para suprimir cualquier fuga de hashes de contraseñas de administradores/empleados en el popup de sugerencias flotantes del POS, garantizando sugerencias limpias y carga completa de datos de contacto (Cédula, Nombre, Teléfono y Correo).
+- **Autocompletado Dual de Clientes (`AutocompletePopup<Usuario>`):** Integración del componente desacoplado de autocompletado en tiempo real en los campos de **Cédula/NIT** y **Nombre del cliente** en el POS (`SalesPage.java`), desplegando sugerencias flotantes al escribir sin requerir `Enter` o cambio de foco.
+- **Eliminación de Interferencia por `focusLost`:** Remoción del listener `focusLost` en `txtClientCC` que provocaba cierres prematuros del popup desplegable al hacer clic en las sugerencias de la lista.
+- **Reset Defensivo de Formulario de Clientes (`syncClientState`):** Garantía de limpieza atómica de los campos de teléfono, correo y restauración del color de texto por defecto (`ThemeConstants.TEXT_PRIMARY`) al alternar entre *Consumidor Final* y *Cliente Registrado* o al modificar el método de pago.
+- **Mejora de UX & Guía Contextual en Registro de Administrador (`ModernAdminRegistrationPage.java`):** Incorporación de microcopy permanente y helper labels descriptivos debajo de todos los campos (Nombre, Teléfono, Correo y Contraseña), orientando al usuario durante la creación de la cuenta principal del negocio.
+- **Autenticación Estandarizada por Primer Nombre o Correo (`UsuarioController.java` & `ModernLoginPage.java`):** Flexibilización del inicio de sesión permitiendo autenticarse ingresando únicamente el **primer nombre** del usuario (ej. `"Brandon"` para `"Brandon Daza"`), su **correo electrónico** o su **nombre completo**, preservando intacto el cifrado SHA-256 y almacenando el nombre real en la sesión.
+
+### 🚀 Añadido (BI Analytics & Business Intelligence)
+- **Filtro Anual Completo ("Este Año"):** Extensión del selector temporal del Dashboard a 4 dimensiones (Hoy, Esta Semana, Este Mes y Este Año).
+- **Gráfico Comparativo Dual & Tasa de Crecimiento (`NeonLineChart`):** Renderizado vectorial 2D en tiempo real con línea continua neón para la serie actual y línea discontinua punteada para el periodo anterior (ej. *Este Mes vs Mes Anterior* o *Este Año vs Año Anterior*).
+- **Badge Neón Dinámico (% vs Per. Anterior):** Cálculo automático del porcentaje de crecimiento o decrecimiento $$\Delta \%$$ desplegado en una etiqueta neón verde o rosa (`+18.5% vs per. anterior`).
+- **Etiquetado Adaptativo de Eje X (`VentasController`):** Formateador inteligente que alterna horas (`08:00`), días/meses (`15 Jul`), meses (`Ene`, `Feb`) y años (`2024`, `2025`).
+- **Formateo Compacto Inteligente de Moneda (`UIUtils.formatCompactCurrency`):** Estandarización de cifras grandes en tarjetas KPI (`$100K`, `$5.4M`, `$1.2B`) en Dashboard, Cartera y Reportes para evitar desbordamiento de texto, conservando la precisión contable exacta (`$ 128.450.000,00`) en tooltips y punto de venta (POS).
+- **Rediseño Compacto de Tarjetas KPI (`MetricCard`, `CarteraPage`, `ReportsPage`):** Optimización de padding interno (insets reducidos a `10, 14`) y tipografía, otorgando mayor respiro visual y espacio para los gráficos y tablas centrales.
+- **Dataset Maestro Demo Multiaño (3 Años - `poblar_master_demo.sql`):** Script SQL realista con 1,225+ ventas y 400+ abonos distribuidos entre 2024 y 2026 para pruebas exhaustivas de comparativas interanuales.
+
+---
+
 ## [2.0.0] - 2026-09-16 — Enterprise Major Release
 
 ### 🚀 Añadido (Enterprise Release)

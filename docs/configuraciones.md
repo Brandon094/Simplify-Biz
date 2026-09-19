@@ -1,4 +1,4 @@
-# Configuración del Sistema & Despliegue — ERP+ Business (v2.0.0)
+# Configuración del Sistema & Despliegue — ERP+ Business (v2.1.0)
 
 > **Guía de Despliegue, Rutas Protegidas por SO, Inyección de Datos y SMTP**
 
@@ -37,7 +37,7 @@ Esto evita la pérdida de datos cuando el desarrollador o usuario ejecuta `mvn c
 
 Para poblar la base de datos SQLite con datos de prueba realistas para demostración de métricas financieras del Dashboard (Fase 5), se proveen los siguientes scripts SQL:
 
-1. **`poblar_master_demo.sql`**: Script maestro de demostración comercial con el DDL completo, 9 usuarios multirol, 4 proveedores, 9 categorías, 38 productos con costo e inventario, 10 ventas históricas (Efectivo, Transferencia, Crédito), abonos a cartera y 3 facturas de compras con 8 detalles de recepción en almacén.
+1. **`poblar_master_demo.sql`**: Script maestro de demostración comercial multiaño (2024–2026) con el DDL oficial, 9 usuarios multirol, 4 proveedores, 9 categorías, 38 productos con costo e inventario, 1,225+ ventas históricas distribuidas mes a mes (Efectivo, Transferencia, Crédito), 400+ abonos a cartera y facturas de compras para probar comparativas anuales, badges de crecimiento neón y gráficas de tendencia.
 2. **`datos_demo_fase5.sql`**: Carga de categorías, productos con costo y compras históricas para probar Utilidad Neta ($) e Inversión ($).
 3. **`poblar_repuestos_motos.sql`**: Catálogo de prueba enfocado en repuestos y accesorios de motocicletas.
 4. **`poblar_sistema_completo.sql`**: Dataset masivo de clientes, empleados, catálogo y ventas.

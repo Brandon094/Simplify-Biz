@@ -1,4 +1,4 @@
-# Referencia de API & Controladores — ERP+ Business (v2.0.0)
+# Referencia de API & Controladores — ERP+ Business (v2.1.0)
 
 > **Especificación Técnica de Métodos de Lógica de Negocio y Data Access Object (DAO)**  
 > Todos los controladores ejecutan operaciones desacopladas de Swing y retornan `ResultadoOperacion` inmutable.
@@ -73,6 +73,9 @@ Transacciones comerciales, historial, reportes y cotizaciones.
 | `obtenerDesgloseMetodosPagoPorPeriodo` | `String periodo` | `Map<String, Double>` | Retorna acumulados por método de pago (`Efectivo`, `Transferencia`, `Crédito`). |
 | `obtenerDesgloseUtilidadNetaPorPeriodo` | `String periodo` | `double[]` | Retorna `[0] Total Facturado`, `[1] Costo Mercancía (COGS)` y `[2] Utilidad Neta Real`. |
 | `obtenerCogsPorVentaIds` | `List<Integer> ventaIds` | `double` | Calcula el Costo de Mercancía Vendida (COGS) para un listado de IDs de ventas visibles/filtrados. |
+| `obtenerVentasGraficaPorPeriodo` | `String periodo` | `List<Double>` | Retorna los puntos acumulados de ventas para la serie actual de la gráfica en función del periodo seleccionado (*Hoy*, *Esta Semana*, *Este Mes*, *Este Año*, *Histórico*). |
+| `obtenerVentasGraficaPeriodoAnterior` | `String periodo` | `List<Double>` | Retorna los puntos de ventas acumulados del periodo anterior equivalente para el trazado comparativo dual en `NeonLineChart` (*vs periodo anterior*). |
+| `obtenerEtiquetasGraficaPorPeriodo` | `String periodo` | `List<String>` | Formateador adaptativo del eje X que genera etiquetas de horas (`08:00`), días/meses (`15 Jul`), meses (`Ene`, `Feb`) o años (`2024`, `2025`). |
 | `obtenerVentasUltimos7Dias` | — | `List<Double>` | Totales acumulados diarios de los últimos 7 días. |
 | `exportarDatosTablaAExcel` | `JTable table, String path` | `void` | Exporta la tabla visible a formato Microsoft Excel `.xlsx` vía Apache POI con diseño ejecutivo corporativo, banner de título, cabeceras en azul oscuro `#1E293B`, formato `$#,##0.00` y fila de Gran Total. |
 

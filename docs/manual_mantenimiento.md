@@ -1,4 +1,4 @@
-# Manual de Mantenimiento & Onboarding — ERP+ BUSINESS (v2.0.0)
+# Manual de Mantenimiento & Onboarding — ERP+ BUSINESS (v2.1.0)
 
 > **Guía Técnica de Operaciones, Extensión de Código, Ciclo de Vida JVM y Empaquetado Nativo**  
 > Destinado a ingenieros de software, mantenedores y nuevos desarrolladores del proyecto.
@@ -78,20 +78,20 @@ Escribe la suite de pruebas unitarias en JUnit 5 utilizando `@TempDir` o bases d
 ```bash
 mvn clean package
 ```
-Esto generará el artefacto ejecutable `dist/ERP-Plus-Business-2.0.0.jar` conteniendo todas las dependencias (FlatLaf, SQLite, Apache POI).
+Esto generará el artefacto ejecutable `dist/ERP-Plus-Business-2.1.0.jar` conteniendo todas las dependencias (FlatLaf, SQLite, Apache POI).
 
 ### 3.2 Generación del Paquete Portable Automático
 ```bash
 bash scripts/package-app.sh
 ```
-Crea la carpeta lista para distribuir `dist/ERP_Plus_Business_v2.0.0_Portable/` con scripts `run.sh` para Linux/macOS y `run.bat` para Windows.
+Crea la carpeta lista para distribuir `dist/ERP_Plus_Business_v2.1.0_Portable/` con scripts `run.sh` para Linux/macOS y `run.bat` para Windows.
 
 ### 3.3 Distribución Nativa con Icono Oficial y Acceso Directo (.ico / VBScript / .deb)
 
 ERP+ BUSINESS incluye un motor de empaquetado multi-plataforma listo para ser distribuido a clientes finales en Windows, Linux y macOS:
 
 #### 1. Generación de Recursos e Icono Nativo
-El sistema convierte automáticamente el isotipo vectorizado de la aplicación (`app_icon.png`) a un icono nativo multi-resolución de Windows (`app_icon.ico` conteniendo capas de 256x256 hasta 16x16 píxeles) dentro de `dist/ERP_Plus_Business_v2.0.0_Portable/`.
+El sistema convierte automáticamente el isotipo vectorizado de la aplicación (`app_icon.png`) a un icono nativo multi-resolución de Windows (`app_icon.ico` conteniendo capas de 256x256 hasta 16x16 píxeles) dentro de `dist/ERP_Plus_Business_v2.1.0_Portable/`.
 
 #### 2. Lanzadores y Acceso Directo de 1 Clic para Windows
 Para evitar consolas de comandos visibles al usuario en Windows:
@@ -102,9 +102,9 @@ Para evitar consolas de comandos visibles al usuario en Windows:
 ```bash
 jpackage \
   --name "ERP-Plus-Business" \
-  --app-version "2.0.0" \
-  --input dist/ERP_Plus_Business_v2.0.0_Portable \
-  --main-jar ERP-Plus-Business-2.0.0.jar \
+  --app-version "2.1.0" \
+  --input dist/ERP_Plus_Business_v2.1.0_Portable \
+  --main-jar ERP-Plus-Business-2.1.0.jar \
   --main-class com.mycompany.zl_solucion_integral.Main \
   --type deb \
   --icon src/main/resources/icons/app_icon.png \
@@ -116,9 +116,9 @@ jpackage \
 ```cmd
 jpackage ^
   --name "ERP-Plus-Business" ^
-  --app-version "2.0.0" ^
-  --input dist\ERP_Plus_Business_v2.0.0_Portable ^
-  --main-jar ERP-Plus-Business-2.0.0.jar ^
+  --app-version "2.1.0" ^
+  --input dist\ERP_Plus_Business_v2.1.0_Portable ^
+  --main-jar ERP-Plus-Business-2.1.0.jar ^
   --main-class com.mycompany.zl_solucion_integral.Main ^
   --type msi ^
   --win-shortcut ^

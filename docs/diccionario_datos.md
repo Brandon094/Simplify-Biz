@@ -16,7 +16,8 @@ Entidad principal para autenticación multirol (Administradores, Vendedores/Empl
 | `telefono` | `TEXT` | No | Teléfono de contacto (7–10 dígitos). Usado en recuperación de cuenta. |
 | `email` | `TEXT` | No | Correo electrónico con regex validado. |
 | `rol` | `INTEGER` | No | Roles: `1` = Administrador, `0` = Vendedor/Empleado, `2` = Cliente. |
-| `contraseña` | `TEXT` | No | Hash criptográfico SHA-256 de 64 caracteres Hex. Jamás expuesto en SELECTs de listado. |
+| `contraseña` | `TEXT` | No | Hash criptográfico SHA-256 de 64 caracteres Hex para usuarios con acceso a sistema (Administradores/Empleados). |
+| `no_cc` | `TEXT` | Sí | Número de Cédula / NIT del cliente en texto plano (ej: `83249810`). Usado para sugerencias y autocompletado en POS. |
 
 ---
 

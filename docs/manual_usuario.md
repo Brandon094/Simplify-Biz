@@ -42,7 +42,11 @@ Mira en tus pantallas ejecutivas cómo crecen tus ganancias en tiempo real con c
 
 Tu información comercial y tu dinero son sagrados. Por eso, el sistema protege tu negocio como una caja fuerte:
 
-### Comodidad y Tranquilidad Diario
+### Configuración Inicial Segura y Guiada (Registro de Administrador)
+Al abrir la aplicación por primera vez, el asistente te guiara paso a paso mediante etiquetas permanentes en cada campo para registrar la cuenta principal del negocio (`Nombre Completo`, `Teléfono de 10 dígitos`, `Correo Electrónico` y `Contraseña Segura`). Esta cuenta tendrá el control total de tu caja fuerte comercial.
+
+### Comodidad y Tranquilidad Diaria
+- **Ingreso Flexible en 1 Clic (Primer Nombre o Correo):** Inicia sesión ingresando únicamente tu **primer nombre** (por ejemplo, `Brandon` si te registraste como `Brandon Daza`) o tu **correo electrónico**. El sistema te reconocerá al instante sin necesidad de recordar nombres complejos.
 - **Entrada Rápida 'Recordarme':** Inicia tu jornada laboral de inmediato sin tener que escribir tus datos una y otra vez. Tu tiempo vale oro.
 - **Recuperación Inteligente de Clave:** Si un día olvidas tu clave, no te preocupes ni pierdas la calma. Con solo escribir tu usuario y teléfono recuperas el acceso en segundos.
 - **Cierre de Sesión Seguro al Terminar:** Al finalizar el día, cierra tu sesión con un solo clic para asegurar que nadie sin autorización pueda curiosear tus ganancias ni tus datos confidenciales.
@@ -57,7 +61,10 @@ Imagina tener un consultor de negocios a tu lado 24/7 que te dice exactamente c�
 - **Ventas Totales:** Siente el orgullo de ver la suma total de dinero que ha ingresado a la caja de tu empresa.
 - **Ganancia Limpia y Real:** El indicador estrella. Es el dinero real que queda en tu bolsillo una vez restado lo que te costó la mercancía.
 - **Dinero Invertido en Bodega:** Descubre exactamente cuánto dinero tienes acumulado y listo para convertirse en ventas dentro de tu estantería.
-- **Alertas de Mercancía por Agotarse:** Te avisa a tiempo qué productos estrella se están terminando para que nunca le digas *'no hay'* a un cliente.
+- **Formato de Cifras Inteligente y Limpio ($100K, $5.4M):** Tus pantallas ejecutivas (Dashboard, Cartera y Reportes) muestran los totales en un formato corto y elegante para que leas la información de un solo vistazo sin llenar la pantalla de ceros. Si deseas ver los centavos exactos, solo pasa el mouse sobre cualquier tarjeta y verás la radiografía completa en pesos exactos.
+- **Filtro Temporal Ampliado ("Este Año"):** Evalúa tu rendimiento en 4 dimensiones temporales: *Hoy*, *Esta Semana*, *Este Mes* y *Este Año*.
+- **Gráfico Comparativo Inteligente & Porcentaje de Crecimiento:** Tu gráfico de tendencia dibuja automáticamente una línea punteada que representa el periodo anterior (por ejemplo, *Este Mes vs Mes Anterior* o *Este Año vs Año Anterior*) y te muestra una etiqueta neón destacada con el porcentaje de crecimiento o decrecimiento (`+18.5% vs per. anterior`) para saber al instante si tu negocio está aumentando sus ventas.
+- **Fechas Nítidas e Inteligentes:** Las etiquetas del gráfico se ajustan solas para mayor claridad: muestran días y meses exactos (`15 Jul`), meses del año (`Ene`, `Feb`) o años completos (`2024`, `2025`).
 
 <div style="background-color: #1E293B; border-left: 4px solid #06B6D4; padding: 12px 16px; border-radius: 8px; margin: 14px 0;">
   <strong style="color: #06B6D4;">Poder Comercial:</strong> Observa en gráficos dinámicos qué días y a qué horas vendes más para aplicar promociones irresistibles y multiplicar tus ingresos.
@@ -105,8 +112,9 @@ Ofrécele a tus clientes una experiencia de compra rápida, moderna y sin filas 
 
 ### El Arte del Cobro Ágil en 3 Pasos
 1. **Encuentra el Producto al Instante:** Escribe una letra o pasa el lector de código de barras. El artículo salta de inmediato al carrito de compras.
-2. **Adapta la Venta a la Medida:** Cambia cantidades o aplica promociones especiales con botones amplios y cómodos diseñados para vender a toda prisa.
-3. **Cierra el Cobro y Recibe el Dinero:**
+2. **Autocompletado Flotante Inteligente de Clientes:** Al cobrar por Transferencia o Crédito, escribe el **Nombre** o la **Cédula / NIT** de tu cliente. Una ventana flotante desplegará sugerencias instantáneas sin necesidad de presionar `Enter` ni cambiar de casilla, completando automáticamente los datos de contacto del cliente en 1 clic.
+3. **Adapta la Venta a la Medida:** Cambia cantidades o aplica promociones especiales con los botones de acción rápida directos en cada fila del carrito (`+`, `-`, `Quitar`). Al deslizar el mouse sobre cada botón, este se iluminará con su color neón correspondiente (`Verde` para sumar, `Púrpura` para restar y `Rojo` para eliminar).
+4. **Cierra el Cobro y Recibe el Dinero:**
    - **Efectivo (Calculadora de Vueltas Exactas):** Escribe en el campo **"Paga con ($)"** el billete que te entrega tu cliente. El sistema te dice de inmediato las **Vueltas Exactas** en neón verde (o cuánto dinero falta), eliminando errores de cálculo manual. Entrega el cambio y despacha al cliente en 2 segundos.
    - **Transferencia Digital (Nequi / Bancolombia):** Registra los datos del pago digital con total nitidez y sin dudas de dinero en el aire.
    - **Crédito Comercial (Fiado de Confianza):** Ofrécele crédito a tus clientes VIP. La cuenta se guarda sola en su expediente sin necesidad de cuadernos.

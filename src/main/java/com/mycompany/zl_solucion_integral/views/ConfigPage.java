@@ -250,7 +250,7 @@ public class ConfigPage extends JPanel {
         JPanel gridPanel = new JPanel(new GridLayout(4, 1, 0, 12));
         gridPanel.setOpaque(false);
 
-        gridPanel.add(createDataRow("Versión del Software", "2.0.0 (Enterprise Major)", "icons/version-code.svg", ThemeConstants.NEON_PURPLE));
+        gridPanel.add(createDataRow("Versión del Software", "2.1.0 (Enterprise Major)", "icons/version-code.svg", ThemeConstants.NEON_PURPLE));
         gridPanel.add(createDataRow("Motor de Base de Datos", "SQLite 3.46 (WAL Mode)", "icons/database.svg", ThemeConstants.NEON_BLUE));
         gridPanel.add(createDataRow("Licenciamiento Criptográfico", "RSA-2048 Hardware-Bound", "icons/license.svg", ThemeConstants.NEON_GREEN));
         gridPanel.add(createDeveloperRow());

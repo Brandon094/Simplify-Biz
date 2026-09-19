@@ -12,8 +12,8 @@ print("✅ Generando configuración del ejecutable Windows...")
 config_xml = """<launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>dist/ERP_Plus_Business_v2.0.0_Portable/ERP-Plus-Business-2.0.0.jar</jar>
-  <outfile>dist/ERP_Plus_Business_v2.0.0_Portable/ERP-Plus-Business.exe</outfile>
+  <jar>dist/ERP_Plus_Business_v2.1.0_Portable/ERP-Plus-Business-2.1.0.jar</jar>
+  <outfile>dist/ERP_Plus_Business_v2.1.0_Portable/ERP-Plus-Business.exe</outfile>
   <errTitle>ERP+ Business</errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
@@ -23,7 +23,7 @@ config_xml = """<launch4jConfig>
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
-  <icon>dist/ERP_Plus_Business_v2.0.0_Portable/app_icon.ico</icon>
+  <icon>dist/ERP_Plus_Business_v2.1.0_Portable/app_icon.ico</icon>
   <jre>
     <path></path>
     <bundledJre64Bit>false</bundledJre64Bit>

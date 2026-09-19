@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mycompany</groupId>
     <artifactId>ERP-Plus-Business</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -25,7 +25,7 @@
 
         <!--
           Carpeta visible dentro del proyecto donde se copia el JAR final tras
-          el `package`, para ejecutarlo como `java -jar dist/Simplify-Biz-2.0.0.jar`.
+          el `package`, para ejecutarlo como `java -jar dist/ERP-Plus-Business-2.1.0.jar`.
         -->
         <dist.dir>${project.basedir}/dist</dist.dir>
     </properties>
@@ -134,6 +134,19 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>com.mycompany.zl_solucion_integral.tools:*</exclude>
+                                </excludes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>com/mycompany/zl_solucion_integral/tools/**</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>${exec.mainClass}</mainClass>

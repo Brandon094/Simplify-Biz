@@ -501,7 +501,7 @@ public class ManualUsuarioDialog extends JDialog {
 
         sections.add(new ManualSection(
                 "¡Tu Máquina de Ventas y Ganancias RÁPIDAS!",
-                "<p>¡Felicitaciones! Has tomado la decisión de transformar tu negocio en una verdadera <b>máquina comercial de altas ganancias</b> con ERP+ Business.</p>" +
+                "<p>¡Felicitaciones! Has tomado la decisión de transformar tu negocio en una verdadera <b>máquina comercial de altas ganancias</b> con ERP+ Business (v2.1.0).</p>" +
                 "<p>Dile adiós a los desvelos haciendo cuentas a mano, a las dudas sobre si estás ganando dinero y al temor de mercancía perdida. Esta herramienta fue diseñada pensando en la psicología del comerciante exitoso: te ahorra tiempo, protege cada billete que entra a tu local y te regala la paz mental de ver tu <b>Ganancia Limpia y Real</b> al instante.</p>" +
                 "<div class='tip'><span class='tag-tip'>✔ CONSEJO DE ÉXITO:</span> <b>Sensación de Control Total —</b> Imagina cerrar tu jornada con la tranquilidad absoluta de saber exactamente cuánto vendiste, cuánto ganaste de utilidad directa y qué productos le encantan a tus clientes. ¡Prepárate para llevar tu negocio al siguiente nivel!</div>" +
                 "<div class='note'><span class='tag-note'>🛡 SEGURIDAD DE DATOS:</span> <b>Protección Total —</b> Tu información no viaja a servidores externos desconocidos; se almacena de forma blindada en tu propio computador.</div>",
@@ -515,11 +515,11 @@ public class ManualUsuarioDialog extends JDialog {
                 "<p>Ingresa la mercancía que vendes en tu negocio. En pocos segundos tendrás cada artículo registrado con su precio de costo y su precio de venta al público.</p>" +
                 "<div class='info'><span class='tag-info'>💡 REGLA DE ORO:</span> <b>¿Inventario o Abastecimiento? —</b> Usa el módulo de <b>Inventario</b> para registrar productos que ya tienes en tu almacén o mercancía propia sin factura. Usa el módulo de <b>Abastecimiento</b> cuando ingreses compras respaldadas por una factura o remisión de tu proveedor.</div>" +
                 "<h2>2. Pon a Tu Equipo a Vender con Confianza:</h2>" +
-                "<p>Crea usuarios para tus colaboradores o cajeros. Ellos podrán cobrar a toda velocidad a tus clientes, mientras tus secretos de costos y tus ganancias privadas se mantienen 100% protegidos bajo tu control exclusivo.</p>" +
+                "<p>Crea usuarios para tus colaboradores o cajeros con guía paso a paso y etiquetas de ayuda intuitivas. Ellos podrán cobrar a toda velocidad a tus clientes, mientras tus secretos de costos y tus ganancias privadas se mantienen 100% protegidos bajo tu control exclusivo.</p>" +
                 "<h2>3. Vive la Magia del Cobro Ágil (Punto de Venta):</h2>" +
-                "<p>Atiende a tus clientes en segundos. Cobra en Efectivo, Nequi, Bancolombia o Fiado. Tu cliente quedará descrestado con la rapidez de tu atención y la mercancía se descontará sola de la bodega.</p>" +
+                "<p>Atiende a tus clientes en segundos. Cobra en Efectivo, Nequi, Bancolombia o Fiado. Tu cliente quedará descrestado con la rapidez de tu atención, el autocompletado flotante de clientes por cédula o nombre y el descuento automático de mercancía en bodega.</p>" +
                 "<h2>4. Siente la Satisfacción de tus Resultados:</h2>" +
-                "<p>Mira en tus pantallas ejecutivas cómo crecen tus ganancias en tiempo real con cada venta que realiza tu equipo.</p>",
+                "<p>Mira en tus pantallas ejecutivas cómo crecen tus ganancias en tiempo real con cada venta que realiza tu equipo, con vistas comparativas anuales y formato compacto de moneda ($100K, $5.4M).</p>",
                 "icons/bolt.svg"
         ));
 
@@ -528,6 +528,7 @@ public class ManualUsuarioDialog extends JDialog {
                 "<p>Tu información comercial y tu dinero son sagrados. Por eso, el sistema protege tu negocio como una caja fuerte:</p>" +
                 "<h2>Comodidad y Tranquilidad Diario:</h2>" +
                 "<ul>" +
+                "<li><b>Ingreso Flexible Simplificado:</b> Puedes iniciar sesión ingresando tu <b>primer nombre</b> (ejemplo: <i>'Brandon'</i> si te llamaste Brandon Daza), tu <b>correo electrónico</b> o tu nombre completo registrado. ¡Cero complicaciones!</li>" +
                 "<li><b>Entrada Rápida 'Recordarme':</b> Inicia tu jornada laboral de inmediato sin tener que escribir tus datos una y otra vez. Tu tiempo vale oro.</li>" +
                 "<li><b>Recuperación Inteligente de Clave:</b> Si un día olvidas tu clave, no te preocupes ni pierdas la calma. Con solo escribir tu usuario y teléfono recuperas el acceso en segundos.</li>" +
                 "<li><b>Cierre de Sesión Seguro al Terminar:</b> Al finalizar el día, cierra tu sesión con un solo clic para asegurar que nadie sin autorización pueda curiosear tus ganancias ni tus datos confidenciales.</li>" +
@@ -542,12 +543,13 @@ public class ManualUsuarioDialog extends JDialog {
                     "<p>Imagina tener un consultor de negocios a tu lado 24/7 que te dice exactamente cómo va tu dinero sin que tengas que hacer una sola suma:</p>" +
                     "<h2>Tus Indicadores de Éxito Comercial:</h2>" +
                     "<ul>" +
-                    "<li><b>Ventas Totales:</b> Siente el orgullo de ver la suma total de dinero que ha ingresado a la caja de tu empresa.</li>" +
+                    "<li><b>Ventas Totales:</b> Siente el orgullo de ver la suma total de dinero que ha ingresado a la caja de tu empresa. Mostrado en formato numérico elegante y compacto (ej: <b>$5.4M</b> o <b>$120K</b>) para lecturas ultrarrápidas.</li>" +
                     "<li><b>Ganancia Limpia y Real:</b> El indicador estrella. Es el dinero real que queda en tu bolsillo una vez restado lo que te costó la mercancía.</li>" +
                     "<li><b>Dinero Invertido en Bodega:</b> Descubre exactamente cuánto dinero tienes acumulado y listo para convertirse en ventas dentro de tu estantería.</li>" +
                     "<li><b>Alertas de Mercancía por Agotarse:</b> Te avisa a tiempo qué productos estrella se están terminando para que nunca le digas <i>'no hay'</i> a un cliente.</li>" +
+                    "<li><b>Analítica de Negocio Inteligente (Filtro Este Año):</b> Selecciona el filtro de tiempo <i>'Este Año'</i> para comparar la línea de Ventas Totales vs. Ganancia Real mes a mes con insignias neón de crecimiento dinámico.</li>" +
                     "</ul>" +
-                    "<div class='info'><span class='tag-info'>⚡ INTELIGENCIA FINANCIERA:</span> <b>Poder Comercial —</b> Observa en gráficos dinámicos qué días y a qué horas vendes más para aplicar promociones irresistibles y multiplicar tus ingresos.</div>",
+                    "<div class='info'><span class='tag-info'>⚡ INTELIGENCIA FINANCIERA:</span> <b>Poder Comercial —</b> Observa en gráficos dinámicos qué meses y a qué horas vendes más para aplicar promociones irresistibles y multiplicar tus ingresos.</div>",
                     "icons/dashboard.svg"
             ));
         }
@@ -586,6 +588,7 @@ public class ManualUsuarioDialog extends JDialog {
                 "<p>Ofrécele a tus clientes una experiencia de compra rápida, moderna y sin filas molestas que los haga regresar siempre a tu negocio:</p>" +
                 "<h2>El Arte del Cobro Ágil en 3 Pasos:</h2>" +
                 "<ol>" +
+                "<li><b>Búsqueda y Autocompletado de Clientes Inteligente:</b> En el selector de cliente, escribe los primeros dígitos de la Cédula/NIT o las primeras letras del Nombre. Aparecerá un menú desplegable flotante con las coincidencia exactas de tus clientes registrados. Al seleccionar uno, se cargará su cédula, nombre, teléfono y correo automáticamente.</li>" +
                 "<li><b>Encuentra el Producto al Instante:</b> Escribe una letra o pasa el lector de código de barras. El artículo salta de inmediato al carrito de compras.</li>" +
                 "<li><b>Adapta la Venta a la Medida:</b> Cambia cantidades o aplica promociones especiales con botones amplios y cómodos diseñados para vender a toda prisa.</li>" +
                 "<li><b>Cierra el Cobro y Recibe el Dinero:</b>" +
@@ -645,7 +648,7 @@ public class ManualUsuarioDialog extends JDialog {
                     "</ul>" +
                     "<h2>Delegación Segura para tus Colaboradores:</h2>" +
                     "<ul>" +
-                    "<li>Crea accesos individuales para tus empleados con <b>Perfil Vendedor</b>. Ellos tendrán todas las facilidades para cobrar rápido a los clientes, pero tus ganancias netas, costos de compra y balances confidenciales permanecerán totalmente bloqueados bajo tu clave de Administrador.</li>" +
+                    "<li>Crea accesos individuales para tus empleados con <b>Perfil Vendedor</b>. El nuevo formulario cuenta con etiquetas de guía visuales para asegurar un registro sin errores. Ellos tendrán todas las facilidades para cobrar rápido a los clientes, pero tus ganancias netas, costos de compra y balances confidenciales permanecerán totalmente bloqueados bajo tu clave de Administrador.</li>" +
                     "</ul>" +
                     "<div class='tip'><span class='tag-tip'>⭐ CLIENTES VIP:</span> <b>Fidelización Efectiva —</b> Sorprende a tus clientes frecuentes ofreciéndoles pequeños descuentos en sus cumpleaños consultando su fecha de registro.</div>",
                     "icons/clients.svg"
