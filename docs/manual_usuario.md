@@ -1,4 +1,4 @@
-# Manual de Operación — ERP+ Business
+# Manual de Operación — ERP+ Business (v2.1.0)
 
 > Guía interactiva de operación comercial para el usuario final. Diseñada bajo principios de neuroventas, agilidad de cobro y psicología comercial para maximizar tus ganancias y proteger tu patrimonio.
 
@@ -65,6 +65,48 @@ Imagina tener un consultor de negocios a tu lado 24/7 que te dice exactamente c�
 - **Filtro Temporal Ampliado ("Este Año"):** Evalúa tu rendimiento en 4 dimensiones temporales: *Hoy*, *Esta Semana*, *Este Mes* y *Este Año*.
 - **Gráfico Comparativo Inteligente & Porcentaje de Crecimiento:** Tu gráfico de tendencia dibuja automáticamente una línea punteada que representa el periodo anterior (por ejemplo, *Este Mes vs Mes Anterior* o *Este Año vs Año Anterior*) y te muestra una etiqueta neón destacada con el porcentaje de crecimiento o decrecimiento (`+18.5% vs per. anterior`) para saber al instante si tu negocio está aumentando sus ventas.
 - **Fechas Nítidas e Inteligentes:** Las etiquetas del gráfico se ajustan solas para mayor claridad: muestran días y meses exactos (`15 Jul`), meses del año (`Ene`, `Feb`) o años completos (`2024`, `2025`).
+
+### Explicación Transparente de Fórmulas & Cálculo de KPIs del Dashboard
+
+Para garantizar la máxima confianza contable, ERP+ Business calcula tus métricas en tiempo real utilizando las siguientes fórmulas de precisión financiera:
+
+#### 1. Ingreso Total Facturado ($\mathbf{V_{total}}$)
+Es la suma bruta de todas las facturas y ventas confirmadas en la ventana de tiempo seleccionada (*Hoy*, *Esta Semana*, *Este Mes*, *Este Año*):
+
+$$\mathbf{V_{total}} = \sum \text{total\_ventas}$$
+
+#### 2. Costo de Mercancía Vendida (COGS $\mathbf{C_{total}}$)
+Representa lo que te costó adquirir la mercancía que efectivamente vendiste en ese periodo. El sistema recuerda el **precio de costo unitario exacto** al que compraste el producto en el momento de la venta:
+
+$$\mathbf{C_{total}} = \sum (\text{precio\_costo\_unitario} \times \text{cantidad\_vendida})$$
+
+#### 3. Ganancia Neta Limpia y Real ($\mathbf{P_{net}}$) & Margen (%)
+Es el dinero real y líquido que te queda en el bolsillo tras descontar el costo de la mercancía del total facturado:
+
+$$\mathbf{P_{net}} = \mathbf{V_{total}} - \mathbf{C_{total}}$$
+
+El **Margen de Ganancia Porcentual ($\mathbf{M_{net}}$)** mide la rentabilidad bruta de tus ventas:
+
+$$\mathbf{M_{net}} = \left( \frac{\mathbf{P_{net}}}{\mathbf{V_{total}}} \right) \times 100$$
+
+#### 4. Porcentaje de Crecimiento Interperiodo ($\mathbf{\Delta \%}$)
+Evalúa la tendencia de aceleración o desaceleración de tu negocio comparando el periodo actual con el periodo anterior equivalente (ejemplo: *Ventas de Este Mes vs Ventas del Mes Anterior*):
+
+$$\mathbf{\Delta \%} = \left( \frac{\mathbf{V_{actual}} - \mathbf{V_{anterior}}}{\mathbf{V_{anterior}}} \right) \times 100$$
+
+*Esta fórmula alimenta automáticamente la etiqueta flotante neón de tu gráfico (`+18.5% vs per. anterior`).*
+
+#### 5. Dinero Invertido en Bodega ($\mathbf{V_{inv}}$)
+Calcula el capital total inmovilizado en tus estantes a precio de costo:
+
+$$\mathbf{V_{inv}} = \sum (\text{precio\_costo} \times \text{existencias\_en\_bodega})$$
+
+#### 6. Saldo Pendiente por Cobrar en Cartera ($\mathbf{R_{cartera}}$)
+Acumula el dinero pendiente de pago en ventas realizadas a crédito:
+
+$$\mathbf{R_{cartera}} = \sum (\text{total\_venta\_crédito} - \text{abonos\_recibidos})$$
+
+---
 
 <div style="background-color: #1E293B; border-left: 4px solid #06B6D4; padding: 12px 16px; border-radius: 8px; margin: 14px 0;">
   <strong style="color: #06B6D4;">Poder Comercial:</strong> Observa en gráficos dinámicos qué días y a qué horas vendes más para aplicar promociones irresistibles y multiplicar tus ingresos.
