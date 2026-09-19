@@ -3,8 +3,6 @@ package com.mycompany.zl_solucion_integral.views;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.mycompany.zl_solucion_integral.controllers.UsuarioController;
-import com.mycompany.zl_solucion_integral.models.Sesion;
-import com.mycompany.zl_solucion_integral.views.components.LayoutResponsive;
 import com.mycompany.zl_solucion_integral.views.components.ThemeConstants;
 import com.mycompany.zl_solucion_integral.views.components.UIMessages;
 import com.mycompany.zl_solucion_integral.views.components.atoms.NeonButton;
@@ -17,9 +15,7 @@ public class ModernLoginPage extends JFrame {
     private JPasswordField txtPassword;
     private JCheckBox chkRemember;
     private NeonButton btnLogin;
-    private Sesion sesion = new Sesion();
     private JPanel mainPanel;
-    private JSplitPane splitPane;
     private RoundedPanel brandPanel;
 
     public ModernLoginPage() {
@@ -129,7 +125,7 @@ public class ModernLoginPage extends JFrame {
         pillOffline.setOpaque(true);
         pillOffline.setBorder(BorderFactory.createLineBorder(ThemeConstants.withAlpha(ThemeConstants.NEON_GREEN, 90), 1));
         
-        JLabel pillLic = new JLabel(" ● Motor ERP+ v2.0.0 ");
+        JLabel pillLic = new JLabel(" ● Motor ERP+ v2.1.0 ");
         pillLic.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
         pillLic.setForeground(ThemeConstants.NEON_PURPLE);
         pillLic.setBackground(ThemeConstants.withAlpha(ThemeConstants.NEON_PURPLE, 30));
@@ -197,9 +193,9 @@ public class ModernLoginPage extends JFrame {
 
         gbc.gridy = 2;
         gbc.insets = new Insets(0, 0, 6, 0);
-        card.add(createLabel("USUARIO"), gbc);
+        card.add(createLabel("USUARIO O CORREO ELECTRÓNICO"), gbc);
 
-        txtUsuario = createTextField("Ingrese su usuario");
+        txtUsuario = createTextField("Primer nombre o correo registrado");
         gbc.gridy = 3;
         gbc.insets = new Insets(0, 0, 16, 0);
         card.add(txtUsuario, gbc);
@@ -265,7 +261,7 @@ public class ModernLoginPage extends JFrame {
         gbc.insets = new Insets(0, 0, 0, 0);
         card.add(btnLogin, gbc);
 
-        JLabel lblFooter = new JLabel("Versión 1.0 • Seguridad y control empresarial");
+        JLabel lblFooter = new JLabel("Versión 2.1.0 • Seguridad y control empresarial");
         lblFooter.setForeground(ThemeConstants.TEXT_SECONDARY);
         lblFooter.setHorizontalAlignment(SwingConstants.CENTER);
         lblFooter.setFont(ThemeConstants.FONT_SMALL);
@@ -314,26 +310,6 @@ public class ModernLoginPage extends JFrame {
             try {
                 FlatSVGIcon icon = new FlatSVGIcon(iconPath, 14, 14);
                 icon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, iconColor));
-                badge.setIcon(icon);
-            } catch (Exception ignored) {}
-        }
-        badge.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeConstants.withAlpha(ThemeConstants.NEON_BLUE, 90), 1),
-            BorderFactory.createEmptyBorder(6, 12, 6, 12)
-        ));
-        badge.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD));
-        return badge;
-    }
-
-    private JLabel createBadge(String text, String iconPath) {
-        JLabel badge = new JLabel(" " + text);
-        badge.setForeground(ThemeConstants.TEXT_PRIMARY);
-        badge.setBackground(ThemeConstants.withAlpha(ThemeConstants.NEON_BLUE, 40));
-        badge.setOpaque(true);
-        if (iconPath != null && !iconPath.isEmpty()) {
-            try {
-                FlatSVGIcon icon = new FlatSVGIcon(iconPath, 14, 14);
-                icon.setColorFilter(new FlatSVGIcon.ColorFilter().add(Color.BLACK, ThemeConstants.NEON_CYAN));
                 badge.setIcon(icon);
             } catch (Exception ignored) {}
         }
@@ -418,14 +394,12 @@ public class ModernLoginPage extends JFrame {
         try {
             // Intentar login como Administrador (Rol 1)
             if (controller.validarCredencialesAdmin(user, pass)) {
-                com.mycompany.zl_solucion_integral.models.Sesion.setUsuarioLogueado(user);
                 com.mycompany.zl_solucion_integral.models.Sesion.setRolLogueado("1");
                 this.dispose();
                 new MainTemplate("1").setVisible(true);
             } 
             // Intentar login como Vendedor (Rol != 1)
             else if (controller.validarCredencialesUsuarioRegular(user, pass)) {
-                com.mycompany.zl_solucion_integral.models.Sesion.setUsuarioLogueado(user);
                 com.mycompany.zl_solucion_integral.models.Sesion.setRolLogueado("0");
                 this.dispose();
                 new MainTemplate("0").setVisible(true);

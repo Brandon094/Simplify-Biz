@@ -228,7 +228,7 @@ public class SalesPage extends JPanel {
         tbCart.getColumnModel().getColumn(1).setCellRenderer(textRenderer);
         tbCart.getColumnModel().getColumn(2).setCellRenderer(textRenderer);
 
-        // Renderer y Editor para la columna 3 (Botones SVG por fila: + / - / Edit / Trash)
+        // Renderer y Editor para la columna 3 (Botones SVG por fila: + / - / Trash)
         CartRowActionsPanel rowActionsRenderer = new CartRowActionsPanel();
 
         tbCart.getColumnModel().getColumn(3).setCellRenderer((table, value, isSelected, hasFocus, row, column) -> {
@@ -236,7 +236,27 @@ public class SalesPage extends JPanel {
             return rowActionsRenderer;
         });
 
-        tbCart.getColumnModel().getColumn(3).setCellEditor(new CartCellEditor());
+        CartCellEditor cartCellEditor = new CartCellEditor();
+        tbCart.getColumnModel().getColumn(3).setCellEditor(cartCellEditor);
+
+        // Activación inmediata del editor al mover o presionar el mouse sobre la columna 3 para efectos Hover fluidos
+        tbCart.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(java.awt.event.MouseEvent e) {
+                int col = tbCart.columnAtPoint(e.getPoint());
+                int row = tbCart.rowAtPoint(e.getPoint());
+                if (col == 3 && row >= 0 && row < tbCart.getRowCount()) {
+                    if (tbCart.getEditingRow() != row || tbCart.getEditingColumn() != 3) {
+                        if (tbCart.isEditing()) {
+                            tbCart.getCellEditor().stopCellEditing();
+                        }
+                        tbCart.editCellAt(row, 3);
+                    }
+                } else if (tbCart.isEditing()) {
+                    tbCart.getCellEditor().stopCellEditing();
+                }
+            }
+        });
 
         JTableHeader cartHeader = tbCart.getTableHeader();
         cartHeader.setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
@@ -372,13 +392,18 @@ public class SalesPage extends JPanel {
 
     // Componente interno para mostrar botones con SVG minus.svg y plus.svg directamente en cada fila de la tabla
     private class CartRowActionsPanel extends JPanel {
-        private final JButton btnPlus = createRowIconButton("icons/plus.svg", ThemeConstants.NEON_GREEN, "Aumentar (+1)");
-        private final JButton btnMinus = createRowIconButton("icons/minus.svg", ThemeConstants.NEON_PURPLE, "Disminuir (-1)");
-        private final JButton btnTrash = createRowIconButton("icons/trash.svg", ThemeConstants.NEON_RED, "Quitar ítem");
+        private final JButton btnPlus;
+        private final JButton btnMinus;
+        private final JButton btnTrash;
 
         public CartRowActionsPanel() {
             setOpaque(true);
             setLayout(new FlowLayout(FlowLayout.CENTER, 4, 4));
+
+            btnPlus = createRowIconButton("icons/plus.svg", ThemeConstants.NEON_GREEN, "Aumentar (+1)");
+            btnMinus = createRowIconButton("icons/minus.svg", ThemeConstants.NEON_PURPLE, "Disminuir (-1)");
+            btnTrash = createRowIconButton("icons/trash.svg", ThemeConstants.NEON_RED, "Quitar ítem");
+
             add(btnPlus);
             add(btnMinus);
             add(btnTrash);
@@ -390,6 +415,15 @@ public class SalesPage extends JPanel {
             } else {
                 setBackground(isEven ? ThemeConstants.CARD_BACKGROUND : ThemeConstants.TABLE_ZEBRA);
             }
+            // Asegurar que al cambiar de celda/fila, los 3 botones vuelvan a su estado neutro individual
+            resetButtonState(btnPlus, "icons/plus.svg", ThemeConstants.NEON_GREEN);
+            resetButtonState(btnMinus, "icons/minus.svg", ThemeConstants.NEON_PURPLE);
+            resetButtonState(btnTrash, "icons/trash.svg", ThemeConstants.NEON_RED);
+        }
+
+        private void resetButtonState(JButton btn, String iconPath, Color accentColor) {
+            btn.setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
+            btn.setIcon(createIcon(iconPath, accentColor, 13, 13));
         }
 
         public void setActionListeners(java.awt.event.ActionListener onPlus,
@@ -414,12 +448,14 @@ public class SalesPage extends JPanel {
             btn.setBorder(BorderFactory.createLineBorder(new Color(accentColor.getRed(), accentColor.getGreen(), accentColor.getBlue(), 140), 1, true));
             btn.setIcon(createIcon(iconPath, accentColor, 13, 13));
 
-            // Efecto Hover neumórfico con cursor de manito (HAND_CURSOR)
+            // Efecto Hover neumórfico estrictamente aislado por cada botón
             btn.addMouseListener(new java.awt.event.MouseAdapter() {
                 @Override
                 public void mouseEntered(java.awt.event.MouseEvent e) {
-                    btn.setBackground(accentColor);
-                    btn.setIcon(createIcon(iconPath, Color.WHITE, 13, 13));
+                    if (btn.isEnabled()) {
+                        btn.setBackground(accentColor);
+                        btn.setIcon(createIcon(iconPath, Color.WHITE, 13, 13));
+                    }
                 }
 
                 @Override
@@ -439,7 +475,7 @@ public class SalesPage extends JPanel {
         @Override
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             this.currentRow = row;
-            rowActionsEditor.updateBackground(true, row % 2 == 0);
+            rowActionsEditor.updateBackground(isSelected, row % 2 == 0);
             rowActionsEditor.setActionListeners(
                     e -> { fireEditingStopped(); changeQtyAtRow(currentRow, 1); },
                     e -> { fireEditingStopped(); changeQtyAtRow(currentRow, -1); },
@@ -474,41 +510,7 @@ public class SalesPage extends JPanel {
         item.setTotal(unitPrice * newQty);
 
         cartModel.setValueAt(newQty, rowIndex, 1);
-        cartModel.setValueAt(String.format("$ %.2f", item.getTotal()), rowIndex, 2);
-        updateTotal();
-    }
-
-    private void setCustomQtyAtRow(int rowIndex) {
-        if (rowIndex < 0 || rowIndex >= cartItems.size()) return;
-        Venta item = cartItems.get(rowIndex);
-        String input = JOptionPane.showInputDialog(this,
-                "Ingresa la nueva cantidad para " + item.getProducto().getProducto() + ":",
-                "Modificar cantidad", JOptionPane.QUESTION_MESSAGE);
-        
-        if (input == null || input.trim().isEmpty()) return;
-
-        if (!com.mycompany.zl_solucion_integral.config.Validaciones.validarCantidad(input.trim())) {
-            UIUtils.showError(this, "La cantidad debe ser un número entero positivo.");
-            return;
-        }
-
-        int newQty = Integer.parseInt(input.trim());
-        if (newQty <= 0) {
-            removeCartItemAtRow(rowIndex);
-            return;
-        }
-
-        if (item.getProducto() != null && newQty > item.getProducto().getCantidad()) {
-            UIUtils.showError(this, "La cantidad (" + newQty + ") supera el stock disponible (" + item.getProducto().getCantidad() + ").");
-            return;
-        }
-
-        double unitPrice = item.getTotal() / item.getCantidad();
-        item.setCantidad(newQty);
-        item.setTotal(unitPrice * newQty);
-
-        cartModel.setValueAt(newQty, rowIndex, 1);
-        cartModel.setValueAt(String.format("$ %.2f", item.getTotal()), rowIndex, 2);
+        cartModel.setValueAt(UIUtils.formatCurrency(item.getTotal()), rowIndex, 2);
         updateTotal();
     }
 
@@ -516,102 +518,6 @@ public class SalesPage extends JPanel {
         if (rowIndex < 0 || rowIndex >= cartItems.size()) return;
         cartItems.remove(rowIndex);
         cartModel.removeRow(rowIndex);
-        updateTotal();
-    }
-
-    private JButton createMiniCartButton(String text, String iconPath, Color accentColor, String tooltip) {
-        JButton btn = new JButton(text);
-        btn.setFont(ThemeConstants.FONT_SMALL.deriveFont(Font.BOLD, 11f));
-        btn.setForeground(ThemeConstants.TEXT_PRIMARY);
-        btn.setBackground(ThemeConstants.SIDEBAR_BACKGROUND);
-        btn.setFocusPainted(false);
-        btn.setToolTipText(tooltip);
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(accentColor.getRed(), accentColor.getGreen(), accentColor.getBlue(), 120), 1, true),
-                BorderFactory.createEmptyBorder(4, 8, 4, 8)
-        ));
-        if (iconPath != null) {
-            btn.setIcon(createIcon(iconPath, accentColor, 12, 12));
-            btn.setIconTextGap(4);
-        }
-        return btn;
-    }
-
-    private void changeSelectedQty(int delta) {
-        int selectedRow = tbCart.getSelectedRow();
-        if (selectedRow < 0 || selectedRow >= cartItems.size()) {
-            UIUtils.showError(this, "Selecciona un producto del carrito para modificar su cantidad.");
-            return;
-        }
-        Venta item = cartItems.get(selectedRow);
-        int newQty = item.getCantidad() + delta;
-
-        if (newQty <= 0) {
-            removeSelectedCartItem();
-            return;
-        }
-
-        if (item.getProducto() != null && newQty > item.getProducto().getCantidad()) {
-            UIUtils.showError(this, "La cantidad (" + newQty + ") supera el stock disponible (" + item.getProducto().getCantidad() + ").");
-            return;
-        }
-
-        double unitPrice = item.getTotal() / item.getCantidad();
-        item.setCantidad(newQty);
-        item.setTotal(unitPrice * newQty);
-
-        cartModel.setValueAt(newQty, selectedRow, 1);
-        cartModel.setValueAt(String.format("$ %.2f", item.getTotal()), selectedRow, 2);
-        updateTotal();
-    }
-
-    private void setCustomQtyForSelected() {
-        int selectedRow = tbCart.getSelectedRow();
-        if (selectedRow < 0 || selectedRow >= cartItems.size()) {
-            UIUtils.showError(this, "Selecciona un producto del carrito para editar su cantidad.");
-            return;
-        }
-        Venta item = cartItems.get(selectedRow);
-        String input = JOptionPane.showInputDialog(this,
-                "Ingresa la nueva cantidad para " + item.getProducto().getProducto() + ":",
-                "Modificar cantidad", JOptionPane.QUESTION_MESSAGE);
-        
-        if (input == null || input.trim().isEmpty()) return;
-
-        if (!com.mycompany.zl_solucion_integral.config.Validaciones.validarCantidad(input.trim())) {
-            UIUtils.showError(this, "La cantidad debe ser un número entero positivo.");
-            return;
-        }
-
-        int newQty = Integer.parseInt(input.trim());
-        if (newQty <= 0) {
-            removeSelectedCartItem();
-            return;
-        }
-
-        if (item.getProducto() != null && newQty > item.getProducto().getCantidad()) {
-            UIUtils.showError(this, "La cantidad (" + newQty + ") supera el stock disponible (" + item.getProducto().getCantidad() + ").");
-            return;
-        }
-
-        double unitPrice = item.getTotal() / item.getCantidad();
-        item.setCantidad(newQty);
-        item.setTotal(unitPrice * newQty);
-
-        cartModel.setValueAt(newQty, selectedRow, 1);
-        cartModel.setValueAt(String.format("$ %.2f", item.getTotal()), selectedRow, 2);
-        updateTotal();
-    }
-
-    private void removeSelectedCartItem() {
-        int selectedRow = tbCart.getSelectedRow();
-        if (selectedRow < 0 || selectedRow >= cartItems.size()) {
-            UIUtils.showError(this, "Selecciona un producto del carrito para quitar.");
-            return;
-        }
-        cartItems.remove(selectedRow);
-        cartModel.removeRow(selectedRow);
         updateTotal();
     }
 
@@ -664,12 +570,6 @@ public class SalesPage extends JPanel {
         txtClientCC = createTextField("Ej: 1098765432...");
         setupFieldIcon(txtClientCC, "icons/id.svg");
         txtClientCC.addActionListener(e -> searchClientByCC());
-        txtClientCC.addFocusListener(new java.awt.event.FocusAdapter() {
-            @Override
-            public void focusLost(java.awt.event.FocusEvent e) {
-                searchClientByCC();
-            }
-        });
         subGbc.gridy = 1; subGbc.insets = new Insets(0, 0, 6, 0);
         txtClientCCHelper = UIUtils.createFieldWithHelper(txtClientCC, "Presiona Enter o cambia de campo para autocompletar");
         clientFieldsContainer.add(txtClientCCHelper, subGbc);
@@ -807,7 +707,7 @@ public class SalesPage extends JPanel {
         v.setFecha(LocalDate.now());
 
         cartItems.add(v);
-        cartModel.addRow(new Object[]{selectedProduct.getProducto(), qty, String.format("$ %.2f", total), ""});
+        cartModel.addRow(new Object[]{selectedProduct.getProducto(), qty, UIUtils.formatCurrency(total), ""});
         updateTotal();
 
         // Reset
@@ -828,13 +728,13 @@ public class SalesPage extends JPanel {
 
         int totalUnits = cartItems.stream().mapToInt(Venta::getCantidad).sum();
         
-        lblTotal.setText(String.format("TOTAL: $ %.2f", grandTotal));
+        lblTotal.setText("TOTAL: " + UIUtils.formatCurrency(grandTotal));
         if (lblSubtotal != null) {
-            lblSubtotal.setText(String.format("$ %.2f", grandSubtotal));
+            lblSubtotal.setText(UIUtils.formatCurrency(grandSubtotal));
         }
         if (lblDiscountSavings != null) {
             if (savings > 0.01) {
-                lblDiscountSavings.setText(String.format("-$ %.2f (%.1f%%)", savings, effectiveDiscountPct));
+                lblDiscountSavings.setText(String.format("-%s (%.1f%%)", UIUtils.formatCurrency(savings), effectiveDiscountPct));
             } else {
                 lblDiscountSavings.setText("-$ 0.00 (0%)");
             }
@@ -874,10 +774,10 @@ public class SalesPage extends JPanel {
             double change = cashGiven - grandTotal;
 
             if (change >= 0) {
-                lblChangeDue.setText(String.format("$ %.2f", change));
+                lblChangeDue.setText(UIUtils.formatCurrency(change));
                 lblChangeDue.setForeground(ThemeConstants.NEON_GREEN);
             } else {
-                lblChangeDue.setText(String.format("Falta: $ %.2f", Math.abs(change)));
+                lblChangeDue.setText(String.format("Falta: %s", UIUtils.formatCurrency(Math.abs(change))));
                 lblChangeDue.setForeground(ThemeConstants.NEON_RED);
             }
         } catch (NumberFormatException e) {
@@ -933,6 +833,7 @@ public class SalesPage extends JPanel {
             if ("N/A".equals(txtClientEmail.getText().trim())) {
                 txtClientEmail.setText("");
             }
+            txtClientCC.setForeground(ThemeConstants.TEXT_PRIMARY);
         }
 
         if (panelCheckout != null) {
@@ -1003,6 +904,7 @@ public class SalesPage extends JPanel {
         if (res.esExito()) {
             if (!genericClient) {
                 Usuario client = finalVenta.getCliente();
+                client.setNoCc(clientCC);
                 client.setTelefono(clientTel);
                 client.setEmail(clientEmail.isEmpty() ? clientCC + "@simplify.biz" : clientEmail);
                 client.setRol("2");
@@ -1067,6 +969,14 @@ public class SalesPage extends JPanel {
         );
 
         // Autocompletado DRY para Clientes (por Cédula/NIT, Nombre, Teléfono o Correo)
+        com.mycompany.zl_solucion_integral.views.components.AutocompletePopup.SelectionListener<Usuario> onClientSelect = c -> {
+            txtClientCC.setText(c.getNoCc() != null ? c.getNoCc() : "");
+            txtClientName.setText(c.getNombre() != null ? c.getNombre() : "");
+            txtClientTel.setText(c.getTelefono() != null ? c.getTelefono() : "");
+            txtClientEmail.setText(c.getEmail() != null ? c.getEmail() : "");
+            txtClientCC.setForeground(ThemeConstants.NEON_GREEN);
+        };
+
         com.mycompany.zl_solucion_integral.views.components.AutocompletePopup.attach(
             txtClientCC,
             query -> usuarioCtrl.buscarClientesSugeridos(query),
@@ -1074,13 +984,17 @@ public class SalesPage extends JPanel {
                 c.getNoCc() != null && !c.getNoCc().isEmpty() ? c.getNoCc() : "S/D",
                 c.getNombre() != null ? c.getNombre() : "",
                 c.getTelefono() != null && !c.getTelefono().isEmpty() ? "(" + c.getTelefono() + ")" : ""),
-            c -> {
-                txtClientCC.setText(c.getNoCc() != null ? c.getNoCc() : "");
-                txtClientName.setText(c.getNombre() != null ? c.getNombre() : "");
-                txtClientTel.setText(c.getTelefono() != null ? c.getTelefono() : "");
-                txtClientEmail.setText(c.getEmail() != null ? c.getEmail() : "");
-                txtClientCC.setForeground(ThemeConstants.NEON_GREEN);
-            }
+            onClientSelect
+        );
+
+        com.mycompany.zl_solucion_integral.views.components.AutocompletePopup.attach(
+            txtClientName,
+            query -> usuarioCtrl.buscarClientesSugeridos(query),
+            c -> String.format("%s [%s] %s",
+                c.getNombre() != null ? c.getNombre() : "",
+                c.getNoCc() != null && !c.getNoCc().isEmpty() ? c.getNoCc() : "S/D",
+                c.getTelefono() != null && !c.getTelefono().isEmpty() ? "(" + c.getTelefono() + ")" : ""),
+            onClientSelect
         );
     }
 

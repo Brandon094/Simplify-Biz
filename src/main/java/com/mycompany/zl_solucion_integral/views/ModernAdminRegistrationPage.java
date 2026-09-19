@@ -49,59 +49,63 @@ public class ModernAdminRegistrationPage extends JFrame {
         // Title
         JLabel lblTitle = new JLabel("REGISTRO INICIAL", SwingConstants.CENTER);
         lblTitle.setForeground(ThemeConstants.NEON_PURPLE);
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 32));
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 30));
         gbc.gridy = 0;
-        gbc.insets = new Insets(0, 0, 10, 0);
+        gbc.insets = new Insets(0, 0, 6, 0);
         regCard.add(lblTitle, gbc);
 
-        JLabel lblSub = new JLabel("Configura la cuenta principal del negocio", SwingConstants.CENTER);
+        JLabel lblSub = new JLabel("Crea la cuenta de Administrador principal para tu negocio", SwingConstants.CENTER);
         lblSub.setForeground(ThemeConstants.TEXT_SECONDARY);
         lblSub.setFont(ThemeConstants.FONT_SMALL);
         gbc.gridy = 1;
-        gbc.insets = new Insets(0, 0, 30, 0);
+        gbc.insets = new Insets(0, 0, 25, 0);
         regCard.add(lblSub, gbc);
 
         // Inputs
-        gbc.insets = new Insets(0, 0, 5, 0);
+        gbc.insets = new Insets(0, 0, 4, 0);
 
         gbc.gridy = 2;
         regCard.add(createLabel("NOMBRE COMPLETO"), gbc);
         txtNombre = createTextField("Ej: Juan Pérez");
         setupFieldIcon(txtNombre, "icons/user.svg");
         gbc.gridy = 3;
-        gbc.insets = new Insets(0, 0, 15, 0);
         regCard.add(txtNombre, gbc);
-
         gbc.gridy = 4;
-        gbc.insets = new Insets(0, 0, 5, 0);
-        regCard.add(createLabel("TELÉFONO"), gbc);
+        gbc.insets = new Insets(2, 0, 12, 0);
+        regCard.add(createHelperLabel("Ingresa tu nombre y apellido para identificarte"), gbc);
+
+        gbc.gridy = 5;
+        gbc.insets = new Insets(0, 0, 4, 0);
+        regCard.add(createLabel("TELÉFONO DE CONTACTO"), gbc);
         txtTel = createTextField("Ej: 3001234567");
         setupFieldIcon(txtTel, "icons/phone.svg");
-        gbc.gridy = 5;
-        regCard.add(txtTel, gbc);
         gbc.gridy = 6;
-        gbc.insets = new Insets(2, 0, 15, 0);
-        regCard.add(createHelperLabel("Debe tener 10 dígitos numéricos"), gbc);
-
+        regCard.add(txtTel, gbc);
         gbc.gridy = 7;
-        gbc.insets = new Insets(0, 0, 5, 0);
+        gbc.insets = new Insets(2, 0, 12, 0);
+        regCard.add(createHelperLabel("Número móvil de 10 dígitos para recuperación de cuenta"), gbc);
+
+        gbc.gridy = 8;
+        gbc.insets = new Insets(0, 0, 4, 0);
         regCard.add(createLabel("CORREO ELECTRÓNICO"), gbc);
         txtEmail = createTextField("usuario@ejemplo.com");
         setupFieldIcon(txtEmail, "icons/email.svg");
-        gbc.gridy = 8;
-        gbc.insets = new Insets(0, 0, 15, 0);
-        regCard.add(txtEmail, gbc);
-
         gbc.gridy = 9;
-        gbc.insets = new Insets(0, 0, 5, 0);
-        regCard.add(createLabel("CONTRASEÑA"), gbc);
+        regCard.add(txtEmail, gbc);
+        gbc.gridy = 10;
+        gbc.insets = new Insets(2, 0, 12, 0);
+        regCard.add(createHelperLabel("Servirá para recibir notificaciones y recuperar tu acceso"), gbc);
+
+        gbc.gridy = 11;
+        gbc.insets = new Insets(0, 0, 4, 0);
+        regCard.add(createLabel("CONTRASEÑA SEGURA"), gbc);
         txtContraseña = createPasswordField("Mínimo 6 caracteres");
         setupFieldIcon(txtContraseña, "icons/lock.svg");
-        gbc.gridy = 10;
+        gbc.gridy = 12;
         regCard.add(txtContraseña, gbc);
-        gbc.gridy = 11;
-        gbc.insets = new Insets(2, 0, 30, 0);
-        regCard.add(createHelperLabel("Usa una contraseña segura que no olvides"), gbc);
+        gbc.gridy = 13;
+        gbc.insets = new Insets(2, 0, 24, 0);
+        regCard.add(createHelperLabel("Utiliza al menos 6 caracteres con letras y números"), gbc);
 
         // Register Button
         NeonButton btnReg = new NeonButton("REGISTRAR ADMINISTRADOR");
@@ -113,7 +117,7 @@ public class ModernAdminRegistrationPage extends JFrame {
         btnReg.setPreferredSize(new Dimension(0, 50));
         btnReg.addActionListener(e -> registerAdmin());
         this.btnReg = btnReg;
-        gbc.gridy = 12;
+        gbc.gridy = 14;
         regCard.add(btnReg, gbc);
 
         mainPanel.add(regCard);

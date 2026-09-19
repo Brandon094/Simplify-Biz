@@ -37,14 +37,18 @@ public class UsuarioController {
             return ResultadoOperacion.error(UIMessages.MSG_USUARIO_DUPLICADO_CORREO);
         }
 
-        final String sql = "INSERT INTO usuarios (nombre, telefono, email, contraseña, rol) VALUES (?, ?, ?, ?, ?)";
+        final String sql = "INSERT INTO usuarios (nombre, telefono, email, contraseña, rol, no_cc) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn().prepareStatement(sql)) {
-            String contraseñaEncriptada = Seguridad.encriptarContraseña(usuario.getContraseña());
+            boolean esCliente = "2".equals(usuario.getRol());
+            String contraseñaFinal = esCliente ? (usuario.getContraseña() != null ? usuario.getContraseña() : "") : Seguridad.encriptarContraseña(usuario.getContraseña());
+            String noCcFinal = usuario.getNoCc() != null && !usuario.getNoCc().isEmpty() ? usuario.getNoCc() : (esCliente ? usuario.getContraseña() : "");
+
             pstmt.setString(1, usuario.getNombre());
             pstmt.setString(2, usuario.getTelefono());
             pstmt.setString(3, usuario.getEmail());
-            pstmt.setString(4, contraseñaEncriptada);
+            pstmt.setString(4, contraseñaFinal);
             pstmt.setString(5, usuario.getRol());
+            pstmt.setString(6, noCcFinal);
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
                 return ResultadoOperacion.ok(UIMessages.MSG_USUARIO_REGISTRADO);
@@ -215,13 +219,26 @@ public class UsuarioController {
         tablaUsuarios.getColumnModel().getColumn(4).setMaxWidth(50);
     }
 
-    public boolean validarCredencialesUsuarioRegular(final String usuario, final String contraseña) {
-        final String sql = "SELECT contraseña FROM usuarios WHERE LOWER(nombre) = LOWER(?) AND rol != 1";
+    public boolean validarCredencialesUsuarioRegular(final String identificador, final String contraseña) {
+        if (identificador == null || identificador.trim().isEmpty() || contraseña == null) {
+            return false;
+        }
+        final String idLimpio = identificador.trim();
+        final String sql = "SELECT nombre, contraseña FROM usuarios WHERE ("
+                + "  LOWER(email) = LOWER(?)"
+                + "  OR LOWER(nombre) = LOWER(?)"
+                + "  OR LOWER(SUBSTR(nombre, 1, INSTR(nombre || ' ', ' ') - 1)) = LOWER(?)"
+                + ") AND rol != 1";
         try (PreparedStatement pstmt = conn().prepareStatement(sql)) {
-            pstmt.setString(1, usuario);
+            pstmt.setString(1, idLimpio);
+            pstmt.setString(2, idLimpio);
+            pstmt.setString(3, idLimpio);
             try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return Seguridad.validarContraseña(contraseña, rs.getString("contraseña"));
+                while (rs.next()) {
+                    if (Seguridad.validarContraseña(contraseña, rs.getString("contraseña"))) {
+                        com.mycompany.zl_solucion_integral.models.Sesion.setUsuarioLogueado(rs.getString("nombre"));
+                        return true;
+                    }
                 }
             }
         } catch (Exception e) {
@@ -230,13 +247,26 @@ public class UsuarioController {
         return false;
     }
 
-    public boolean validarCredencialesAdmin(final String usuario, final String contraseña) {
-        final String sql = "SELECT contraseña FROM usuarios WHERE LOWER(nombre) = LOWER(?) AND rol = 1";
+    public boolean validarCredencialesAdmin(final String identificador, final String contraseña) {
+        if (identificador == null || identificador.trim().isEmpty() || contraseña == null) {
+            return false;
+        }
+        final String idLimpio = identificador.trim();
+        final String sql = "SELECT nombre, contraseña FROM usuarios WHERE ("
+                + "  LOWER(email) = LOWER(?)"
+                + "  OR LOWER(nombre) = LOWER(?)"
+                + "  OR LOWER(SUBSTR(nombre, 1, INSTR(nombre || ' ', ' ') - 1)) = LOWER(?)"
+                + ") AND rol = 1";
         try (PreparedStatement pstmt = conn().prepareStatement(sql)) {
-            pstmt.setString(1, usuario);
+            pstmt.setString(1, idLimpio);
+            pstmt.setString(2, idLimpio);
+            pstmt.setString(3, idLimpio);
             try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return Seguridad.validarContraseña(contraseña, rs.getString("contraseña"));
+                while (rs.next()) {
+                    if (Seguridad.validarContraseña(contraseña, rs.getString("contraseña"))) {
+                        com.mycompany.zl_solucion_integral.models.Sesion.setUsuarioLogueado(rs.getString("nombre"));
+                        return true;
+                    }
                 }
             }
         } catch (Exception e) {
@@ -337,8 +367,8 @@ public class UsuarioController {
         }
         String ccLimpia = cc.trim();
 
-        // 1. Buscar en la tabla usuarios por cualquier campo identificador (nombre, email, o teléfono/contraseña)
-        String sqlUsuario = "SELECT nombre, telefono, email FROM usuarios WHERE LOWER(nombre) = LOWER(?) OR LOWER(email) = LOWER(?) OR LOWER(contraseña) = LOWER(?) OR LOWER(telefono) = LOWER(?) LIMIT 1";
+        // 1. Buscar en la tabla usuarios por cualquier campo identificador (nombre, email, no_cc o teléfono)
+        String sqlUsuario = "SELECT nombre, telefono, email, no_cc FROM usuarios WHERE LOWER(nombre) = LOWER(?) OR LOWER(email) = LOWER(?) OR LOWER(no_cc) = LOWER(?) OR LOWER(telefono) = LOWER(?) LIMIT 1";
         try (PreparedStatement pstmt = conn().prepareStatement(sqlUsuario)) {
             pstmt.setString(1, ccLimpia);
             pstmt.setString(2, ccLimpia);
@@ -350,7 +380,8 @@ public class UsuarioController {
                     u.setNombre(rs.getString("nombre"));
                     u.setTelefono(rs.getString("telefono"));
                     u.setEmail(rs.getString("email"));
-                    u.setNoCc(ccLimpia);
+                    String noCcDB = rs.getString("no_cc");
+                    u.setNoCc(noCcDB != null && !noCcDB.isEmpty() ? noCcDB : ccLimpia);
                     return u;
                 }
             }
@@ -386,12 +417,14 @@ public class UsuarioController {
             return resultados;
         }
         String term = "%" + query.trim().toLowerCase() + "%";
+        // Consolidación limpia: busca primero en usuarios usando no_cc, y luego en ventas excluyendo clientes ya encontrados
         String sql = "SELECT DISTINCT nombre, email, telefono, no_cc FROM ("
-                + "  SELECT nombre, email, telefono, contraseña AS no_cc FROM usuarios "
-                + "  WHERE LOWER(nombre) LIKE ? OR LOWER(email) LIKE ? OR LOWER(telefono) LIKE ? OR LOWER(contraseña) LIKE ? "
+                + "  SELECT nombre, email, telefono, COALESCE(NULLIF(no_cc, ''), contraseña) AS no_cc FROM usuarios "
+                + "  WHERE (LOWER(nombre) LIKE ? OR LOWER(email) LIKE ? OR LOWER(telefono) LIKE ? OR LOWER(no_cc) LIKE ?) "
+                + "    AND LENGTH(COALESCE(NULLIF(no_cc, ''), contraseña)) < 40 "
                 + "  UNION "
                 + "  SELECT cliente AS nombre, '' AS email, '' AS telefono, cc_cliente AS no_cc FROM ventas "
-                + "  WHERE LOWER(cliente) LIKE ? OR LOWER(cc_cliente) LIKE ?"
+                + "  WHERE (LOWER(cliente) LIKE ? OR LOWER(cc_cliente) LIKE ?) AND cc_cliente IS NOT NULL AND cc_cliente != '' AND cc_cliente != 'N/A' "
                 + ") LIMIT 10";
 
         try (PreparedStatement pstmt = conn().prepareStatement(sql)) {

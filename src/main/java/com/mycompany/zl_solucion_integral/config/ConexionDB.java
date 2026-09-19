@@ -29,7 +29,8 @@ public class ConexionDB {
                 + "telefono TEXT NOT NULL,"
                 + "email TEXT NOT NULL,"
                 + "rol INTEGER NOT NULL,"
-                + "contraseña TEXT NOT NULL);", "usuarios");
+                + "contraseña TEXT NOT NULL,"
+                + "no_cc TEXT);", "usuarios");
 
         crearTabla(conn, "CREATE TABLE IF NOT EXISTS productos ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -61,7 +62,8 @@ public class ConexionDB {
                 + "total REAL NOT NULL,"
                 + "FOREIGN KEY (venta_id) REFERENCES ventas(id));", "detalles_venta");
 
-        // Migración limpia para instalaciones previas que no tenían la columna precio_costo o descuento
+        // Migración limpia para instalaciones previas que no tenían ciertas columnas
+        migrarColumnaSegura(conn, "usuarios", "no_cc", "TEXT");
         migrarColumnaSegura(conn, "productos", "precio_costo", "REAL DEFAULT 0.0");
         migrarColumnaSegura(conn, "detalles_venta", "precio_costo", "REAL DEFAULT 0.0");
         migrarColumnaSegura(conn, "detalles_venta", "descuento", "REAL DEFAULT 0.0");

@@ -76,6 +76,27 @@ public class UsuarioControllerTest {
     }
 
     @Test
+    void testValidarCredencialesPorPrimerNombreYCorreo() {
+        Usuario adminCompleto = new Usuario(0, "Brandon Daza", "3009990000", "brandon@empresa.com", "miClaveSuperSegura", "1");
+        controller.agregarUsuario(adminCompleto);
+
+        // 1. Acceso por primer nombre ("Brandon")
+        assertTrue(controller.validarCredencialesAdmin("Brandon", "miClaveSuperSegura"), "Debe permitir login ingresando solo el primer nombre");
+        assertEquals("Brandon Daza", com.mycompany.zl_solucion_integral.models.Sesion.getUsuarioLogueado());
+
+        // 2. Acceso por correo electrónico ("brandon@empresa.com")
+        assertTrue(controller.validarCredencialesAdmin("brandon@empresa.com", "miClaveSuperSegura"), "Debe permitir login ingresando el correo electrónico");
+        assertEquals("Brandon Daza", com.mycompany.zl_solucion_integral.models.Sesion.getUsuarioLogueado());
+
+        // 3. Acceso por nombre completo ("Brandon Daza")
+        assertTrue(controller.validarCredencialesAdmin("Brandon Daza", "miClaveSuperSegura"), "Debe permitir login ingresando el nombre completo");
+        assertEquals("Brandon Daza", com.mycompany.zl_solucion_integral.models.Sesion.getUsuarioLogueado());
+
+        // 4. Rechazo con clave errónea
+        assertFalse(controller.validarCredencialesAdmin("Brandon", "claveIncorrecta"));
+    }
+
+    @Test
     void testListadoSinColumnaContraseña() {
         Usuario vendedor = new Usuario(0, "Pedro", "3004445555", "pedro@test.com", "secret", "0");
         controller.agregarUsuario(vendedor);
