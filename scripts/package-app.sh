@@ -48,20 +48,21 @@ fi
 EOF
 chmod +x "$BUNDLE_DIR/run.sh"
 
-# 5. Generar Script Lanzador para Windows (run.bat)
+# 5. Generar Script Lanzador para Windows (run.bat y lanzador gráfico silencioso con icono)
 cat << 'EOF' > "$BUNDLE_DIR/run.bat"
 @echo off
 title ERP+ Business v2.1.0
 cd /d "%~dp0"
 echo ---------------------------------------------------
-echo  Iniciando ERP+ Business v2.1.0 - ERP Intelligent
+echo  Iniciando ERP+ Business v2.1.0 - ChopCode Solutions
 echo ---------------------------------------------------
-java -jar ERP-Plus-Business-2.1.0.jar
-if %ERRORLEVEL% NEQ 0 (
-    echo.
-    echo Error al iniciar la aplicación. Verifica que Java 21+ esté instalado.
-    pause
-)
+start javaw -jar ERP-Plus-Business-2.1.0.jar
+EOF
+
+# Lanzador gráfico sin ventana negra de consola para Windows
+cat << 'EOF' > "$BUNDLE_DIR/ERP-Plus-Business.vbs"
+Set WshShell = CreateObject("WScript.Shell")
+WshShell.Run "javaw -jar ERP-Plus-Business-2.1.0.jar", 0, False
 EOF
 
 # 6. Copiar Scripts SQL de Demostración y Recursos de Icono
