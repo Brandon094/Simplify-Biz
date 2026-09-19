@@ -13,31 +13,31 @@
 
     <!-- Navigation Tabs for All Main Modules -->
     <div class="flex items-center gap-1.5 overflow-x-auto text-xs py-1 scrollbar-none max-w-full">
-      <button onclick="changePreviewImage('assets/images/dashboard.png', 'Panel Principal (Dashboard BI)')" class="preview-tab active px-3 py-1.5 rounded-lg bg-purple-600/30 text-purple-300 border border-purple-500/40 font-semibold transition-all whitespace-nowrap">
+      <button onclick="changePreviewImage(this, 'assets/images/dashboard.png', 'Panel Principal (Dashboard BI)')" class="preview-tab active px-3 py-1.5 rounded-lg bg-purple-600/30 text-purple-300 border border-purple-500/40 font-semibold transition-all whitespace-nowrap">
         Dashboard
       </button>
-      <button onclick="changePreviewImage('assets/images/punto_de_venta.png', 'Punto de Venta (POS Rápido)')" class="preview-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white border border-white/5 font-medium transition-all whitespace-nowrap">
+      <button onclick="changePreviewImage(this, 'assets/images/punto_de_venta.png', 'Punto de Venta (POS Rápido)')" class="preview-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white border border-white/5 font-medium transition-all whitespace-nowrap">
         Punto de Venta (POS)
       </button>
-      <button onclick="changePreviewImage('assets/images/inventario.png', 'Gestión de Inventario & Stock')" class="preview-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white border border-white/5 font-medium transition-all whitespace-nowrap">
+      <button onclick="changePreviewImage(this, 'assets/images/inventario.png', 'Gestión de Inventario & Stock')" class="preview-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white border border-white/5 font-medium transition-all whitespace-nowrap">
         Inventario
       </button>
-      <button onclick="changePreviewImage('assets/images/abastecimiento.png', 'Abastecimiento de Facturas')" class="preview-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white border border-white/5 font-medium transition-all whitespace-nowrap">
+      <button onclick="changePreviewImage(this, 'assets/images/abastecimiento.png', 'Abastecimiento de Facturas')" class="preview-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white border border-white/5 font-medium transition-all whitespace-nowrap">
         Abastecimiento
       </button>
-      <button onclick="changePreviewImage('assets/images/cartera_clientes.png', 'Cuentas por Cobrar (Cartera)')" class="preview-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white border border-white/5 font-medium transition-all whitespace-nowrap">
+      <button onclick="changePreviewImage(this, 'assets/images/cartera_clientes.png', 'Cuentas por Cobrar (Cartera)')" class="preview-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white border border-white/5 font-medium transition-all whitespace-nowrap">
         Cartera
       </button>
-      <button onclick="changePreviewImage('assets/images/directorio_clientes.png', 'Directorio & Historial de Clientes')" class="preview-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white border border-white/5 font-medium transition-all whitespace-nowrap">
+      <button onclick="changePreviewImage(this, 'assets/images/directorio_clientes.png', 'Directorio & Historial de Clientes')" class="preview-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white border border-white/5 font-medium transition-all whitespace-nowrap">
         Clientes
       </button>
-      <button onclick="changePreviewImage('assets/images/gestion_empleados.png', 'Gestión de Empleados & Roles')" class="preview-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white border border-white/5 font-medium transition-all whitespace-nowrap">
+      <button onclick="changePreviewImage(this, 'assets/images/gestion_empleados.png', 'Gestión de Empleados & Roles')" class="preview-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white border border-white/5 font-medium transition-all whitespace-nowrap">
         Empleados
       </button>
-      <button onclick="changePreviewImage('assets/images/centro_reportes.png', 'Centro de Reportes BI & Excel')" class="preview-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white border border-white/5 font-medium transition-all whitespace-nowrap">
+      <button onclick="changePreviewImage(this, 'assets/images/centro_reportes.png', 'Centro de Reportes BI & Excel')" class="preview-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white border border-white/5 font-medium transition-all whitespace-nowrap">
         Reportes
       </button>
-      <button onclick="changePreviewImage('assets/images/configuracion.png', 'Ajustes del Sistema & Licencia')" class="preview-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white border border-white/5 font-medium transition-all whitespace-nowrap">
+      <button onclick="changePreviewImage(this, 'assets/images/configuracion.png', 'Ajustes del Sistema & Licencia')" class="preview-tab px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white border border-white/5 font-medium transition-all whitespace-nowrap">
         Configuración
       </button>
     </div>
@@ -65,7 +65,7 @@
 </div>
 
 <script>
-  function changePreviewImage(src, caption) {
+  window.changePreviewImage = function(btnElement, src, caption) {
     const img = document.getElementById('main-preview-img');
     const cap = document.getElementById('preview-caption');
     if (!img) return;
@@ -81,7 +81,9 @@
       btn.classList.remove('bg-purple-600/30', 'text-purple-300', 'border-purple-500/40', 'font-semibold');
       btn.classList.add('bg-slate-800', 'text-slate-400', 'border-white/5', 'font-medium');
     });
-    event.currentTarget.classList.remove('bg-slate-800', 'text-slate-400', 'border-white/5', 'font-medium');
-    event.currentTarget.classList.add('bg-purple-600/30', 'text-purple-300', 'border-purple-500/40', 'font-semibold');
-  }
+    if (btnElement) {
+      btnElement.classList.remove('bg-slate-800', 'text-slate-400', 'border-white/5', 'font-medium');
+      btnElement.classList.add('bg-purple-600/30', 'text-purple-300', 'border-purple-500/40', 'font-semibold');
+    }
+  };
 </script>

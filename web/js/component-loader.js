@@ -15,7 +15,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const response = await fetch(file);
                     if (response.ok) {
                         const htmlContent = await response.text();
-                        el.outerHTML = htmlContent;
+                        
+                        // Crear un contenedor temporal para extraer e inyectar el HTML y ejecutar sus scripts
+                        const temp = document.createElement('div');
+                        temp.innerHTML = htmlContent;
+                        
+                        // Reemplazar el elemento objetivo por el contenido HTML
+                        el.replaceWith(...temp.childNodes);
+                        
+                        // Ejecutar explícitamente cualquier etiqueta <script> interna del componente
+                        temp.querySelectorAll('script').forEach(oldScript => {
+                            const newScript = document.createElement('script');
+                            Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                            newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                            document.body.appendChild(newScript);
+                        });
                     } else {
                         console.error(`Error al cargar el componente: ${file}`);
                     }
