@@ -180,7 +180,90 @@ class AppViewModel {
     init() {
         this.bindMockupEvents();
         this.bindNavigationEvents();
+        this.bindReviewsEvents();
         this.carouselVM = new ScreenshotCarouselViewModel();
+    }
+
+    // --- Enlace de la Sección de Reseñas y Calificaciones de Clientes ---
+    bindReviewsEvents() {
+        const starBtns = document.querySelectorAll('.star-btn');
+        const ratingInput = document.getElementById('selectedRating');
+        const ratingText = document.getElementById('ratingText');
+
+        if (starBtns.length > 0) {
+            starBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const rating = parseInt(btn.getAttribute('data-rating'));
+                    if (ratingInput) ratingInput.value = rating;
+
+                    // Actualizar color de estrellas
+                    starBtns.forEach((s, idx) => {
+                        if (idx < rating) {
+                            s.classList.remove('text-slate-600');
+                            s.classList.add('text-amber-400');
+                        } else {
+                            s.classList.remove('text-amber-400');
+                            s.classList.add('text-slate-600');
+                        }
+                    });
+
+                    if (ratingText) {
+                        const labels = ['Pésimo', 'Regular', 'Bueno', 'Muy Bueno', 'Excelente'];
+                        ratingText.textContent = `${rating}.0 / 5.0 (${labels[rating - 1]})`;
+                    }
+                });
+            });
+        }
+
+        const reviewForm = document.getElementById('reviewForm');
+        if (reviewForm) {
+            reviewForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const author = document.getElementById('reviewAuthor')?.value.trim();
+                const comment = document.getElementById('reviewComment')?.value.trim();
+                const rating = document.getElementById('selectedRating')?.value || '5';
+                const visibility = document.querySelector('input[name="visibility"]:checked')?.value || 'public';
+
+                if (!author || !comment) return;
+
+                if (visibility === 'public') {
+                    // Agregar la nueva reseña pública al muro de la comunidad
+                    const container = document.getElementById('reviewsListContainer');
+                    if (container) {
+                        const starsStr = '★'.repeat(parseInt(rating)) + '☆'.repeat(5 - parseInt(rating));
+                        const initials = author.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
+                        const card = document.createElement('div');
+                        card.className = "bg-slate-900/90 border border-purple-500/50 rounded-2xl p-5 hover:border-purple-400 transition-all shadow-xl animate-fade-in";
+                        card.innerHTML = `
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 rounded-full bg-purple-600/40 border border-purple-400/50 flex items-center justify-center text-xs font-bold text-purple-200">
+                                        ${initials}
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-slate-100">${author}</h4>
+                                        <span class="text-[10px] text-emerald-400 font-semibold">🌐 Opinión Reciente • Publicada hoy</span>
+                                    </div>
+                                </div>
+                                <div class="text-amber-400 text-xs font-bold">${starsStr} ${rating}.0</div>
+                            </div>
+                            <p class="text-slate-300 text-xs leading-relaxed">
+                                "${comment}"
+                            </p>
+                        `;
+                        container.prepend(card);
+                    }
+                    alert('¡Gracias por tu opinión pública! Ha sido agregada exitosamente al muro de la comunidad.');
+                } else {
+                    alert('¡Gracias por tu feedback privado! Ha sido enviado de manera confidencial al desarrollador.');
+                }
+
+                reviewForm.reset();
+                if (ratingText) ratingText.textContent = '5.0 / 5.0 (Excelente)';
+            });
+        }
     }
 
     // --- Enlace de la Maqueta Interactiva de PC ---

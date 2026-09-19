@@ -1,0 +1,173 @@
+<!-- ORGANISMS: Reseñas & Calificaciones de Clientes (Conectado a Firebase Firestore) -->
+<section class="py-16 px-4 max-w-7xl mx-auto z-10 relative" id="opiniones">
+  <div class="text-center max-w-3xl mx-auto mb-12">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold mb-4 shadow-lg shadow-amber-950/30">
+      <img src="assets/icons/star.svg" class="w-4 h-4 icon-svg icon-amber" alt="Estrella">
+      <span>Opiniones Reales de Comerciantes</span>
+    </div>
+    <h2 class="font-heading text-2xl sm:text-4xl font-extrabold mb-3">
+      Lo que dicen los comerciantes sobre <span class="bg-gradient-to-r from-blue-500 via-purple-400 to-amber-400 bg-clip-text text-transparent">ERP+ Business</span>
+    </h2>
+    <p class="text-slate-300 text-sm md:text-base leading-relaxed">
+      Déjanos tu calificación y experiencia con el programa. Tu opinión nos ayuda a seguir mejorando cada día.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <!-- Formulario para Enviar Reseña -->
+    <div class="lg:col-span-5 bg-slate-900/90 backdrop-blur-xl border border-white/15 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-32 h-32 bg-purple-600/10 rounded-full blur-2xl pointer-events-none"></div>
+      
+      <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+        <img src="assets/icons/user-plus.svg" class="w-5 h-5 icon-svg icon-purple" alt="Comentar">
+        Dejar tu Opinión o Calificación
+      </h3>
+      <p class="text-xs text-slate-400 mb-6">Completa los campos para publicar tu experiencia.</p>
+
+      <form id="reviewForm" class="space-y-4">
+        <!-- Nombre / Negocio -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Tu Nombre o Nombre de tu Negocio *</label>
+          <input 
+            type="text" 
+            id="reviewAuthor" 
+            required 
+            placeholder="Ej. Carlos Mendoza — Ferretería El Carmen"
+            class="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-colors"
+          >
+        </div>
+
+        <!-- Calificación con Estrellas Interactivas -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Calificación del Software *</label>
+          <div class="flex items-center gap-2 py-1" id="starRatingContainer">
+            <button type="button" data-rating="1" class="star-btn text-2xl text-slate-600 hover:text-amber-400 transition-colors">★</button>
+            <button type="button" data-rating="2" class="star-btn text-2xl text-slate-600 hover:text-amber-400 transition-colors">★</button>
+            <button type="button" data-rating="3" class="star-btn text-2xl text-slate-600 hover:text-amber-400 transition-colors">★</button>
+            <button type="button" data-rating="4" class="star-btn text-2xl text-slate-600 hover:text-amber-400 transition-colors">★</button>
+            <button type="button" data-rating="5" class="star-btn text-2xl text-amber-400 transition-colors">★</button>
+            <span id="ratingText" class="text-xs font-bold text-amber-400 ml-2">5.0 / 5.0 (Excelente)</span>
+          </div>
+          <input type="hidden" id="selectedRating" value="5">
+        </div>
+
+        <!-- Comentario -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Tu Comentario o Experiencia *</label>
+          <textarea 
+            id="reviewComment" 
+            rows="3" 
+            required 
+            placeholder="¿Qué te pareció el control de inventario y las ventas en caja?..."
+            class="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-colors resize-none"
+          ></textarea>
+        </div>
+
+        <!-- Preferencia de Visibilidad (Pública o Privada) -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-2">Preferencia de Visibilidad</label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="flex items-center gap-2 p-3 bg-slate-950 border border-purple-500/40 rounded-xl cursor-pointer hover:border-purple-400 transition-colors">
+              <input type="radio" name="visibility" value="public" checked class="accent-purple-500">
+              <div>
+                <span class="block text-xs font-bold text-slate-200">🌐 Pública</span>
+                <span class="block text-[10px] text-slate-400">Visible en la web</span>
+              </div>
+            </label>
+            <label class="flex items-center gap-2 p-3 bg-slate-950 border border-white/10 rounded-xl cursor-pointer hover:border-white/20 transition-colors">
+              <input type="radio" name="visibility" value="private" class="accent-purple-500">
+              <div>
+                <span class="block text-xs font-bold text-slate-200">🔒 Privada</span>
+                <span class="block text-[10px] text-slate-400">Solo desarrollador</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Botón Enviar -->
+        <button 
+          type="submit" 
+          id="btnSubmitReview"
+          class="w-full py-3.5 px-6 rounded-xl font-bold text-sm bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white shadow-lg shadow-purple-600/30 transition-all duration-300 flex items-center justify-center gap-2"
+        >
+          <img src="assets/icons/rocket.svg" class="w-4 h-4 icon-svg icon-white" alt="Enviar">
+          Publicar mi Opinión
+        </button>
+      </form>
+    </div>
+
+    <!-- Muro de Reseñas Públicas de la Comunidad -->
+    <div class="lg:col-span-7 space-y-4">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <span>Reseñas de Usuarios</span>
+          <span id="reviewCountBadge" class="text-xs font-extrabold bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2.5 py-0.5 rounded-full">3 Opiniones</span>
+        </h3>
+        <div class="flex items-center gap-1 text-amber-400 text-sm font-bold">
+          <span>★★★★★</span>
+          <span class="text-slate-300 text-xs font-medium ml-1">4.9 promedio</span>
+        </div>
+      </div>
+
+      <!-- Lista de Reseñas (Renderizado Dinámico desde Firebase / Fallback) -->
+      <div id="reviewsListContainer" class="space-y-4 max-h-[520px] overflow-y-auto pr-1 scrollbar-none">
+        <!-- Reseña Demo 1 -->
+        <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-5 hover:border-purple-500/30 transition-all shadow-lg">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-full bg-purple-600/30 border border-purple-400/40 flex items-center justify-center text-xs font-bold text-purple-200">
+                CM
+              </div>
+              <div>
+                <h4 class="text-sm font-bold text-slate-100">Carlos Mendoza</h4>
+                <span class="text-[10px] text-slate-400">Ferretería El Carmen • Hace 2 días</span>
+              </div>
+            </div>
+            <div class="text-amber-400 text-xs font-bold">★★★★★ 5.0</div>
+          </div>
+          <p class="text-slate-300 text-xs leading-relaxed">
+            "Excelente programa. Lo compré para mi ferretería porque no quería seguir pagando $120 mil mensuales en otro software. El autocompletado en caja vuela y el soporte por WhatsApp fue inmediato."
+          </p>
+        </div>
+
+        <!-- Reseña Demo 2 -->
+        <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-5 hover:border-purple-500/30 transition-all shadow-lg">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-full bg-emerald-600/30 border border-emerald-400/40 flex items-center justify-center text-xs font-bold text-emerald-200">
+                DR
+              </div>
+              <div>
+                <h4 class="text-sm font-bold text-slate-100">Droguería La Rebaja Local</h4>
+                <span class="text-[10px] text-slate-400">Neiva • Hace 5 días</span>
+              </div>
+            </div>
+            <div class="text-amber-400 text-xs font-bold">★★★★★ 5.0</div>
+          </div>
+          <p class="text-slate-300 text-xs leading-relaxed">
+            "Súper recomendado. La importación de listas en Excel me ahorró días metiendo productos. Me sirvió mucho la función de cuentas por cobrar para fiados."
+          </p>
+        </div>
+
+        <!-- Reseña Demo 3 -->
+        <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-5 hover:border-purple-500/30 transition-all shadow-lg">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-full bg-blue-600/30 border border-blue-400/40 flex items-center justify-center text-xs font-bold text-blue-200">
+                AR
+              </div>
+              <div>
+                <h4 class="text-sm font-bold text-slate-100">Almacén Repuestos MotoRider</h4>
+                <span class="text-[10px] text-slate-400">Pitalito • Hace 1 semana</span>
+              </div>
+            </div>
+            <div class="text-amber-400 text-xs font-bold">★★★★☆ 4.8</div>
+          </div>
+          <p class="text-slate-300 text-xs leading-relaxed">
+            "Muy práctico y rápido. Funciona perfecto sin internet cuando falla la luz en la zona. El reporte de ganancia limpia es lo que más uso al final del día."
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

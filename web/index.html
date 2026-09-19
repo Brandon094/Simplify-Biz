@@ -91,10 +91,13 @@
   <!-- Organism 4: Comparativa de Ahorro (Pago Único vs Arriendo) -->
   <div data-include="components/organisms/calculator.html"></div>
 
-  <!-- Organism 5: Descarga de Prueba Gratis 30 Días para PC -->
+  <!-- Organism 5: Sección de Opiniones y Reseñas de Usuarios -->
+  <div data-include="components/organisms/reviews.html"></div>
+
+  <!-- Organism 6: Descarga de Prueba Gratis 30 Días para PC -->
   <div data-include="components/organisms/downloads.html"></div>
 
-  <!-- Organism 6: Footer Mobile-First Sobrio -->
+  <!-- Organism 7: Footer Mobile-First Sobrio -->
   <div data-include="components/organisms/footer.html"></div>
 
   <!-- BOTÓN FLOTANTE PERMANENTE DE WHATSAPP (Número Real 3222824941) -->
@@ -104,6 +107,25 @@
       <span class="hidden sm:inline text-xs sm:text-sm font-extrabold">Comprar por WhatsApp</span>
     </a>
   </div>
+
+  <!-- Firebase App & Cloud Firestore SDKs (v12.19.0) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+    // Configuración oficial del proyecto Firebase: erp-plus-business
+    const firebaseConfig = {
+      apiKey: "AIzaSyCP6mRu4WE19LHgHMHBdJEs3Uoc2n1gT1E",
+      authDomain: "erp-plus-business.firebaseapp.com",
+      projectId: "erp-plus-business",
+      storageBucket: "erp-plus-business.firebasestorage.app",
+      messagingSenderId: "1064071375061",
+      appId: "1:1064071375061:web:d94b89a4ee78f740ec1a5c"
+    };
+
+    // Inicialización global de Firebase App
+    const app = initializeApp(firebaseConfig);
+    window.firebaseApp = app;
+  </script>
 
   <!-- JS Scripts (MVVM ViewModels & Atomic Component Loader) -->
   <script src="js/app-viewmodel.js"></script>
