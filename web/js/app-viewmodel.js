@@ -141,8 +141,12 @@ class ScreenshotCarouselViewModel {
         tabs.forEach((tab, idx) => {
             if (idx === this.currentIndex) {
                 tab.className = "preview-tab active px-3 py-1.5 rounded-lg bg-purple-600/40 text-purple-200 border border-purple-400/50 font-semibold transition-all whitespace-nowrap shadow-lg shadow-purple-900/40 scale-105";
-                // Asegurar que la pestaña activa sea visible en scroll horizontal
-                tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                // Centrar la pestaña dentro de su contenedor de pestañas sin desplazar la ventana del usuario
+                const container = tab.parentElement;
+                if (container) {
+                    const scrollLeftGoal = tab.offsetLeft - (container.clientWidth / 2) + (tab.clientWidth / 2);
+                    container.scrollTo({ left: scrollLeftGoal, behavior: 'smooth' });
+                }
             } else {
                 tab.className = "preview-tab px-3 py-1.5 rounded-lg bg-slate-800/80 text-slate-400 hover:text-white border border-white/5 font-medium transition-all whitespace-nowrap opacity-80 hover:opacity-100";
             }
