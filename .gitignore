@@ -6,6 +6,7 @@
 /target/maven-status/
 /target/test-classes/
 .._.._.._.._.m2-tmp*
+out/
 
 db/
 *.deb
@@ -15,5 +16,6 @@ config.properties
 .vscode/
 .idea/
 *.iml
+
 
 
