@@ -1,0 +1,39 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Reglas de Seguridad Robustas para la Colección 'reviews' de ERP+ Business
+    match /reviews/{reviewId} {
+      
+      // 1. LECTURA PÚBLICA:
+      // Cualquier persona puede LEER una reseña únicamente si está marcada como pública ('visibility == public').
+      allow read: if resource.data.visibility == 'public';
+
+      // 2. CREACIÓN SEGURA (Sin requerir autenticación previa de usuario):
+      // Permite a cualquier visitante o cliente enviar su opinión con validación estricta de estructura:
+      allow create: if 
+        // A. Validar que la reseña contenga exactamente los campos permitidos (Evita inyección de campos maliciosos)
+        request.resource.data.keys().hasOnly(['author', 'comment', 'rating', 'visibility', 'createdAt']) &&
+        
+        // B. Validar tipos de datos y restricciones de longitud (Evita saturación / DoS)
+        request.resource.data.author is string &&
+        request.resource.data.author.size() > 0 &&
+        request.resource.data.author.size() <= 100 &&
+        
+        request.resource.data.comment is string &&
+        request.resource.data.comment.size() > 0 &&
+        request.resource.data.comment.size() <= 1000 &&
+        
+        request.resource.data.rating is int &&
+        request.resource.data.rating >= 1 &&
+        request.resource.data.rating <= 5 &&
+        
+        request.resource.data.visibility in ['public', 'private'];
+
+      // 3. INMUTABILIDAD Y PROTECCIÓN DE DATOS:
+      // Nadie puede EDITAR ni BORRAR las opiniones enviadas desde el cliente.
+      allow update, delete: if false;
+    }
+  }
+}
